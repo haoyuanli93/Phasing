@@ -2,17 +2,16 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/obselete/HIO-GPU-dev.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/GPU-Dev.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/GPU-Dev.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/HIO-GPU-dev.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/src/HIO-GPU-dev.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Line Search.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/Line Search.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Phasing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/Phasing.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Test body.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/Test body.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/backups.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/backups.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/cpu_numba-dev.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/cpu_numba-dev.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/prepare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/prepare.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/util.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/setup.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obselete/GPU-Dev.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/GPU-Dev.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obselete/HIO-GPU-dev.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/HIO-GPU-dev.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obselete/Phasing.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/Phasing.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obselete/backups.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/backups.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obselete/cpu_numba-dev.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/cpu_numba-dev.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/obselete/prepare.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/obselete/prepare.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/HIO-GPU-dev.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/phase/HIO-GPU-dev.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/tests/samples/Albert_Einstein_Head.jpg" beforeDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="TRACKING_ENABLED" value="true" />
@@ -25,12 +24,41 @@
     <SUITE FILE_PATH="coverage/Phasing$Phasing.coverage" NAME="Phasing Coverage Results" MODIFIED="1539806579822" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file leaf-file-name="HIO-GPU-dev.ipynb" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/HIO-GPU-dev.ipynb">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="Phasing.ipynb" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/obselete/Phasing.ipynb">
           <provider selected="true" editor-type-id="ipnb-editor">
             <state>
-              <selected id="1" />
+              <selected id="7" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="prepare.ipynb" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/obselete/prepare.ipynb">
+          <provider selected="true" editor-type-id="ipnb-editor">
+            <state>
+              <selected id="0" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="util.py" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/obselete/util.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state>
+              <folding>
+                <element signature="e#0#31#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="backups.ipynb" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/obselete/backups.ipynb">
+          <provider selected="true" editor-type-id="ipnb-editor">
+            <state>
+              <selected id="0" />
             </state>
           </provider>
         </entry>
@@ -41,6 +69,7 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="Jupyter Notebook" />
+        <option value="Python Script" />
       </list>
     </option>
   </component>
@@ -51,6 +80,10 @@
     <option name="CHANGED_PATHS">
       <list>
         <option value="$PROJECT_DIR$/src/HIO-GPU-dev.ipynb" />
+        <option value="$PROJECT_DIR$/obselete/cpu_numba-dev.ipynb" />
+        <option value="$PROJECT_DIR$/setup.py" />
+        <option value="$PROJECT_DIR$/phase/HIO-GPU-dev.ipynb" />
+        <option value="$PROJECT_DIR$/obselete/backups.ipynb" />
       </list>
     </option>
   </component>
@@ -82,18 +115,12 @@
             <path>
               <item name="Phasing" type="b2602c69:ProjectViewProjectNode" />
               <item name="Phasing" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
+              <item name="obselete" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="Phasing" type="b2602c69:ProjectViewProjectNode" />
               <item name="Phasing" type="462c0819:PsiDirectoryNode" />
-              <item name="tests" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="Phasing" type="b2602c69:ProjectViewProjectNode" />
-              <item name="Phasing" type="462c0819:PsiDirectoryNode" />
-              <item name="tests" type="462c0819:PsiDirectoryNode" />
-              <item name="samples" type="462c0819:PsiDirectoryNode" />
+              <item name="phase" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -104,7 +131,7 @@
   </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Arsenal" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="com.jetbrains.python.configuration.PyActiveSdkModuleConfigurable" />
@@ -135,7 +162,7 @@
       <envs>
         <env name="PYTHONUNBUFFERED" value="1" />
       </envs>
-      <option name="SDK_HOME" value="" />
+      <option name="SDK_HOME" value="C:\Users\haoyu\Anaconda3\envs\spipy3\python.exe" />
       <option name="WORKING_DIRECTORY" value="" />
       <option name="IS_MODULE_SDK" value="false" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
@@ -160,30 +187,30 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-8" y="-8" width="1874" height="1096" extended-state="6" />
+    <frame x="-8" y="-8" width="1936" height="1096" extended-state="6" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="bottom" id="Event Log" side_tool="true" />
-      <window_info anchor="bottom" id="Database Changes" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
+      <window_info anchor="bottom" id="Database Changes" order="7" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Version Control" order="7" />
+      <window_info anchor="bottom" id="Python Console" order="7" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32925585" />
-      <window_info anchor="bottom" id="Version Control" />
-      <window_info anchor="bottom" id="Python Console" />
-      <window_info anchor="bottom" id="Terminal" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2497309" />
-      <window_info anchor="bottom" id="Docker" show_stripe_button="false" />
-      <window_info anchor="right" id="Database" />
-      <window_info anchor="right" id="SciView" />
+      <window_info anchor="bottom" id="Terminal" order="7" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.14322917" />
+      <window_info anchor="bottom" id="Docker" order="7" show_stripe_button="false" />
+      <window_info anchor="right" id="Database" order="3" />
+      <window_info anchor="right" id="SciView" order="3" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
+      <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info id="Favorites" side_tool="true" />
-      <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" />
     </layout>
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -193,7 +220,74 @@
     <option name="myLimit" value="2678400000" />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/obselete/HIO-GPU-dev.ipynb">
+    <entry file="file://$PROJECT_DIR$/obselete/Phasing.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/prepare.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/backups.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/Phasing.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/prepare.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/backups.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/Phasing.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/HIO-GPU-dev.ipynb">
       <provider selected="true" editor-type-id="ipnb-editor">
         <state>
           <selected id="0" />
@@ -207,10 +301,78 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/HIO-GPU-dev.ipynb">
+    <entry file="file://$PROJECT_DIR$/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="57">
+          <caret line="3" column="15" selection-start-line="3" selection-start-column="15" selection-end-line="3" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="190">
+            <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/HIO-GPU-dev.ipynb">
       <provider selected="true" editor-type-id="ipnb-editor">
         <state>
-          <selected id="1" />
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/HIO-GPU-dev.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/cpu_numba-dev.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/GPU-Dev.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/prepare.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state>
+          <folding>
+            <element signature="e#0#31#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/backups.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/obselete/Phasing.ipynb">
+      <provider selected="true" editor-type-id="ipnb-editor">
+        <state>
+          <selected id="7" />
         </state>
       </provider>
     </entry>
