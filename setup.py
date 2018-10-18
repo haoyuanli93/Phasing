@@ -15,7 +15,9 @@ setup(
     packages=["phase", ],
     install_requires=['numpy',
                       'matplotlib',
-                      'h5py'],
+                      'h5py',
+                      'numba',
+                      'cudatoolkit'],
     platforms=["Linux"],
     url='https://github.com/haoyuanli93/DiffusionMap'
 )
