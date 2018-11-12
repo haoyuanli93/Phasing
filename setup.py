@@ -17,7 +17,8 @@ setup(
                       'matplotlib',
                       'h5py',
                       'numba',
-                      'cudatoolkit'],
+                      'cudatoolkit',
+                      'pyculib'],
     platforms=["Linux"],
     url='https://github.com/haoyuanli93/DiffusionMap'
 )
