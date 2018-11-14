@@ -3,10 +3,6 @@
   <component name="ChangeListManager">
     <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="minor">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-GPU-dev-2-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-GPU-dev-2-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/HIO-GPU-dev-2.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/HIO-GPU-dev-2.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/gpuutil-2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpuutil2d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/util.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -21,10 +17,10 @@
     <session id="1748234190">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="2" />
+          <entry key="project.closed" value="3" />
           <entry key="project.open.time.0" value="1" />
-          <entry key="project.open.time.3" value="2" />
-          <entry key="project.opened" value="3" />
+          <entry key="project.open.time.3" value="3" />
+          <entry key="project.opened" value="4" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -66,8 +62,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/phase/util.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="287">
-              <caret line="46" column="21" lean-forward="true" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
+            <state relative-caret-position="1012">
+              <caret line="46" column="21" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
               <folding>
                 <marker date="1542152747490" expanded="true" signature="296:305" ph="..." />
                 <marker date="1542152747490" expanded="true" signature="1223:1224" ph="..." />
@@ -81,7 +77,7 @@
         <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="617">
-              <caret line="209" column="80" lean-forward="true" selection-start-line="209" selection-start-column="80" selection-end-line="209" selection-end-column="80" />
+              <caret line="209" column="80" selection-start-line="209" selection-start-column="80" selection-end-line="209" selection-end-column="80" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
                 <marker date="1542153518855" expanded="true" signature="6409:6414" ph="..." />
@@ -156,7 +152,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
+  <component name="ProjectFrameBounds" extendedState="6">
     <option name="width" value="1920" />
     <option name="height" value="1080" />
   </component>
@@ -248,7 +244,14 @@
       <option name="project" value="LOCAL" />
       <updated>1542080946010</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="minor">
+      <created>1542153630067</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1542153630067</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TodoView">
@@ -261,10 +264,10 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="0" y="0" width="1536" height="864" extended-state="6" />
+    <frame x="-7" y="-7" width="1488" height="878" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.14295302" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.15126051" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.50201344" side_tool="true" weight="0.14705883" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -393,17 +396,10 @@
     <entry file="file://$PROJECT_DIR$/phase/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
-    <entry file="file://$PROJECT_DIR$/setup.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="308">
-          <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/phase/util.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="287">
-          <caret line="46" column="21" lean-forward="true" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
+        <state relative-caret-position="1012">
+          <caret line="46" column="21" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
           <folding>
             <marker date="1542152747490" expanded="true" signature="296:305" ph="..." />
             <marker date="1542152747490" expanded="true" signature="1223:1224" ph="..." />
@@ -412,10 +408,17 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/setup.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="308">
+          <caret line="14" column="25" selection-start-line="14" selection-start-column="25" selection-end-line="14" selection-end-column="25" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="617">
-          <caret line="209" column="80" lean-forward="true" selection-start-line="209" selection-start-column="80" selection-end-line="209" selection-end-column="80" />
+          <caret line="209" column="80" selection-start-line="209" selection-start-column="80" selection-end-line="209" selection-end-column="80" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
             <marker date="1542153518855" expanded="true" signature="6409:6414" ph="..." />
