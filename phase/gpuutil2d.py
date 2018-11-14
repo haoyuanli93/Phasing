@@ -139,7 +139,8 @@ def cast_to_complex(shape_0, shape_1, real_part, complex_array):
         complex_array[i, j] = real_part[i, j] + 0j
 
 
-@cuda.jit('void(int64, int64, int64, float64[:,:], float64[:,:], float64[:,:])')
+@cuda.jit(str('void(int64, int64[:], int64[:],' +
+              'float64[:,:], float64[:,:], float64[:,:])'))
 def apply_filter(f_range, filter_start,
                  filter_end, filter_array,
                  raw_data, new_data):
@@ -158,7 +159,8 @@ def apply_filter(f_range, filter_start,
     """
     i, j = cuda.grid(2)
 
-    if filter_start < i < filter_end and filter_start < j < filter_end:
+    if (filter_start[0] < i < filter_end[0]
+            and filter_start[1] < j < filter_end[1]):
 
         # initialize the value
         new_data[i, j] = 0
@@ -208,3 +210,31 @@ def combine_two_supports(shape_0, shape_1,
 
     if i < shape_0 and j < shape_1:
         output_support[i, j] = (input_support_1[i, j] and input_support_2[i, j])
+
+
+@cuda.jit('void(float64[:], float64[:,:])')
+def get_max_2d(result, values):
+    """
+    Get the max value from the array
+
+    :param result:
+    :param values:
+    :return:
+    """
+    i, j = cuda.grid(2)
+    # Atomically store to result[0] from values[i, j]
+    cuda.atomic.max(result, 0, values[i, j])
+
+
+@cuda.jit('void(float64[:], float64[:,:,:])')
+def get_max_3d(result, values):
+    """
+    Get the max value from the array
+
+    :param result:
+    :param values:
+    :return:
+    """
+    i, j, k = cuda.grid(3)
+    # Atomically store to result[0] from values[i, j]
+    cuda.atomic.max(result, 0, values[i, j, k])

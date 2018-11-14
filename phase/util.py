@@ -47,7 +47,9 @@ def get_gaussian_filter(extend, sigma, dimension):
     :param dimension:
     :return:
     """
-    coor = np.meshgrid(*tuple((np.arange(-extend, extend + 1),) * dimension))
+    coor = np.meshgrid(*tuple((np.arange(-extend,
+                                         extend + 1,
+                                         dtype=np.float64),) * dimension))
 
     holder = np.square(coor[0])
     for l in range(1, dimension):
