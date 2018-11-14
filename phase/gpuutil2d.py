@@ -67,6 +67,38 @@ def apply_diffraction_constrain(shape_0, shape_1, diffraction_constrain,
                                                  guess_diffraction[i, j])))
 
 
+@cuda.jit('void(int64, int64, complex128[:,:],' +
+          'complex128[:,:], complex128[:,:], boolean[:,:])')
+def apply_diffraction_constrain_mask(shape_0, shape_1,
+                                     diffraction_constrain,
+                                     guess_diffraction,
+                                     magnitude_constrain_pattern,
+                                     reciprocal_mask):
+    """
+    Apply the diffraction constrain with mask in the reciprocal space.
+
+    :param shape_0:
+    :param shape_1:
+    :param diffraction_constrain:
+    :param guess_diffraction:
+    :param magnitude_constrain_pattern:
+    :param reciprocal_mask:
+    :return:
+    """
+    # Get grid index
+    i, j = cuda.grid(2)
+
+    # Make sure that the grid is not out of the pattern
+    if i < shape_0 and j < shape_1:
+
+        if reciprocal_mask[i, j]:
+            # Keep the phase from the guess and
+            # apply the constrain from the diffraction pattern
+            magnitude_constrain_pattern[i, j] = (diffraction_constrain[i, j] *
+                                                 cmath.exp(1j * cmath.phase(
+                                                     guess_diffraction[i, j])))
+
+
 @cuda.jit('void(int64, int64, float64[:,:], complex128[:,:])')
 def get_real_part(shape_0, shape_1, real_part, complex_array):
     """
@@ -107,7 +139,7 @@ def cast_to_complex(shape_0, shape_1, real_part, complex_array):
         complex_array[i, j] = real_part[i, j] + 0j
 
 
-@cuda.jit('void(int64, int64, int64, float64[:], float64[:,:]')
+@cuda.jit('void(int64, int64, int64, float64[:,:], float64[:,:], float64[:,:])')
 def apply_filter(f_range, filter_start,
                  filter_end, filter_array,
                  raw_data, new_data):
@@ -124,7 +156,7 @@ def apply_filter(f_range, filter_start,
     :param new_data: The variable to hold the processed array.
     :return:
     """
-    i, j = cuda.grid()
+    i, j = cuda.grid(2)
 
     if filter_start < i < filter_end and filter_start < j < filter_end:
 
@@ -138,7 +170,7 @@ def apply_filter(f_range, filter_start,
                                    raw_data[i + l, j + m])
 
 
-@cuda.jit('void(int64, int64, float64[:,:], boolean[:,:]')
+@cuda.jit('void(int64, int64, float64[:,:], float64, boolean[:,:])')
 def take_threshold(shape_0, shape_1, raw_data, threshold, new_data):
     """
     The difference map needs to use a threshold to generate a new support.
@@ -150,16 +182,16 @@ def take_threshold(shape_0, shape_1, raw_data, threshold, new_data):
     :param new_data:
     :return:
     """
-    i, j = cuda.grid()
+    i, j = cuda.grid(2)
 
     if i < shape_0 and j < shape_1:
         if raw_data[i, j] > threshold:
             new_data[i, j] = True
 
 
-@cuda.jit('void(int64, int64, boolean[:,:], boolean[:,:]')
-def combine_two_masks(shape_0, shape_1,
-                      input_support_1, input_support_2, output_support):
+@cuda.jit('void(int64, int64, boolean[:,:], boolean[:,:], boolean[:,:])')
+def combine_two_supports(shape_0, shape_1,
+                         input_support_1, input_support_2, output_support):
     """
     Sometimes, the user might know something about the support.
     This function do an element-wise and on the two input boolean array
@@ -172,7 +204,7 @@ def combine_two_masks(shape_0, shape_1,
     :param output_support:
     :return:
     """
-    i, j = cuda.grid()
+    i, j = cuda.grid(2)
 
     if i < shape_0 and j < shape_1:
         output_support[i, j] = (input_support_1[i, j] and input_support_2[i, j])

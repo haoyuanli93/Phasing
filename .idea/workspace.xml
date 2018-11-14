@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="">
+    <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="minor">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/gpuutil.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpuutil-2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-GPU-dev-2-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-GPU-dev-2-checkpoint.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/notebooks/HIO-GPU-dev-2.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/HIO-GPU-dev-2.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/gpuutil-2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpuutil2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/util.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -18,10 +21,10 @@
     <session id="1748234190">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="1" />
+          <entry key="project.closed" value="2" />
           <entry key="project.open.time.0" value="1" />
-          <entry key="project.open.time.3" value="1" />
-          <entry key="project.opened" value="2" />
+          <entry key="project.open.time.3" value="2" />
+          <entry key="project.opened" value="3" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
@@ -37,14 +40,15 @@
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="4" />
-          <entry key="dummy" value="4" />
-          <entry key="py" value="2503" />
+          <entry key="dummy" value="5" />
+          <entry key="py" value="3787" />
+          <entry key="txt" value="5" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="PLAIN_TEXT" value="4" />
-          <entry key="Python" value="2507" />
+          <entry key="PLAIN_TEXT" value="10" />
+          <entry key="Python" value="3791" />
         </counts>
       </usages-collector>
     </session>
@@ -61,18 +65,27 @@
       </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/phase/util.py">
-          <provider selected="true" editor-type-id="text-editor" />
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="287">
+              <caret line="46" column="21" lean-forward="true" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
+              <folding>
+                <marker date="1542152747490" expanded="true" signature="296:305" ph="..." />
+                <marker date="1542152747490" expanded="true" signature="1223:1224" ph="..." />
+                <marker date="1542152747490" expanded="true" signature="1223:1225" ph="..." />
+              </folding>
+            </state>
+          </provider>
         </entry>
       </file>
       <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/phase/gpuutil-2d.py">
+        <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="419">
-              <caret line="164" column="32" selection-start-line="164" selection-start-column="32" selection-end-line="164" selection-end-column="32" />
+            <state relative-caret-position="617">
+              <caret line="209" column="80" lean-forward="true" selection-start-line="209" selection-start-column="80" selection-end-line="209" selection-end-column="80" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
-                <marker date="1542080894594" expanded="true" signature="5183:5188" ph="..." />
-                <marker date="1542080894594" expanded="true" signature="6034:6039" ph="..." />
+                <marker date="1542153518855" expanded="true" signature="6409:6414" ph="..." />
+                <marker date="1542153518855" expanded="true" signature="7282:7287" ph="..." />
               </folding>
             </state>
           </provider>
@@ -105,6 +118,8 @@
       <find>filter_half_length</find>
       <find>_2d</find>
       <find>mask</find>
+      <find>grid</find>
+      <find>grid()</find>
     </findStrings>
     <replaceStrings>
       <replace>filter_half_length</replace>
@@ -113,6 +128,7 @@
       <replace>new_data</replace>
       <replace>f_range</replace>
       <replace>support</replace>
+      <replace>grid(2)</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -127,9 +143,10 @@
         <option value="$PROJECT_DIR$/obselete/backups.ipynb" />
         <option value="$PROJECT_DIR$/phase/__init__.py" />
         <option value="$PROJECT_DIR$/setup.py" />
-        <option value="$PROJECT_DIR$/phase/util.py" />
         <option value="$PROJECT_DIR$/phase/gpuutil.py" />
         <option value="$PROJECT_DIR$/phase/gpuutil-2d.py" />
+        <option value="$PROJECT_DIR$/phase/util.py" />
+        <option value="$PROJECT_DIR$/phase/gpuutil2d.py" />
       </list>
     </option>
   </component>
@@ -148,7 +165,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -165,6 +181,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -224,6 +241,14 @@
       <option name="presentableId" value="Default" />
       <updated>1539804045717</updated>
     </task>
+    <task id="LOCAL-00001" summary="minor">
+      <created>1542080946010</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1542080946010</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TodoView">
@@ -239,7 +264,7 @@
     <frame x="0" y="0" width="1536" height="864" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.1409396" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.14295302" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.50201344" side_tool="true" weight="0.14705883" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -264,7 +289,7 @@
     <layout-to-restore>
       <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.14705883" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
-      <window_info id="Favorites" order="2" sideWeight="0.50201344" side_tool="true" visible="true" weight="0.14705883" />
+      <window_info id="Favorites" order="2" sideWeight="0.50201344" side_tool="true" weight="0.14705883" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32925585" />
@@ -290,6 +315,10 @@
   </component>
   <component name="VcsContentAnnotationSettings">
     <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="minor" />
+    <option name="LAST_COMMIT_MESSAGE" value="minor" />
   </component>
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/outdate/Line Search.ipynb">
@@ -361,6 +390,9 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/phase/__init__.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
     <entry file="file://$PROJECT_DIR$/setup.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="308">
@@ -368,20 +400,26 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/phase/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
     <entry file="file://$PROJECT_DIR$/phase/util.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/phase/gpuutil-2d.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="419">
-          <caret line="164" column="32" selection-start-line="164" selection-start-column="32" selection-end-line="164" selection-end-column="32" />
+        <state relative-caret-position="287">
+          <caret line="46" column="21" lean-forward="true" selection-start-line="46" selection-start-column="21" selection-end-line="46" selection-end-column="21" />
+          <folding>
+            <marker date="1542152747490" expanded="true" signature="296:305" ph="..." />
+            <marker date="1542152747490" expanded="true" signature="1223:1224" ph="..." />
+            <marker date="1542152747490" expanded="true" signature="1223:1225" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="617">
+          <caret line="209" column="80" lean-forward="true" selection-start-line="209" selection-start-column="80" selection-end-line="209" selection-end-column="80" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
-            <marker date="1542080894594" expanded="true" signature="5183:5188" ph="..." />
-            <marker date="1542080894594" expanded="true" signature="6034:6039" ph="..." />
+            <marker date="1542153518855" expanded="true" signature="6409:6414" ph="..." />
+            <marker date="1542153518855" expanded="true" signature="7282:7287" ph="..." />
           </folding>
         </state>
       </provider>
