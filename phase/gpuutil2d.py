@@ -166,25 +166,29 @@ def apply_filter(f_range, filter_start,
         new_data[i, j] = 0
 
         # for loop through the filter to get the value.
-        for l in range(-f_range, f_range):
-            for m in range(-f_range, f_range):
+        for l in range(-f_range, f_range+1):
+            for m in range(-f_range, f_range+1):
                 new_data[i, j] += (filter_array[l + f_range, m + f_range] *
                                    raw_data[i + l, j + m])
 
 
-@cuda.jit('void(int64, int64, float64[:,:], float64, boolean[:,:])')
-def take_threshold(shape_0, shape_1, raw_data, threshold, new_data):
+@cuda.jit('void(int64, int64, float64[:,:], float64[:], float64, boolean[:,:])')
+def take_threshold(shape_0, shape_1, raw_data, max_value, threshold_ratio,
+                   new_data):
     """
     The difference map needs to use a threshold to generate a new support.
 
     :param shape_0:
     :param shape_1:
     :param raw_data:
-    :param threshold:
+    :param max_value:
+    :param threshold_ratio:
     :param new_data:
     :return:
     """
     i, j = cuda.grid(2)
+
+    threshold = max_value[0]*threshold_ratio
 
     if i < shape_0 and j < shape_1:
         if raw_data[i, j] > threshold:
