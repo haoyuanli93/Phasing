@@ -19,7 +19,7 @@ setup(
                       'numba',
                       'cudatoolkit',
                       'pyculib',
-                      'scikit-image'],
+                      'scipy'],
     platforms=["Linux"],
     url='https://github.com/haoyuanli93/DiffusionMap'
 )

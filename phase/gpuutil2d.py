@@ -5,10 +5,10 @@ from numba import cuda
 
 @cuda.jit('void(int64, int64, float64, float64[:,:],' +
           ' boolean[:,:], float64[:,:], float64[:,:])')
-def apply_real_space_constrain_and_update_guess(shape_0, shape_1, beta,
-                                                real_ifft_pattern, mask,
-                                                real_constrain_ifft_pattern,
-                                                guess_real_space):
+def apply_support_constrain(shape_0, shape_1, beta,
+                            real_ifft_pattern, mask,
+                            real_constrain_ifft_pattern,
+                            guess_real_space):
     """
     Apply the HIO update for the patterns.
 
