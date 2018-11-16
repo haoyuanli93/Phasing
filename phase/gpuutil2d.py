@@ -43,8 +43,8 @@ def apply_support_constrain(shape_0, shape_1, beta,
 
 @cuda.jit('void(int64, int64, complex128[:,:],' +
           'complex128[:,:], complex128[:,:])')
-def apply_diffraction_constrain(shape_0, shape_1, diffraction_constrain,
-                                guess_diffraction, magnitude_constrain_pattern):
+def apply_magnitude_constrain(shape_0, shape_1, diffraction_constrain,
+                              guess_diffraction, magnitude_constrain_pattern):
     """
     Apply the diffraction constrain
 
@@ -69,11 +69,11 @@ def apply_diffraction_constrain(shape_0, shape_1, diffraction_constrain,
 
 @cuda.jit('void(int64, int64, complex128[:,:],' +
           'complex128[:,:], complex128[:,:], boolean[:,:])')
-def apply_diffraction_constrain_mask(shape_0, shape_1,
-                                     diffraction_constrain,
-                                     guess_diffraction,
-                                     magnitude_constrain_pattern,
-                                     reciprocal_mask):
+def apply_magnitude_constrain_with_mask(shape_0, shape_1,
+                                        diffraction_constrain,
+                                        guess_diffraction,
+                                        magnitude_constrain_pattern,
+                                        reciprocal_mask):
     """
     Apply the diffraction constrain with mask in the reciprocal space.
 
@@ -166,79 +166,7 @@ def apply_filter(f_range, filter_start,
         new_data[i, j] = 0
 
         # for loop through the filter to get the value.
-        for l in range(-f_range, f_range+1):
-            for m in range(-f_range, f_range+1):
+        for l in range(-f_range, f_range + 1):
+            for m in range(-f_range, f_range + 1):
                 new_data[i, j] += (filter_array[l + f_range, m + f_range] *
                                    raw_data[i + l, j + m])
-
-
-@cuda.jit('void(int64, int64, float64[:,:], float64[:], float64, boolean[:,:])')
-def take_threshold(shape_0, shape_1, raw_data, max_value, threshold_ratio,
-                   new_data):
-    """
-    The difference map needs to use a threshold to generate a new support.
-
-    :param shape_0:
-    :param shape_1:
-    :param raw_data:
-    :param max_value:
-    :param threshold_ratio:
-    :param new_data:
-    :return:
-    """
-    i, j = cuda.grid(2)
-
-    threshold = max_value[0]*threshold_ratio
-
-    if i < shape_0 and j < shape_1:
-        if raw_data[i, j] > threshold:
-            new_data[i, j] = True
-
-
-@cuda.jit('void(int64, int64, boolean[:,:], boolean[:,:], boolean[:,:])')
-def combine_two_supports(shape_0, shape_1,
-                         input_support_1, input_support_2, output_support):
-    """
-    Sometimes, the user might know something about the support.
-    This function do an element-wise and on the two input boolean array
-    The result is saved to the output_support
-
-    :param shape_0:
-    :param shape_1:
-    :param input_support_1:
-    :param input_support_2:
-    :param output_support:
-    :return:
-    """
-    i, j = cuda.grid(2)
-
-    if i < shape_0 and j < shape_1:
-        output_support[i, j] = (input_support_1[i, j] and input_support_2[i, j])
-
-
-@cuda.jit('void(float64[:], float64[:,:])')
-def get_max_2d(result, values):
-    """
-    Get the max value from the array
-
-    :param result:
-    :param values:
-    :return:
-    """
-    i, j = cuda.grid(2)
-    # Atomically store to result[0] from values[i, j]
-    cuda.atomic.max(result, 0, values[i, j])
-
-
-@cuda.jit('void(float64[:], float64[:,:,:])')
-def get_max_3d(result, values):
-    """
-    Get the max value from the array
-
-    :param result:
-    :param values:
-    :return:
-    """
-    i, j, k = cuda.grid(3)
-    # Atomically store to result[0] from values[i, j]
-    cuda.atomic.max(result, 0, values[i, j, k])
