@@ -2,18 +2,21 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="dev">
-      <change afterPath="$PROJECT_DIR$/phase/testutil.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-GPU-dev-3-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-GPU-dev-4-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-GPU-dev-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/HIO-GPU-dev-3.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/HIO-GPU-dev-4.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/HIO-GPU-dev.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/HIO-GPU-dev.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/Test body.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/outdate/Test body.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/cpuutil.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/cpuutil.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/.ipynb_checkpoints/HIO-GPU-dev-0-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/.ipynb_checkpoints/HIO-GPU-dev-3-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/.ipynb_checkpoints/Test body-checkpoint.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/GPU-Dev.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/HIO-GPU-dev-0.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/HIO-GPU-dev-2.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/HIO-GPU-dev-3.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/Test body.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/coordinate_grid_flat.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/cpu_numba-dev.ipynb" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/momentum_grid.npy" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/outdate/util.py" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/phase/gpualgorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpualgorithms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/gpuutil2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpuutil2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/testutil.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/testutil.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -24,6 +27,7 @@
   <component name="CoverageDataManager">
     <SUITE FILE_PATH="coverage/Phasing$Phasing.coverage" NAME="Phasing Coverage Results" MODIFIED="1542218671860" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="" />
     <SUITE FILE_PATH="coverage/Phasing$gpuutil2d.coverage" NAME="gpuutil2d Coverage Results" MODIFIED="1542230142485" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/phase" />
+    <SUITE FILE_PATH="coverage/Phasing$testutil.coverage" NAME="testutil Coverage Results" MODIFIED="1542662438307" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$/phase" />
   </component>
   <component name="DatabaseView">
     <option name="SHOW_INTERMEDIATE" value="true" />
@@ -45,35 +49,35 @@
         <counts>
           <entry key="project.closed" value="12" />
           <entry key="project.open.time.0" value="1" />
-          <entry key="project.open.time.3" value="6" />
+          <entry key="project.open.time.3" value="7" />
           <entry key="project.open.time.4" value="4" />
-          <entry key="project.opened" value="12" />
+          <entry key="project.opened" value="13" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="ipynb" value="2" />
-          <entry key="py" value="13" />
+          <entry key="py" value="14" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="IPNB" value="2" />
-          <entry key="Python" value="13" />
+          <entry key="Python" value="14" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="4" />
           <entry key="dummy" value="8" />
-          <entry key="py" value="9680" />
+          <entry key="py" value="12294" />
           <entry key="txt" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="17" />
-          <entry key="Python" value="9684" />
+          <entry key="Python" value="12298" />
         </counts>
       </usages-collector>
     </session>
@@ -103,19 +107,6 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/phase/gpualgorithms.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-8339">
-              <caret line="75" column="93" lean-forward="true" selection-start-line="75" selection-start-column="93" selection-end-line="75" selection-end-column="93" />
-              <folding>
-                <element signature="e#0#22#0" expanded="true" />
-                <marker date="1542655429285" expanded="true" signature="2651:2652" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/phase/cpuutil.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="22">
@@ -124,13 +115,14 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/phase/testutil.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-331">
-              <caret line="45" selection-start-line="45" selection-end-line="45" />
+            <state relative-caret-position="639">
+              <caret line="185" column="61" selection-start-line="185" selection-start-column="61" selection-end-line="185" selection-end-column="61" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
+                <marker date="1542662571843" expanded="true" signature="5267:5268" ph="..." />
               </folding>
             </state>
           </provider>
@@ -139,8 +131,20 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="352">
-              <caret line="91" column="12" lean-forward="true" selection-start-line="91" selection-start-column="12" selection-end-line="91" selection-end-column="12" />
+            <state relative-caret-position="-615">
+              <caret line="91" column="12" selection-start-line="91" selection-start-column="12" selection-end-line="91" selection-end-column="12" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3037">
+              <caret line="139" lean-forward="true" selection-start-line="139" selection-end-line="139" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -160,7 +164,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>_2d</find>
       <find>mask</find>
       <find>grid</find>
       <find>grid()</find>
@@ -190,9 +193,9 @@
       <find>real_part</find>
       <find>magnitude_constrain_pattern</find>
       <find>diffract_field_complex</find>
+      <find>asanyarray</find>
     </findStrings>
     <replaceStrings>
-      <replace>support</replace>
       <replace>grid(2)</replace>
       <replace>mask_ib</replace>
       <replace>r_stop</replace>
@@ -222,6 +225,7 @@
       <replace>real_array</replace>
       <replace>diffract_with_magnitude_constrain</replace>
       <replace>diffract_no_magnitude_constrain</replace>
+      <replace>ascontiguousarray</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -243,10 +247,10 @@
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/phase/gpuutil3d.py" />
         <option value="$PROJECT_DIR$/outdate/function.py" />
-        <option value="$PROJECT_DIR$/phase/gpuutil2d.py" />
         <option value="$PROJECT_DIR$/phase/cpuutil.py" />
-        <option value="$PROJECT_DIR$/phase/testutil.py" />
         <option value="$PROJECT_DIR$/phase/gpualgorithms.py" />
+        <option value="$PROJECT_DIR$/phase/gpuutil2d.py" />
+        <option value="$PROJECT_DIR$/phase/testutil.py" />
       </list>
     </option>
   </component>
@@ -256,7 +260,7 @@
     <detection-done>true</detection-done>
     <sorting>DEFINITION_ORDER</sorting>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="6" fullScreen="true">
     <option name="width" value="1920" />
     <option name="height" value="1080" />
   </component>
@@ -320,7 +324,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.gpuutil2d">
+  <component name="RunManager" selected="Python.testutil">
     <configuration name="Phasing" type="JupiterNotebook" factoryName="Jupyter Notebook">
       <module name="Phasing" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -361,12 +365,36 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
+    <configuration name="testutil" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Phasing" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/phase" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/phase/testutil.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
     <list>
       <item itemvalue="Jupyter Notebook.Phasing" />
       <item itemvalue="Python.gpuutil2d" />
+      <item itemvalue="Python.testutil" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.testutil" />
         <item itemvalue="Python.gpuutil2d" />
       </list>
     </recent_temporary>
@@ -416,13 +444,14 @@
     </todo-panel>
   </component>
   <component name="ToolWindowManager">
-    <frame x="-7" y="-7" width="1488" height="878" extended-state="6" />
+    <frame x="0" y="0" width="1536" height="864" extended-state="6" />
+    <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.18067227" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.17583893" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.50201344" side_tool="true" weight="0.14705883" />
       <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32858992" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32844934" />
       <window_info anchor="bottom" id="Debug" order="2" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="3" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="4" weight="0.4" />
@@ -438,7 +467,7 @@
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="right" id="SciView" order="3" weight="0.3295302" />
       <window_info anchor="right" id="Database" order="4" weight="0.32913166" />
-      <window_info anchor="right" x="47" y="9" width="1442" height="846" id="Run" order="5" sideWeight="0.4992997" type="FLOATING" weight="0.6054334" />
+      <window_info anchor="right" x="705" y="378" width="644" height="284" id="Run" order="5" sideWeight="0.4992997" type="FLOATING" weight="0.6054334" />
     </layout>
     <layout-to-restore>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.15126051" />
@@ -493,20 +522,8 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/notebooks/HIO-GPU-dev.ipynb">
-      <provider selected="true" editor-type-id="ipnb-editor">
-        <state>
-          <selected id="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/outdate/HIO-GPU-dev.ipynb">
-      <provider selected="true" editor-type-id="ipnb-editor">
-        <state>
-          <selected id="0" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/notebooks/HIO-GPU-dev.ipynb" />
+    <entry file="file://$PROJECT_DIR$/outdate/HIO-GPU-dev.ipynb" />
     <entry file="file://$PROJECT_DIR$/outdate/cpu_numba-dev.ipynb">
       <provider selected="true" editor-type-id="ipnb-editor">
         <state>
@@ -559,21 +576,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/phase/__init__.py">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/phase/util.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="396">
-          <caret line="18" selection-start-line="18" selection-end-line="18" />
-          <folding>
-            <marker date="1542230834848" expanded="true" signature="296:305" ph="..." />
-            <marker date="1542230834848" expanded="true" signature="1223:1224" ph="..." />
-            <marker date="1542230834848" expanded="true" signature="1223:1225" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/outdate/function.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="593">
@@ -588,43 +590,54 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
+    <entry file="file://$PROJECT_DIR$/phase/__init__.py">
+      <provider selected="true" editor-type-id="text-editor" />
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/gpualgorithms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="681">
-          <caret line="160" selection-start-line="160" selection-end-line="160" />
+        <state relative-caret-position="1364">
+          <caret line="888" column="74" selection-start-line="888" selection-start-column="74" selection-end-line="888" selection-end-column="74" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#0#22#0" expanded="true" />
+            <element signature="e#718#12546#0" />
+            <element signature="e#13067#25098#0" />
+            <element signature="e#25395#35058#0" />
+            <element signature="e#35354#45208#0" />
+            <element signature="e#45754#55770#0" />
+            <element signature="e#56174#66028#0" />
+            <marker date="1542661321525" expanded="true" signature="3091:3092" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="396">
+          <caret line="18" selection-start-line="18" selection-end-line="18" />
+          <folding>
+            <marker date="1542230834848" expanded="true" signature="296:305" ph="..." />
+            <marker date="1542230834848" expanded="true" signature="1223:1224" ph="..." />
+            <marker date="1542230834848" expanded="true" signature="1223:1225" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="352">
-          <caret line="91" column="12" lean-forward="true" selection-start-line="91" selection-start-column="12" selection-end-line="91" selection-end-column="12" />
+        <state relative-caret-position="-615">
+          <caret line="91" column="12" selection-start-line="91" selection-start-column="12" selection-end-line="91" selection-end-column="12" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/phase/gpualgorithms.py">
+    <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-8339">
-          <caret line="75" column="93" lean-forward="true" selection-start-line="75" selection-start-column="93" selection-end-line="75" selection-end-column="93" />
+        <state relative-caret-position="3037">
+          <caret line="139" lean-forward="true" selection-start-line="139" selection-end-line="139" />
           <folding>
-            <element signature="e#0#22#0" expanded="true" />
-            <marker date="1542655429285" expanded="true" signature="2651:2652" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/phase/testutil.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-331">
-          <caret line="45" selection-start-line="45" selection-end-line="45" />
-          <folding>
-            <element signature="e#0#18#0" expanded="true" />
+            <element signature="e#0#12#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -633,6 +646,17 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="22">
           <caret line="1" selection-start-line="1" selection-end-line="1" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/testutil.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="639">
+          <caret line="185" column="61" selection-start-line="185" selection-start-column="61" selection-end-line="185" selection-end-column="61" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <marker date="1542662571843" expanded="true" signature="5267:5268" ph="..." />
+          </folding>
         </state>
       </provider>
     </entry>

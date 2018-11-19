@@ -137,36 +137,3 @@ def cast_to_complex(shape_0, shape_1, real_part, complex_array):
     # Make sure that the grid is not out of the pattern
     if i < shape_0 and j < shape_1:
         complex_array[i, j] = real_part[i, j] + 0j
-
-
-@cuda.jit(str('void(int64, int64[:], int64[:],' +
-              'float64[:,:], float64[:,:], float64[:,:])'))
-def apply_filter(f_range, filter_start,
-                 filter_end, filter_array,
-                 raw_data, new_data):
-    """
-    This function apply the filter to the raw pattern and saves the processed
-    pattern to the new_data variable.
-
-    :param f_range: Assume that the shape of the filter array is [2n+1, 2n+1]
-                    Then f_range = n
-    :param filter_start: the first index to process
-    :param filter_end: the last index to process
-    :param filter_array: The 2D array containing the filter
-    :param raw_data: The raw pattern array to process
-    :param new_data: The variable to hold the processed array.
-    :return:
-    """
-    i, j = cuda.grid(2)
-
-    if (filter_start[0] < i < filter_end[0]
-            and filter_start[1] < j < filter_end[1]):
-
-        # initialize the value
-        new_data[i, j] = 0
-
-        # for loop through the filter to get the value.
-        for l in range(-f_range, f_range + 1):
-            for m in range(-f_range, f_range + 1):
-                new_data[i, j] += (filter_array[l + f_range, m + f_range] *
-                                   raw_data[i + l, j + m])
