@@ -66,9 +66,14 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
+    # Retrieved diffraction field with phase
+    diffract_no_magnitude_constrain = np.asanyarray(np.zeros_like(magnitude_constrain,
+                                                                  dtype=np.complex128))
+
     # Variable containing the diffraction satisfies the magnitude constrain
-    magnitude_constrain_pattern = np.asanyarray(np.zeros_like(magnitude_constrain,
-                                                              dtype=np.complex128))
+    phase_tmp = np.exp(1j * np.random.rand(shape_0, shape_1) * 2 * np.pi)
+    diffract_with_magnitude_constrain = np.ascontiguousarray(np.multiply(phase_tmp,
+                                                                         magnitude_constrain))
 
     # Variable holding the derived intensity from the complex diffraction field. Notice
     # That this is a complex variable
@@ -93,10 +98,6 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
     density_real_previous = np.asanyarray(np.zeros_like(magnitude_constrain,
                                                         dtype=np.float64))
 
-    # Retrieved diffraction field with phase
-    diffract_field_complex = np.asanyarray(np.zeros_like(magnitude_constrain,
-                                                         dtype=np.complex128))
-
     ###############################################################################################
     # Step 1: Configure the gpu devices
     ###############################################################################################
@@ -120,8 +121,11 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
     gpu_support_bool = cuda.to_device(support_bool)
     gpu_reciprocal_mask = cuda.to_device(reciprocal_mask)
 
+    # Retrieved diffraction field with phase
+    gpu_diffract_no_magnitude_constrain = cuda.to_device(diffract_no_magnitude_constrain)
+
     # Variable containing the diffraction satisfies the magnitude constrain
-    gpu_magnitude_constrain_pattern = cuda.to_device(magnitude_constrain_pattern)
+    gpu_diffract_with_magnitude_constrain = cuda.to_device(diffract_with_magnitude_constrain)
 
     # Variable holding the derived intensity from the complex diffraction field. Notice
     # That this is a complex variable
@@ -141,16 +145,13 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
     # Containing the previous result of the density function with support constrain
     gpu_density_real_previous = cuda.to_device(density_real_previous)
 
-    # Retrieved diffraction field with phase
-    gpu_diffract_field_complex = cuda.to_device(diffract_field_complex)
-
     ###############################################################################################
     # Step 3: Begin calculation
     ###############################################################################################
     # Begin the loop
     for idx in range(iter_num):
 
-        pfft.ifft(ary=gpu_magnitude_constrain_pattern,
+        pfft.ifft(ary=gpu_diffract_with_magnitude_constrain,
                   out=gpu_density_no_constrain_complex)
 
         gpuutil2d.get_real_part[blockspg, threadspb](shape_0,
@@ -177,15 +178,15 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
 
         # Update the guess for the diffraction
         pfft.fft(ary=gpu_density_with_constrain_complex,
-                 out=gpu_diffract_field_complex)
+                 out=gpu_diffract_no_magnitude_constrain)
 
         # apply fourier domain constraints
         gpuutil2d.apply_magnitude_constrain_with_mask[
             blockspg, threadspb](shape_0,
                                  shape_1,
                                  gpu_magnitude_constrain,
-                                 gpu_diffract_field_complex,
-                                 gpu_magnitude_constrain_pattern,
+                                 gpu_diffract_no_magnitude_constrain,
+                                 gpu_diffract_with_magnitude_constrain,
                                  gpu_reciprocal_mask)
 
         # Every 50 iterations, update the estimation of the support
@@ -214,13 +215,13 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
     gpu_support_bool.to_host()
     gpu_reciprocal_mask.to_host()
 
-    gpu_magnitude_constrain_pattern.to_host()
+    gpu_diffract_with_magnitude_constrain.to_host()
     gpu_density_no_constrain_complex.to_host()
     gpu_density_no_constrain_real.to_host()
     gpu_density_with_constrain_real.to_host()
     gpu_density_with_constrain_complex.to_host()
     gpu_density_real_previous.to_host()
-    gpu_diffract_field_complex.to_host()
+    gpu_diffract_no_magnitude_constrain.to_host()
 
     toc = time.time()
     print("It takes {:.2f} seconds to do {} iterations.".format(toc - tic, iter_num))
@@ -232,8 +233,8 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
               'Initial Support': initial_support,
               'Final Support': support_bool,
               'Reconstructed Density': density_with_constrain_real,
-              'Reconstructed Diffraction Field': diffract_field_complex,
-              'Reconstructed Magnitude Field': np.abs(diffract_field_complex),
+              'Reconstructed Diffraction Field': diffract_no_magnitude_constrain,
+              'Reconstructed Magnitude Field': np.abs(diffract_no_magnitude_constrain),
               'Calculation Time (s)': toc - tic,
               'Iteration number': iter_num,
               'Sigma list': sigma_list}
@@ -299,9 +300,14 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
+    # Retrieved diffraction field with phase
+    diffract_no_magnitude_constrain = np.asanyarray(np.zeros_like(magnitude_constrain,
+                                                                  dtype=np.complex128))
+
     # Variable containing the diffraction satisfies the magnitude constrain
-    magnitude_constrain_pattern = np.asanyarray(np.zeros_like(magnitude_constrain,
-                                                              dtype=np.complex128))
+    phase_tmp = np.exp(1j * np.random.rand(shape_0, shape_1, shape_2) * 2 * np.pi)
+    diffract_with_magnitude_constrain = np.ascontiguousarray(np.multiply(phase_tmp,
+                                                                         magnitude_constrain))
 
     # Variable holding the derived intensity from the complex diffraction field. Notice
     # That this is a complex variable
@@ -326,15 +332,11 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
     density_real_previous = np.asanyarray(np.zeros_like(magnitude_constrain,
                                                         dtype=np.float64))
 
-    # Retrieved diffraction field with phase
-    diffract_field_complex = np.asanyarray(np.zeros_like(magnitude_constrain,
-                                                         dtype=np.complex128))
-
     ###############################################################################################
     # Step 1: Configure the gpu devices
     ###############################################################################################
     # Initialize the gpu parameters
-    tpb = 32
+    tpb = 4
 
     # Configure the blocks
 
@@ -354,8 +356,11 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
     gpu_support_bool = cuda.to_device(support_bool)
     gpu_reciprocal_mask = cuda.to_device(reciprocal_mask)
 
+    # Retrieved diffraction field with phase
+    gpu_diffract_no_magnitude_constrain = cuda.to_device(diffract_no_magnitude_constrain)
+
     # Variable containing the diffraction satisfies the magnitude constrain
-    gpu_magnitude_constrain_pattern = cuda.to_device(magnitude_constrain_pattern)
+    gpu_diffract_with_magnitude_constrain = cuda.to_device(diffract_with_magnitude_constrain)
 
     # Variable holding the derived intensity from the complex diffraction field. Notice
     # That this is a complex variable
@@ -375,16 +380,13 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
     # Containing the previous result of the density function with support constrain
     gpu_density_real_previous = cuda.to_device(density_real_previous)
 
-    # Retrieved diffraction field with phase
-    gpu_diffract_field_complex = cuda.to_device(diffract_field_complex)
-
     ###############################################################################################
     # Step 3: Begin calculation
     ###############################################################################################
     # Begin the loop
     for idx in range(iter_num):
 
-        pfft.ifft(ary=gpu_magnitude_constrain_pattern,
+        pfft.ifft(ary=gpu_diffract_with_magnitude_constrain,
                   out=gpu_density_no_constrain_complex)
 
         gpuutil3d.get_real_part[blockspg, threadspb](shape_0,
@@ -414,7 +416,7 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
 
         # Update the guess for the diffraction
         pfft.fft(ary=gpu_density_with_constrain_complex,
-                 out=gpu_diffract_field_complex)
+                 out=gpu_diffract_no_magnitude_constrain)
 
         # apply fourier domain constraints
         gpuutil3d.apply_magnitude_constrain_with_mask[blockspg, threadspb](
@@ -422,8 +424,8 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
             shape_1,
             shape_2,
             gpu_magnitude_constrain,
-            gpu_diffract_field_complex,
-            gpu_magnitude_constrain_pattern,
+            gpu_diffract_no_magnitude_constrain,
+            gpu_diffract_with_magnitude_constrain,
             gpu_reciprocal_mask)
 
         # Every 50 iterations, update the estimation of the support
@@ -452,13 +454,13 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
     gpu_support_bool.to_host()
     gpu_reciprocal_mask.to_host()
 
-    gpu_magnitude_constrain_pattern.to_host()
+    gpu_diffract_with_magnitude_constrain.to_host()
     gpu_density_no_constrain_complex.to_host()
     gpu_density_no_constrain_real.to_host()
     gpu_density_with_constrain_real.to_host()
     gpu_density_with_constrain_complex.to_host()
     gpu_density_real_previous.to_host()
-    gpu_diffract_field_complex.to_host()
+    gpu_diffract_no_magnitude_constrain.to_host()
 
     toc = time.time()
     print("It takes {:.2f} seconds to do {} iterations.".format(toc - tic, iter_num))
@@ -470,8 +472,8 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
               'Initial Support': initial_support,
               'Final Support': support_bool,
               'Reconstructed Density': density_with_constrain_real,
-              'Reconstructed Diffraction Field': diffract_field_complex,
-              'Reconstructed Magnitude Field': np.abs(diffract_field_complex),
+              'Reconstructed Diffraction Field': diffract_no_magnitude_constrain,
+              'Reconstructed Magnitude Field': np.abs(diffract_no_magnitude_constrain),
               'Calculation Time (s)': toc - tic,
               'Iteration number': iter_num,
               'Sigma list': sigma_list}
