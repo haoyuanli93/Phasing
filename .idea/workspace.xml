@@ -2,20 +2,6 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="dev">
-      <change beforePath="$PROJECT_DIR$/outdate/.ipynb_checkpoints/HIO-GPU-dev-0-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/.ipynb_checkpoints/HIO-GPU-dev-3-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/.ipynb_checkpoints/Test body-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/GPU-Dev.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/HIO-GPU-dev-0.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/HIO-GPU-dev-2.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/HIO-GPU-dev-3.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/Test body.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/coordinate_grid_flat.npy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/cpu_numba-dev.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/momentum_grid.npy" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/outdate/util.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/gpualgorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpualgorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/gpuutil2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpuutil2d.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/phase/testutil.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/testutil.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
@@ -70,14 +56,14 @@
         <counts>
           <entry key="Python Console" value="4" />
           <entry key="dummy" value="8" />
-          <entry key="py" value="12294" />
+          <entry key="py" value="12380" />
           <entry key="txt" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="17" />
-          <entry key="Python" value="12298" />
+          <entry key="Python" value="12384" />
         </counts>
       </usages-collector>
     </session>
@@ -118,11 +104,11 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/phase/testutil.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="639">
-              <caret line="185" column="61" selection-start-line="185" selection-start-column="61" selection-end-line="185" selection-end-column="61" />
+            <state relative-caret-position="198">
+              <caret line="27" column="17" lean-forward="true" selection-end-line="203" />
               <folding>
                 <element signature="e#0#18#0" expanded="true" />
-                <marker date="1542662571843" expanded="true" signature="5267:5268" ph="..." />
+                <marker date="1542663944706" expanded="true" signature="5439:5440" ph="..." />
               </folding>
             </state>
           </provider>
@@ -144,7 +130,7 @@
         <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="3037">
-              <caret line="139" lean-forward="true" selection-start-line="139" selection-end-line="139" />
+              <caret line="139" selection-start-line="139" selection-end-line="139" />
               <folding>
                 <element signature="e#0#12#0" expanded="true" />
               </folding>
@@ -296,7 +282,7 @@
   <component name="PropertiesComponent">
     <property name="ToolWindowRun.ShowToolbar" value="false" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Arsenal" />
     <property name="nodejs_interpreter_path.stuck_in_default_project" value="undefined stuck path" />
     <property name="nodejs_npm_path_reset_for_default_project" value="true" />
     <property name="settings.editor.selected.configurable" value="preferences.sourceCode" />
@@ -447,7 +433,7 @@
     <frame x="0" y="0" width="1536" height="864" extended-state="6" />
     <editor active="true" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.17583893" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.17583893" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info id="Favorites" order="2" sideWeight="0.50201344" side_tool="true" weight="0.14705883" />
       <window_info anchor="bottom" id="Message" order="0" />
@@ -635,7 +621,7 @@
     <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="3037">
-          <caret line="139" lean-forward="true" selection-start-line="139" selection-end-line="139" />
+          <caret line="139" selection-start-line="139" selection-end-line="139" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
@@ -651,11 +637,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/phase/testutil.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="639">
-          <caret line="185" column="61" selection-start-line="185" selection-start-column="61" selection-end-line="185" selection-end-column="61" />
+        <state relative-caret-position="198">
+          <caret line="27" column="17" lean-forward="true" selection-end-line="203" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
-            <marker date="1542662571843" expanded="true" signature="5267:5268" ph="..." />
+            <marker date="1542663944706" expanded="true" signature="5439:5440" ph="..." />
           </folding>
         </state>
       </provider>

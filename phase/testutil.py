@@ -67,6 +67,15 @@ def get_torus(r1, r2, a=128, b=128, c=128):
 
 
 def rotate(data, a, b, c):
+    """
+    Rotate the volume along the center of the space with the specified eular angle
+
+    :param data:
+    :param a:
+    :param b:
+    :param c:
+    :return:
+    """
     space = data[:]
     # first rotation
     space = scipy.ndimage.rotate(space, a, axes=(1, 0),
