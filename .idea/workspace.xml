@@ -3,6 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="dev">
       <change beforePath="$PROJECT_DIR$/notebooks/HIO-GPU-3d.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/HIO-GPU-3d.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/gpualgorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpualgorithms.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/gpuutil2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpuutil2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/gpuutil3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpuutil3d.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,7 +36,7 @@
     <session id="1748234190">
       <usages-collector id="statistics.lifecycle.project">
         <counts>
-          <entry key="project.closed" value="13" />
+          <entry key="project.closed" value="14" />
           <entry key="project.open.time.0" value="1" />
           <entry key="project.open.time.3" value="8" />
           <entry key="project.open.time.4" value="4" />
@@ -43,27 +46,29 @@
       <usages-collector id="statistics.file.extensions.open">
         <counts>
           <entry key="ipynb" value="2" />
-          <entry key="py" value="20" />
+          <entry key="md" value="1" />
+          <entry key="py" value="23" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="IPNB" value="2" />
-          <entry key="Python" value="20" />
+          <entry key="Markdown" value="1" />
+          <entry key="Python" value="23" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="4" />
           <entry key="dummy" value="19" />
-          <entry key="py" value="13926" />
+          <entry key="py" value="14124" />
           <entry key="txt" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="PLAIN_TEXT" value="28" />
-          <entry key="Python" value="13930" />
+          <entry key="Python" value="14128" />
         </counts>
       </usages-collector>
     </session>
@@ -79,10 +84,25 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="220">
+                <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+              </first_editor>
+              <second_editor />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/phase/cpualgorithms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret column="12" lean-forward="true" selection-start-column="12" selection-end-column="12" />
+            <state relative-caret-position="740">
+              <caret line="65" column="63" selection-start-line="65" selection-start-column="44" selection-end-line="65" selection-end-column="63" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -90,11 +110,35 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/phase/gpualgorithms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="44">
-              <caret line="2" column="3" selection-start-line="2" selection-end-line="3" />
+            <state relative-caret-position="143">
+              <caret line="530" column="46" lean-forward="true" selection-start-line="530" selection-start-column="46" selection-end-line="530" selection-end-column="46" />
               <folding>
-                <element signature="e#1010#12880#0" />
-                <marker date="1542684864399" expanded="true" signature="3091:3092" ph="..." />
+                <element signature="e#0#22#0" expanded="true" />
+                <marker date="1542687731200" expanded="true" signature="3091:3092" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="527">
+              <caret line="120" column="18" lean-forward="true" selection-start-line="120" selection-start-column="18" selection-end-line="120" selection-end-column="18" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1055">
+              <caret line="140" selection-start-line="140" selection-end-line="140" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -112,11 +156,8 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>gpu_diffract</find>
-      <find>diffract</find>
       <find>mask_bool</find>
       <find>reciprocal_mask_bool</find>
-      <find>real_ifft_pattern</find>
       <find>ifft_pattern</find>
       <find>gpu_guess_real_space</find>
       <find>guess_real_space</find>
@@ -142,6 +183,9 @@
       <find>angle</find>
       <find>density_present_real</find>
       <find>128</find>
+      <find>real_ifft_pattern</find>
+      <find>get_re</find>
+      <find>get_rea</find>
     </findStrings>
     <replaceStrings>
       <replace>gpu_diffract</replace>
@@ -160,7 +204,6 @@
       <replace>blockspg</replace>
       <replace>gpuutil2d</replace>
       <replace>initial_support</replace>
-      <replace>density_no_constrain</replace>
       <replace>previous_density</replace>
       <replace>density_with_constrain</replace>
       <replace>diffraction_with_constrain</replace>
@@ -174,6 +217,7 @@
       <replace>fftn</replace>
       <replace>density_present</replace>
       <replace>64</replace>
+      <replace>density_no_constrain</replace>
     </replaceStrings>
   </component>
   <component name="Git.Settings">
@@ -193,13 +237,13 @@
         <option value="$PROJECT_DIR$/phase/algorithms.py" />
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/outdate/function.py" />
-        <option value="$PROJECT_DIR$/phase/gpuutil2d.py" />
         <option value="$PROJECT_DIR$/phase/testutil.py" />
         <option value="$PROJECT_DIR$/phase/cpuutil.py" />
         <option value="$PROJECT_DIR$/phase/cpualgorithms.py" />
         <option value="$PROJECT_DIR$/phase/__init__.py" />
-        <option value="$PROJECT_DIR$/phase/gpualgorithms.py" />
+        <option value="$PROJECT_DIR$/phase/gpuutil2d.py" />
         <option value="$PROJECT_DIR$/phase/gpuutil3d.py" />
+        <option value="$PROJECT_DIR$/phase/gpualgorithms.py" />
       </list>
     </option>
   </component>
@@ -394,7 +438,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="-7" width="1488" height="878" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.18627451" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -458,16 +501,6 @@
       <provider selected="true" editor-type-id="ipnb-editor">
         <state>
           <selected id="0" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="190">
-            <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
-          </first_editor>
-          <second_editor />
         </state>
       </provider>
     </entry>
@@ -542,10 +575,30 @@
     <entry file="file://$PROJECT_DIR$/phase/__init__.py">
       <provider selected="true" editor-type-id="text-editor" />
     </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="220">
+            <caret line="10" lean-forward="true" selection-start-line="10" selection-end-line="10" />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="527">
+          <caret line="120" column="18" lean-forward="true" selection-start-line="120" selection-start-column="18" selection-end-line="120" selection-end-column="18" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="8" column="45" selection-start-line="8" selection-start-column="28" selection-end-line="8" selection-end-column="45" />
+        <state relative-caret-position="1055">
+          <caret line="140" selection-start-line="140" selection-end-line="140" />
           <folding>
             <element signature="e#0#12#0" expanded="true" />
           </folding>
@@ -554,7 +607,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/phase/cpualgorithms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="484">
+        <state relative-caret-position="740">
           <caret line="65" column="63" selection-start-line="65" selection-start-column="44" selection-end-line="65" selection-end-column="63" />
           <folding>
             <element signature="e#0#18#0" expanded="true" />
@@ -562,20 +615,13 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret column="12" lean-forward="true" selection-start-column="12" selection-end-column="12" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/phase/gpualgorithms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="44">
-          <caret line="2" column="3" selection-start-line="2" selection-end-line="3" />
+        <state relative-caret-position="143">
+          <caret line="530" column="46" lean-forward="true" selection-start-line="530" selection-start-column="46" selection-end-line="530" selection-end-column="46" />
           <folding>
-            <element signature="e#1010#12880#0" />
-            <marker date="1542684864399" expanded="true" signature="3091:3092" ph="..." />
+            <element signature="e#0#22#0" expanded="true" />
+            <marker date="1542687731200" expanded="true" signature="3091:3092" ph="..." />
           </folding>
         </state>
       </provider>

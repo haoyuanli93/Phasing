@@ -99,8 +99,8 @@ def apply_magnitude_constrain_with_mask(shape_0, shape_1,
                                                      guess_diffraction[i, j])))
 
 
-@cuda.jit('void(int64, int64, float64[:,:], complex128[:,:])')
-def get_real_part(shape_0, shape_1, real_part, complex_array):
+@cuda.jit('void(int64, int64, float64, float64[:,:], complex128[:,:])')
+def get_real_part(shape_0, shape_1, volume, real_part, complex_array):
     """
     This function save the real part of the
      complex array into the real_part variable.
@@ -109,6 +109,7 @@ def get_real_part(shape_0, shape_1, real_part, complex_array):
     :param shape_1:
     :param real_part:
     :param complex_array:
+    :param volume:
     :return:
     """
     # Get grid index
@@ -116,7 +117,7 @@ def get_real_part(shape_0, shape_1, real_part, complex_array):
 
     # Make sure that the grid is not out of the pattern
     if i < shape_0 and j < shape_1:
-        real_part[i, j] = complex_array[i, j].real
+        real_part[i, j] = complex_array[i, j].real / volume
 
 
 @cuda.jit('void(int64, int64, float64[:,:], complex128[:,:])')

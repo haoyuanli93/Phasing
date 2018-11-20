@@ -107,8 +107,8 @@ def apply_magnitude_constrain_with_mask(shape_0, shape_1, shape_2,
                                                        diffraction_no_constrain[i, j, k])))
 
 
-@cuda.jit('void(int64, int64, int64, float64[:,:,:], complex128[:,:,:])')
-def get_real_part(shape_0, shape_1, shape_2, real_array, complex_array):
+@cuda.jit('void(int64, int64, int64, float64, float64[:,:,:], complex128[:,:,:])')
+def get_real_part(shape_0, shape_1, shape_2, volume, real_array, complex_array):
     """
     This function save the real part of the
      complex array into the real_part variable.
@@ -118,6 +118,7 @@ def get_real_part(shape_0, shape_1, shape_2, real_array, complex_array):
     :param shape_2:
     :param real_array:
     :param complex_array:
+    :param volume:
     :return:
     """
     # Get grid index
@@ -125,7 +126,7 @@ def get_real_part(shape_0, shape_1, shape_2, real_array, complex_array):
 
     # Make sure that the grid is not out of the pattern
     if i < shape_0 and j < shape_1 and k < shape_2:
-        real_array[i, j, k] = complex_array[i, j, k].real
+        real_array[i, j, k] = complex_array[i, j, k].real / volume
 
 
 @cuda.jit('void(int64, int64, int64, float64[:,:,:], complex128[:,:,:])')
@@ -147,4 +148,3 @@ def cast_to_complex(shape_0, shape_1, shape_2, real_array, complex_array):
     # Make sure that the grid is not out of the pattern
     if i < shape_0 and j < shape_1 and k < shape_2:
         complex_array[i, j, k] = np.complex128(real_array[i, j, k])
-
