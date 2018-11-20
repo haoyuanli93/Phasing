@@ -307,7 +307,7 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
     # Step 0: Create variables for calculation
     ###############################################################################################
     shape_0, shape_1, shape_2 = magnitude_constrain.shape
-    pixel_num = float(shape_0*shape_1*shape_2)
+    pixel_num = float(shape_0 * shape_1 * shape_2)
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
@@ -531,6 +531,7 @@ def apply_2d_hio_no_wrap_shrink(magnitude_constrain,
     # Step 0: Create variables for calculation
     ###############################################################################################
     shape_0, shape_1 = magnitude_constrain.shape
+    pixel_num = shape_0 * shape_1
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
@@ -623,6 +624,7 @@ def apply_2d_hio_no_wrap_shrink(magnitude_constrain,
 
         gpuutil2d.get_real_part[blockspg, threadspb](shape_0,
                                                      shape_1,
+                                                     pixel_num,
                                                      gpu_density_no_constrain_real,
                                                      gpu_density_no_constrain_complex
                                                      )
@@ -724,6 +726,7 @@ def apply_3d_hio_no_wrap_shrink(magnitude_constrain,
     # Step 0: Create variables for calculation
     ###############################################################################################
     shape_0, shape_1, shape_2 = magnitude_constrain.shape
+    pixel_num = shape_0 * shape_1 * shape_2
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
@@ -818,6 +821,7 @@ def apply_3d_hio_no_wrap_shrink(magnitude_constrain,
         gpuutil3d.get_real_part[blockspg, threadspb](shape_0,
                                                      shape_1,
                                                      shape_2,
+                                                     pixel_num,
                                                      gpu_density_no_constrain_real,
                                                      gpu_density_no_constrain_complex
                                                      )
@@ -934,6 +938,7 @@ def apply_2d_hio_with_specified_initial_condition(magnitude_constrain,
     # Step 0: Create variables for calculation
     ###############################################################################################
     shape_0, shape_1 = magnitude_constrain.shape
+    pixel_num = shape_0 * shape_1
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
@@ -1025,6 +1030,7 @@ def apply_2d_hio_with_specified_initial_condition(magnitude_constrain,
 
         gpuutil2d.get_real_part[blockspg, threadspb](shape_0,
                                                      shape_1,
+                                                     pixel_num,
                                                      gpu_density_no_constrain_real,
                                                      gpu_density_no_constrain_complex
                                                      )
@@ -1134,6 +1140,7 @@ def apply_3d_hio_with_specified_initial_condition(magnitude_constrain,
     # Step 0: Create variables for calculation
     ###############################################################################################
     shape_0, shape_1, shape_2 = magnitude_constrain.shape
+    pixel_num = shape_0 * shape_1 * shape_2
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
@@ -1227,6 +1234,7 @@ def apply_3d_hio_with_specified_initial_condition(magnitude_constrain,
         gpuutil3d.get_real_part[blockspg, threadspb](shape_0,
                                                      shape_1,
                                                      shape_2,
+                                                     pixel_num,
                                                      gpu_density_no_constrain_real,
                                                      gpu_density_no_constrain_complex
                                                      )
