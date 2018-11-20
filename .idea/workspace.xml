@@ -2,18 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="dev">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-CPU-dev-2-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-CPU-dev-checkpoint.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-GPU-2d-checkpoint.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/.ipynb_checkpoints/HIO-GPU-2d-checkpoint.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/HIO-CPU-dev-2.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/HIO-CPU-dev.ipynb" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/notebooks/HIO-GPU-2d.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/HIO-GPU-2d.ipynb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/notebooks/HIO-GPU-3d.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/notebooks/HIO-GPU-3d.ipynb" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/__init__.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/__init__.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/cpuutil.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/cpualgorithms.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/gpuutil3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpuutil3d.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/phase/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/outdate/util.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -89,25 +78,21 @@
           <provider selected="true" editor-type-id="text-editor" />
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="418">
-              <caret line="76" column="21" selection-start-line="76" selection-start-column="19" selection-end-line="76" selection-end-column="21" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
-              </folding>
+            <state>
+              <caret column="12" lean-forward="true" selection-start-column="12" selection-end-column="12" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/phase/gpualgorithms.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="242">
-              <caret line="558" column="31" lean-forward="true" selection-start-line="558" selection-start-column="31" selection-end-line="558" selection-end-column="31" />
+            <state relative-caret-position="44">
+              <caret line="2" column="3" selection-start-line="2" selection-end-line="3" />
               <folding>
-                <element signature="e#0#22#0" expanded="true" />
                 <element signature="e#1010#12880#0" />
                 <marker date="1542684864399" expanded="true" signature="3091:3092" ph="..." />
               </folding>
@@ -577,24 +562,20 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/phase/gpualgorithms.py">
+    <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="242">
-          <caret line="558" column="31" lean-forward="true" selection-start-line="558" selection-start-column="31" selection-end-line="558" selection-end-column="31" />
-          <folding>
-            <element signature="e#0#22#0" expanded="true" />
-            <element signature="e#1010#12880#0" />
-            <marker date="1542684864399" expanded="true" signature="3091:3092" ph="..." />
-          </folding>
+        <state>
+          <caret column="12" lean-forward="true" selection-start-column="12" selection-end-column="12" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
+    <entry file="file://$PROJECT_DIR$/phase/gpualgorithms.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="418">
-          <caret line="76" column="21" selection-start-line="76" selection-start-column="19" selection-end-line="76" selection-end-column="21" />
+        <state relative-caret-position="44">
+          <caret line="2" column="3" selection-start-line="2" selection-end-line="3" />
           <folding>
-            <element signature="e#0#12#0" expanded="true" />
+            <element signature="e#1010#12880#0" />
+            <marker date="1542684864399" expanded="true" signature="3091:3092" ph="..." />
           </folding>
         </state>
       </provider>
