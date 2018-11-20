@@ -1,6 +1,7 @@
 import cmath
-
+import math
 from numba import cuda
+import numpy as np
 
 
 @cuda.jit('void(int64, int64, int64, float64, float64[:,:,:],' +
@@ -67,9 +68,10 @@ def apply_magnitude_constrain(shape_0, shape_1, shape_2,
     if i < shape_0 and j < shape_1 and k < shape_2:
         # Keep the phase from the guess and
         # apply the constrain from the diffraction pattern
+        phase = cmath.phase(diffraction_no_constrain[i, j, k])
         diffraction_with_constrain[i, j, k] = (magnitude_constrain[i, j, k] *
-                                               cmath.exp(1j * cmath.phase(
-                                                   diffraction_no_constrain[i, j, k])))
+                                               complex(math.cos(phase),
+                                                       math.sin(phase)))
 
 
 @cuda.jit('void(int64, int64, int64, complex128[:,:,:],' +
@@ -144,5 +146,5 @@ def cast_to_complex(shape_0, shape_1, shape_2, real_array, complex_array):
 
     # Make sure that the grid is not out of the pattern
     if i < shape_0 and j < shape_1 and k < shape_2:
-        complex_array[i, j, k] = real_array[i, j, k] + 0j
+        complex_array[i, j, k] = np.complex128(real_array[i, j, k])
 
