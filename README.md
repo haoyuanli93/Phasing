@@ -24,18 +24,12 @@ keep the link here for record. I'll fix it as soon as possible
 if anyone claim the copyright of any part of this repo.
 
 ## Introduction
-This repo, as is depicted in the above section, is an 
-implementation of the HIO algorithm with the shrinkwrap
-function. Why another repo on this? 
-
-First, I am a PhD student and I have some ideas to try with 
-this algorithm. The existing implementations are not very
-convenient for this purpose. 
-
-Second, I'd like to have a package working with gpu and is 
-convenient to use inside the jupyter notebook. 
-
-So, here I have developed this repo. I have finished the first 
+This repo is an implementation of the HIO algorithm 
+with the shrinkwrap function.  
+ 
+I'd like to have a package working with gpu and is 
+convenient to use inside the jupyter notebook. So,
+I build this repo. I have finished the first 
 stage. i.e. It can do HIO with shrinkwrap on both cpu and gpu
 now. However, it's not published to pip yet. Therefore, 
 if one would like to use this repo, one has to clone this 
@@ -45,3 +39,20 @@ repo and add the path as I have done in the examples in the
 So much intro for now. I'll temporarily move to the other 
 projects now. Hopefully, I'll come back to this soon and 
 finish the next step. 
+
+## Dependence
+This repo depends on the following packages:
+
+    1.numpy
+    2.numba
+    3.cudatoolkit
+    4.pyculib
+    5.scipy
+ 
+To run the examples, one needs additionally the following
+packages:
+
+    1. matplotlib
+    2. scikit-image
+    3. jupyter notebook
+    
