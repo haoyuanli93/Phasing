@@ -7,5 +7,10 @@ import scipy as sp
     
 """
 
+
 def shrink_wrap():
+    pass
+
+
+def check_algorithm_configuritions():
     pass

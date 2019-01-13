@@ -2,7 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="dev">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/cpualgs.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/cpualgs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/gpualgorithms.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpualgorithms.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/phase/gpualgs.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpualgs.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/gpuutil2d.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpufun2d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/gpuutil3d.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpufun3d.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/util.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/util.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -45,30 +51,30 @@
         <counts>
           <entry key="ipynb" value="2" />
           <entry key="md" value="1" />
-          <entry key="py" value="28" />
+          <entry key="py" value="31" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="IPNB" value="2" />
           <entry key="Markdown" value="1" />
-          <entry key="Python" value="28" />
+          <entry key="Python" value="31" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="Python Console" value="4" />
-          <entry key="dummy" value="19" />
+          <entry key="dummy" value="25" />
           <entry key="md" value="2043" />
-          <entry key="py" value="14768" />
+          <entry key="py" value="15009" />
           <entry key="txt" value="9" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
           <entry key="Markdown" value="2043" />
-          <entry key="PLAIN_TEXT" value="28" />
-          <entry key="Python" value="14772" />
+          <entry key="PLAIN_TEXT" value="34" />
+          <entry key="Python" value="15013" />
         </counts>
       </usages-collector>
     </session>
@@ -104,13 +110,51 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/phase/gpualgs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4635">
-              <caret line="223" lean-forward="true" selection-start-line="223" selection-end-line="223" />
+            <state relative-caret-position="323">
+              <caret line="24" column="30" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="30" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/phase/cpualgs.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="329">
+              <caret line="15" column="77" lean-forward="true" selection-start-line="15" selection-start-column="77" selection-end-line="15" selection-end-column="77" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/phase/util.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="286">
+              <caret line="13" selection-start-line="13" selection-end-line="13" />
+              <folding>
+                <element signature="e#0#18#0" expanded="true" />
+                <marker date="1547355194937" expanded="true" signature="163:168" ph="..." />
+                <marker date="1547355194937" expanded="true" signature="212:217" ph="..." />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/phase/gpufun2d.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="3080">
+              <caret line="140" selection-start-line="140" selection-end-line="140" />
+              <folding>
+                <element signature="e#0#12#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -123,7 +167,7 @@
               <caret line="23" column="55" lean-forward="true" selection-start-line="23" selection-start-column="55" selection-end-line="23" selection-end-column="55" />
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
-                <marker date="1542758367071" expanded="true" signature="3091:3092" ph="..." />
+                <marker date="1547355194920" expanded="true" signature="3089:3090" ph="..." />
               </folding>
             </state>
           </provider>
@@ -218,7 +262,6 @@
         <option value="$PROJECT_DIR$/phase/gpuutil.py" />
         <option value="$PROJECT_DIR$/phase/gpuutil-2d.py" />
         <option value="$PROJECT_DIR$/notebooks/HIO-GPU-dev-2.ipynb" />
-        <option value="$PROJECT_DIR$/phase/util.py" />
         <option value="$PROJECT_DIR$/phase/algorithms.py" />
         <option value="$PROJECT_DIR$/setup.py" />
         <option value="$PROJECT_DIR$/outdate/function.py" />
@@ -233,6 +276,8 @@
         <option value="$PROJECT_DIR$/phase/phasing.py" />
         <option value="$PROJECT_DIR$/phase/asset.py" />
         <option value="$PROJECT_DIR$/phase/gpualgs.py" />
+        <option value="$PROJECT_DIR$/phase/util.py" />
+        <option value="$PROJECT_DIR$/phase/cpualgs.py" />
       </list>
     </option>
   </component>
@@ -338,7 +383,7 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
-      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/phase/gpuutil2d.py" />
+      <option name="SCRIPT_NAME" value="C:\Users\hyli93\Documents\GitHub\Phasing\phase\gpufun2d.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -427,7 +472,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1536" height="864" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.18724832" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -579,17 +623,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="3080">
-          <caret line="140" selection-start-line="140" selection-end-line="140" />
-          <folding>
-            <element signature="e#0#12#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
+    <entry file="file://$PROJECT_DIR$/phase/gpufun3d.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="2640">
           <caret line="120" column="18" selection-start-line="120" selection-start-column="18" selection-end-line="120" selection-end-column="18" />
@@ -619,17 +653,49 @@
           <caret line="23" column="55" lean-forward="true" selection-start-line="23" selection-start-column="55" selection-end-line="23" selection-end-column="55" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
-            <marker date="1542758367071" expanded="true" signature="3091:3092" ph="..." />
+            <marker date="1547355194920" expanded="true" signature="3089:3090" ph="..." />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/util.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="286">
+          <caret line="13" selection-start-line="13" selection-end-line="13" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+            <marker date="1547355194937" expanded="true" signature="163:168" ph="..." />
+            <marker date="1547355194937" expanded="true" signature="212:217" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/phase/gpualgs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4635">
-          <caret line="223" lean-forward="true" selection-start-line="223" selection-end-line="223" />
+        <state relative-caret-position="323">
+          <caret line="24" column="30" selection-start-line="24" selection-start-column="4" selection-end-line="24" selection-end-column="30" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/cpualgs.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="329">
+          <caret line="15" column="77" lean-forward="true" selection-start-line="15" selection-start-column="77" selection-end-line="15" selection-end-column="77" />
+          <folding>
+            <element signature="e#0#18#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/phase/gpufun2d.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="3080">
+          <caret line="140" selection-start-line="140" selection-end-line="140" />
+          <folding>
+            <element signature="e#0#12#0" expanded="true" />
           </folding>
         </state>
       </provider>

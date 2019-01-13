@@ -4,8 +4,8 @@ from pyculib import fft as pfft
 import scipy.ndimage as sn
 import time
 import math
-import phase.gpuutil2d as gpuutil2d
-import phase.gpuutil3d as gpuutil3d
+import phase.gpufun2d as gpuutil2d
+import phase.gpufun3d as gpuutil3d
 
 
 #####################################################################################

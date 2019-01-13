@@ -3,8 +3,8 @@ import numpy as np
 from pyculib import fft as pfft
 import time
 import math
-import phase.gpuutil2d as gpuutil2d
-import phase.gpuutil3d as gpuutil3d
+import phase.gpufun2d as gpuutil2d
+import phase.gpufun3d as gpuutil3d
 
 """
         
