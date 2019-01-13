@@ -2,10 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="6d30007a-0db7-4dce-a634-96f13cb5c395" name="Default" comment="dev">
-      <change afterPath="$PROJECT_DIR$/phase/asset.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/phase/gpualgs.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/phase/phasing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/phase/gpualgs.py" beforeDir="false" afterPath="$PROJECT_DIR$/phase/gpualgs.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -48,14 +45,14 @@
         <counts>
           <entry key="ipynb" value="2" />
           <entry key="md" value="1" />
-          <entry key="py" value="27" />
+          <entry key="py" value="28" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
           <entry key="IPNB" value="2" />
           <entry key="Markdown" value="1" />
-          <entry key="Python" value="27" />
+          <entry key="Python" value="28" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
@@ -63,7 +60,7 @@
           <entry key="Python Console" value="4" />
           <entry key="dummy" value="19" />
           <entry key="md" value="2043" />
-          <entry key="py" value="14718" />
+          <entry key="py" value="14768" />
           <entry key="txt" value="9" />
         </counts>
       </usages-collector>
@@ -71,7 +68,7 @@
         <counts>
           <entry key="Markdown" value="2043" />
           <entry key="PLAIN_TEXT" value="28" />
-          <entry key="Python" value="14722" />
+          <entry key="Python" value="14772" />
         </counts>
       </usages-collector>
     </session>
@@ -107,22 +104,13 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/setup.py">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/phase/gpualgs.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="462">
-              <caret line="21" column="31" selection-start-line="15" selection-start-column="22" selection-end-line="21" selection-end-column="31" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/phase/cpualgorithms.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1386">
-              <caret line="65" column="63" selection-start-line="65" selection-start-column="44" selection-end-line="65" selection-end-column="63" />
+            <state relative-caret-position="4635">
+              <caret line="223" lean-forward="true" selection-start-line="223" selection-end-line="223" />
               <folding>
-                <element signature="e#0#18#0" expanded="true" />
+                <element signature="e#0#22#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -136,51 +124,6 @@
               <folding>
                 <element signature="e#0#22#0" expanded="true" />
                 <marker date="1542758367071" expanded="true" signature="3091:3092" ph="..." />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/phase/gpualgs.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="392">
-              <caret line="18" selection-start-line="18" selection-end-line="18" />
-              <folding>
-                <element signature="e#0#22#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/phase/asset.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="66">
-              <caret line="3" selection-start-line="3" selection-end-line="3" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/phase/gpuutil3d.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2640">
-              <caret line="120" column="18" selection-start-line="120" selection-start-column="18" selection-end-line="120" selection-end-column="18" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/phase/gpuutil2d.py">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="3080">
-              <caret line="140" selection-start-line="140" selection-end-line="140" />
-              <folding>
-                <element signature="e#0#12#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -288,8 +231,8 @@
         <option value="$PROJECT_DIR$/phase/gpualgorithms.py" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/phase/phasing.py" />
-        <option value="$PROJECT_DIR$/phase/gpualgs.py" />
         <option value="$PROJECT_DIR$/phase/asset.py" />
+        <option value="$PROJECT_DIR$/phase/gpualgs.py" />
       </list>
     </option>
   </component>
@@ -484,6 +427,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="0" y="0" width="1536" height="864" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49798658" visible="true" weight="0.18724832" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
@@ -662,6 +606,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/phase/asset.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="66">
+          <caret line="3" selection-start-line="3" selection-end-line="3" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/phase/gpualgorithms.py">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="506">
@@ -675,18 +626,11 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/phase/gpualgs.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="392">
-          <caret line="18" selection-start-line="18" selection-end-line="18" />
+        <state relative-caret-position="4635">
+          <caret line="223" lean-forward="true" selection-start-line="223" selection-end-line="223" />
           <folding>
             <element signature="e#0#22#0" expanded="true" />
           </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/phase/asset.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="66">
-          <caret line="3" selection-start-line="3" selection-end-line="3" />
         </state>
       </provider>
     </entry>
