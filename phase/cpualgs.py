@@ -2,13 +2,13 @@ import numpy as np
 import time
 
 
-def alternating_projections(magnitude_constrain,
-                            support_bool,
-                            reciprocal_mask,
-                            initial_diffract_field,
-                            initial_density,
-                            beta=0.8,
-                            iter_num=1000):
+def iterative_projection(magnitude_constrain,
+                        support_bool,
+                        reciprocal_mask,
+                        initial_diffract_field,
+                        initial_density,
+                        beta=0.8,
+                        iter_num=1000):
     """
     This function calculate the retrieved phase and the corresponding real space electron density
     in n-dimension.
@@ -103,3 +103,7 @@ def alternating_projections(magnitude_constrain,
               'Sigma list': []}
 
     return result
+
+
+def stablized_magnitude_projection(diffraction_field, magnitude, output, epsilon):
+    pass

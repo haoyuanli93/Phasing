@@ -22,14 +22,14 @@ import phase.gpufun3d as gpuutil3d
 # missing region. The functions in below only do the HIO with the specified
 # initial density and diffraction field which is suitable for the purpose.
 ############################################################################
-def alternating_projections_2d(magnitude_constrain,
-                               support_bool,
-                               reciprocal_mask,
-                               initial_diffract_field,
-                               initial_density,
-                               beta=0.8,
-                               iter_num=100,
-                               thread_per_block=32):
+def iterative_projection_2d(magnitude_constrain,
+                            support_bool,
+                            reciprocal_mask,
+                            initial_diffract_field,
+                            initial_density,
+                            beta=0.8,
+                            iter_num=100,
+                            thread_per_block=32):
     """
     This function calculate the retrieved phase and the corresponding real space electron density
     in the 2d case.
@@ -223,14 +223,14 @@ def alternating_projections_2d(magnitude_constrain,
     return result
 
 
-def alternating_projections_3d(magnitude_constrain,
-                               support_bool,
-                               reciprocal_mask,
-                               initial_diffract_field,
-                               initial_density,
-                               beta=0.8,
-                               iter_num=100,
-                               thread_per_block=4):
+def iterative_projection_3d(magnitude_constrain,
+                            support_bool,
+                            reciprocal_mask,
+                            initial_diffract_field,
+                            initial_density,
+                            beta=0.8,
+                            iter_num=100,
+                            thread_per_block=4):
     """
     This function calculate the retrieved phase and the corresponding real space electron density
     in the 2d case.
