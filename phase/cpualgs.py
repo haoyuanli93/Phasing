@@ -1,14 +1,16 @@
 import numpy as np
 import time
+from phase import util
+import numba
 
 
 def iterative_projection(magnitude_constrain,
-                        support_bool,
-                        reciprocal_mask,
-                        initial_diffract_field,
-                        initial_density,
-                        beta=0.8,
-                        iter_num=1000):
+                         support_bool,
+                         reciprocal_mask,
+                         initial_diffract_field,
+                         initial_density,
+                         beta=0.8,
+                         iter_num=1000):
     """
     This function calculate the retrieved phase and the corresponding real space electron density
     in n-dimension.
@@ -105,5 +107,49 @@ def iterative_projection(magnitude_constrain,
     return result
 
 
-def stablized_magnitude_projection(diffraction_field, magnitude, output, epsilon):
+def stablized_magnitude_projection(diff, _holder_1, _holder_2, _holder_3, mag, epsilon):
+    """
+       This is a new operator to replace the original magnitude operator. According to professor
+    Luke in the paper
+
+        http://iopscience.iop.org/article/10.1088/0266-5611/21/1/004
+
+        Relaxed averaged alternating reflections for diffraction imaging
+
+    This new operator is more stable. Concrete formula is (34) in the paper. Notice that the
+    formula contains a typo. I here represents the identity operator and should be replaced by u.
+
+
+    :param diff: The estimated diffraction field with phase
+    :param _holder_1: The holder for intermediate calculation
+    :param _holder_2:
+    :param _holder_3:
+    :param mag: The magnitude array. Notice that, here, the magnitude array might not be the
+                original one. Because the original array have edges if one simply assign zeros to
+                the missing data, one might consider to assign values from the estimation to reduce
+                the artifical edges.
+    :param epsilon: A epsilon value used to calculate the true epsilon value. The detail should be
+                    find from the article.
+    :return:
+    """
+    # Get the fourier transform
+    _holder_1 = np.fft.fftn(diff)
+
+    # Get the norm of the transformed data
+    _holder_2 = util.abs2(_holder_1)
+
+    # Calculate the true epsilon that should be used in the calculation
+    teps = (epsilon * np.max(_holder_2)) ** 2
+
+    # Calculatet the output without truely return any array
+    _holder_3 = np.divide(np.multiply(_holder_2 - np.multiply(mag, np.sqrt(_holder_2 + teps)),
+                                      np.multiply(_holder_2 + 2 * teps, _holder_1)),
+                          np.square(_holder_2 + teps))
+    return diff - np.fft.ifftn(_holder_3)
+
+
+@numba.vectorize([numba.float32(numba.float32, numba.boolean),
+                  numba.float64(numba.float64, numba.boolean)])
+def filling_missing_magnitude():
+
     pass

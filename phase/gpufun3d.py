@@ -148,3 +148,4 @@ def cast_to_complex(shape_0, shape_1, shape_2, real_array, complex_array):
     # Make sure that the grid is not out of the pattern
     if i < shape_0 and j < shape_1 and k < shape_2:
         complex_array[i, j, k] = np.complex128(real_array[i, j, k])
+
