@@ -1,7 +1,6 @@
 import numpy as np
 import time
 from phase import util
-import numba
 
 
 def iterative_projection(magnitude_constrain,
@@ -146,10 +145,3 @@ def stablized_magnitude_projection(diff, _holder_1, _holder_2, _holder_3, mag, e
                                       np.multiply(_holder_2 + 2 * teps, _holder_1)),
                           np.square(_holder_2 + teps))
     return diff - np.fft.ifftn(_holder_3)
-
-
-@numba.vectorize([numba.float32(numba.float32, numba.boolean),
-                  numba.float64(numba.float64, numba.boolean)])
-def filling_missing_magnitude():
-
-    pass
