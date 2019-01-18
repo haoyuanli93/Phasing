@@ -13,7 +13,7 @@ setup(
     maintainer_email='hyli16@stanford.edu',
     license='BSD License',
     packages=["phase", ],
-    install_requires=['numpy',
+    install_requires=['numpy>=1.10',
                       'matplotlib',
                       'h5py',
                       'numba',

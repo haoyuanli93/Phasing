@@ -1,113 +1,289 @@
 import numpy as np
-import time
 from phase import util
-import numba
 
 
-def iterative_projection(magnitude_constrain,
-                         support_bool,
-                         reciprocal_mask,
-                         initial_diffract_field,
-                         initial_density,
-                         beta=0.8,
-                         iter_num=1000):
+def iterative_projection_normal(info_dict):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
-    in n-dimension.
+    This function carries out the iterative projection for one iteration.
 
-    :param magnitude_constrain: This is the magnitude measured by the detector. This has to be
-                                a 2d numpy array. It can be either np.float or np.complex since I
-                                will convert it into complex variable at the beginning anyway.
-    :param support_bool: This is the initial estimate of the support. This is a 2D boolean array.
-    :param reciprocal_mask: This is the mask for the 2d detector. This algorithm only consider
-                            values in the magnitude constrain with the corresponding values in this
-                            mask being True.
-    :param initial_diffract_field: the initial value of the diffraction field to start the
-                                    searching. Notice that even though this value is not requried
-                                    to be compatible with the magnitude constrain, it's recommended
-                                    to be compatible.
-    :param initial_density: the initial value of the density distribution. Notice that is variable
-                            is used as the previous guess in this process.
+    :param info_dict: This is the dictionary containing all information essential for the
+                        calculation. This dict should contain the following information
 
-    :param beta: The update rate in the HIO algorithm
-    :param iter_num: The iteration number to apply the hio procedure
-    :return:
+                        magnitude array      -> The numpy array containing the magnitude array
+                        magnitude mask       -> The boolean mask for the magnitude array
+                        magnitude mask not   -> The boolean mask for the magnitude array.
+                                                This is simply
+                                                        not*magnitude_mask
+
+                        old diffraction    -> The diffraction field from previous step
+                                                Notice that this is not essential. I include it
+                                                here only becase it can be useful for later usage.
+                        old density        -> The density from previous iteration
+                        support              -> The boolean array for the support
+
+
+                        new density          -> This is the new density derived from the diffraction
+                                                field with the magnitude constrain
+
+                        new density final   -> This is the new density that will be used
+
+                        new diffraction with magnitude constrain  -> This is the diffraction field
+                                                                     with magnitude constrain
+
+                        new diffraction magnitude   -> This is the magnitude of the diffraction
+                                                        field before applying the magnitude
+                                                        constrain
+
+                        new diffraction flag  -> Whether to new the diffraction or not
+                        new diffraction       -> This is the diffraction field derived from the
+                                                    old density distribution
+
+                        phase holder          -> This is the phase of the derived diffraction
+                                                    field
+
+                        modified support   -> In the algorithm, one needs to change pixels
+                                                     in the support and in the same time
+                                                     satisfied some conditions
+
+                        tmp holder 1        -> Sorry I just reall can not think up a name for
+                                                this holder. It's used to store the information
+                                                before one calculate the modified support
+
+                        par_a
+                        par_b
+                        par_c
+                        par_d
+                        par_e
+                        par_f
+
+                       The last six entries are complicated. They defines the structure of the
+                       projections.
+
+                       Below, I use u_(n+1) to denote the new density, then in general,
+                       the algorithm can be represented as
+
+                                     par_c * P(u_n)(x) + par_d * u_n(x)
+                       u_(n+1)(x) =
+                                     par_a * P(u_n)(x) + par_b * u_n(x)     for x (in support) and
+                                                                            par_e * P(u_n)(x) >
+                                                                            par_f * u_n(x)
+
+    :return: None. The resut is directly saved to the dictionary. This is also the very reason
+            why I choose this mutable structure.
     """
-    tic = time.time()
 
-    ###############################################################################################
-    # Step 0: Generated required meta-parameters
-    ###############################################################################################
-    # Because later, I would need the opposite of the support, therefore I flip it here.
-    flipped_support_bool = np.logical_not(support_bool)
+    # Because this is a very basic function, I will not check paramters or counting the time
 
-    # Make a copy of the initial support
-    initial_support = np.copy(support_bool)
+    # Get values from the dictionary
+    mag = info_dict['magnitude array']
+    mag_m = info_dict['magnitude mask']
 
-    ###############################################################################################
-    # Step 0: Create variables for calculation
-    ###############################################################################################
-    magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
+    odens = info_dict['old density']
+    support = info_dict['support']
+    support_m = info_dict['modified support']
 
-    # Variable containing the diffraction satisfies the magnitude constrain
-    phase_tmp = np.exp(1j * np.angle(initial_diffract_field))
-    diffract_with_magnitude_constrain = np.ascontiguousarray(np.multiply(phase_tmp,
-                                                                         magnitude_constrain))
+    ndens = info_dict['new density']
+    ndens_f = info_dict['new density final']
 
-    # Containing the previous result of the density function with support constrain
-    density_previous = np.ascontiguousarray(initial_density)
+    ndiff = info_dict['new diffraction']
+    ndiff_m = info_dict['new diffraction magnitude']
 
-    ###############################################################################################
-    # Step 3: Begin calculation
-    ###############################################################################################
-    # Begin the loop
-    for idx in range(iter_num):
-        # Derive the density from the diffraction
-        density_present = np.fft.ifftn(diffract_with_magnitude_constrain)
+    phase = info_dict['phase']
+    ndiff_c = info_dict['new diffraction with magnitude constrain']
 
-        # Get the real part
-        density_present = np.real(density_present)
+    tmp_1 = info_dict['tmp holder 1']
 
-        # apply real space constraints
-        density_present[(density_present < 0) |
-                        flipped_support_bool] = (density_previous[(density_present < 0) |
-                                                                  flipped_support_bool] -
-                                                 beta *
-                                                 density_present[
-                                                     (density_present < 0) |
-                                                     flipped_support_bool])
+    a, b, c, d, e, f = [info_dict['par_a'],
+                        info_dict['par_b'],
+                        info_dict['par_c'],
+                        info_dict['par_d'],
+                        info_dict['par_e'],
+                        info_dict['par_f']]
 
-        # Update the previous estimation of the density for next iteration's calculation
-        density_previous = np.copy(density_present)
+    # Step 1: Calculate the fourier transformation of the density
+    ndiff_c[:] = np.fft.fftn(odens)
 
-        # Update the guess for the diffraction
-        diffract_no_magnitude_constrain = np.fft.fftn(density_present)
+    if info_dict['new diffraction flag']:
+        ndiff[:] = ndiff_c[:]
 
-        # apply fourier domain constraints
-        phase_tmp = np.exp(1j * np.angle(diffract_no_magnitude_constrain))
-        diffract_with_magnitude_constrain[reciprocal_mask] = (magnitude_constrain[reciprocal_mask] *
-                                                              phase_tmp[reciprocal_mask])
+    # Step 2: Apply magnitude constrain to the diffraction
+    np.absolute(np.absolute(ndiff_c[mag_m]), out=ndiff_m[mag_m])
+    np.divide(ndiff_c[mag_m], ndiff_m[mag_m],
+              out=phase[mag_m], where=ndiff_m[mag_m] > 0)
 
-    toc = time.time()
-    print("It takes {:.2f} seconds to do {} iterations.".format(toc - tic, iter_num))
+    np.multiply(mag[mag_m], phase[mag_m], out=ndiff_c[mag_m])
 
-    ###############################################################################################
-    # Step 4: Put results into a dictionary
-    ###############################################################################################
-    result = {'Magnitude': magnitude_constrain,
-              'Initial Support': initial_support,
-              'Final Support': np.logical_not(flipped_support_bool),
-              'Reconstructed Density': density_present,
-              'Reconstructed Diffraction Field': diffract_no_magnitude_constrain,
-              'Reconstructed Magnitude Field': np.abs(diffract_no_magnitude_constrain),
-              'Calculation Time (s)': toc - tic,
-              'Iteration number': iter_num,
-              'Sigma list': []}
+    # Step 3: Get the updated density
+    ndens[:] = np.fft.ifftn(ndiff_c)
 
-    return result
+    # Step 4: Apply real space constrain
+    # Get the positions where to modify
+    support_m[:] = support[:]
+
+    np.add(e * ndens[support], f * odens[support], out=tmp_1[support])
+    np.greater(tmp_1[support], 0, out=support_m[support])
+
+    np.add(c * ndens, d * odens, out=ndens_f)
+    np.add(a * ndens[support_m], b * odens[support_m], out=ndens_f[support_m])
 
 
-def stablized_magnitude_projection(diff, _holder_1, _holder_2, _holder_3, mag, epsilon):
+def iterative_projection_approximate(data_dict, holder_dict, param_dict):
+    """
+    This function carries out the iterative projection for one iteration.
+
+    This function aims to be a stablized version of the previous function. According to Professor
+    Russell Luke in the paper
+
+        Relaxed averaged alternating reflections for diffraction imaging.
+
+    It seems that the way one impose the magnitude constrain also introduces some instablity.
+    Therefore, he has proposed to used an approximation to the magnitude constrain opeartor. This
+    function implements that idea.
+
+    In this function, the magnitude operator is not implemented in the naive way. Rather, if one
+    would like to know the detail, then he should either look that the paper and find the formula
+    (34) or look at the function : approximate_magnitude_projection   in this script.
+
+    However one should notice that, that approximation is not directly available in real world
+    applications. The reason is complicated.
+
+    The most important reason is that in that formula, Prof. Luke seems to have assumed that
+    there is not gaps on the detectors. However, there are a lot of gaps on the detector. Therefore
+    there will be a lot of edges in the magnitude array if one set the unknown pixels to be zero.
+    However, these artificial edges will have huge influences on inverse fourier transformations.
+
+    Therefore, I have added the following operations.
+    1. Get the magnitude of the diffraction patterns derived from the input density operators.
+    2. Replace the corresponding values in this pattern with the experiment values.
+    3. Use the modified array to do the magnitude projection.
+
+
+    :param data_dict: This dictionary contains the following info
+
+
+                        magnitude array      -> The numpy array containing the magnitude array
+                        magnitude mask       -> The boolean mask for the magnitude array
+                        magnitude mask not   -> The boolean mask for the magnitude array.
+                        This is
+                                                simply
+                                                        not*magnitude_mask
+
+                        old diffraction    -> The diffraction field from previous step
+                                                Notice that this is not essential. I include it
+                                                here only becase it can be useful for later usage.
+                        old density        -> The density from previous iteration
+                        support              -> The boolean array for the support
+
+
+                        new density          -> This is the new density derived from the diffraction
+                                                field with the magnitude constrain
+
+                        new density final   -> This is the new density that will be used
+
+                        new diffraction with magnitude constrain  -> This is the diffraction field
+                                                                     with magnitude constrain
+
+                        new diffraction magnitude   -> This is the magnitude of the diffraction
+                                                        field before applying the magnitude
+                                                        constrain
+
+                        new diffraction flag  -> Whether to new the diffraction or not
+                        new diffraction       -> This is the diffraction field derived from the
+                                                    old density distribution
+
+                        phase holder          -> This is the phase of the derived diffraction
+                                                    field
+
+                        modified support   -> In the algorithm, one needs to change pixels
+                                                     in the support and in the same time
+                                                     satisfied some conditions
+
+                        tmp holder 1        -> Sorry I just reall can not think up a name for
+                                                this holder. It's used to store the information
+                                                before one calculate the modified support
+
+                        par_a
+                        par_b
+                        par_c
+                        par_d
+                        par_e
+                        par_f
+
+                       The last six entries are complicated. They defines the structure of the
+                       projections.
+
+                       Below, I use u_(n+1) to denote the new density, then in general,
+                       the algorithm can be represented as
+
+                                     par_c * P(u_n)(x) + par_d * u_n(x)
+                       u_(n+1)(x) =
+                                     par_a * P(u_n)(x) + par_b * u_n(x)     for x (in support) and
+                                                                            par_e * P(u_n)(x) >
+                                                                            par_f * u_n(x)
+
+    :return: None. The resut is directly saved to the dictionary. This is also the very reason
+            why I choose this mutable structure.
+    """
+
+    # Because this is a very basic function, I will not check paramters or counting the time
+
+    # Get values from the dictionary
+    mag = info_dict['magnitude array']
+    mag_m = info_dict['magnitude mask']
+    mag_mn = info_dict['magnitude mask not']
+
+    odens = info_dict['old density']
+    support = info_dict['support']
+    support_m = info_dict['modified support']
+
+    ndens = info_dict['new density']
+    ndens_f = info_dict['new density final']
+
+    ndiff = info_dict['new diffraction']
+    ndiff_m = info_dict['new diffraction magnitude']
+
+    phase = info_dict['phase']
+    ndiff_c = info_dict['new diffraction with magnitude constrain']
+
+    tmp_1 = info_dict['tmp holder 1']
+
+    a, b, c, d, e, f = [info_dict['par_a'],
+                        info_dict['par_b'],
+                        info_dict['par_c'],
+                        info_dict['par_d'],
+                        info_dict['par_e'],
+                        info_dict['par_f']]
+
+    # Step 1: Calculate the fourier transformation of the density
+    ndiff_c[:] = np.fft.fftn(odens)
+
+    if info_dict['new diffraction flag']:
+        ndiff[:] = ndiff_c[:]
+
+    # Step 2: Apply magnitude constrain to the diffraction
+
+    # Padding the gaps with the derived magnitude
+    np.absolute(np.absolute(ndiff_c), out=ndiff_m)
+    mag[mag_mn] = ndiff_m[mag_mn]
+
+    # Apply the approximated operator
+    approximate_magnitude_projection(diff=)
+
+    # Step 3: Get the updated density
+    ndens[:] = np.fft.ifftn(ndiff_c)
+
+    # Step 4: Apply real space constrain
+    # Get the positions where to modify
+    support_m[:] = support[:]
+
+    np.add(e * ndens[support], f * odens[support], out=tmp_1[support])
+    np.greater(tmp_1[support], 0, out=support_m[support])
+
+    np.add(c * ndens, d * odens, out=ndens_f)
+    np.add(a * ndens[support_m], b * odens[support_m], out=ndens_f[support_m])
+
+
+def approximate_magnitude_projection(diff, _holder_1, _holder_2, _holder_3, mag, epsilon):
     """
        This is a new operator to replace the original magnitude operator. According to professor
     Luke in the paper
@@ -146,10 +322,3 @@ def stablized_magnitude_projection(diff, _holder_1, _holder_2, _holder_3, mag, e
                                       np.multiply(_holder_2 + 2 * teps, _holder_1)),
                           np.square(_holder_2 + teps))
     return diff - np.fft.ifftn(_holder_3)
-
-
-@numba.vectorize([numba.float32(numba.float32, numba.boolean),
-                  numba.float64(numba.float64, numba.boolean)])
-def filling_missing_magnitude():
-
-    pass
