@@ -2,7 +2,6 @@ import numpy as np
 import scipy as sp
 import numba
 
-
 """
     Some functions are shared by both cpu and gpu algorithms,
     I'll just put them here.
@@ -26,7 +25,7 @@ def abs2(x):
     :return:
     """
 
-    return x.real**2 + x.imag**2
+    return x.real ** 2 + x.imag ** 2
 
 
 def calculate_radial_distribution_simple(pattern, origin):
@@ -46,12 +45,14 @@ def calculate_radial_distribution_simple(pattern, origin):
                         "of the pattern array. i.e. len(pattern.shape)==origin.shape[0] ")
 
     if dim == 3:
-
-        grid_x, grid_y, grid_z = np.meshgrid(np.arange(shape[0])-origin[0],
-                                             np.arange(shape[1])-origin[1],
-                                             np.arange(shape[2])-origin[2]
+        grid_x, grid_y, grid_z = np.meshgrid(np.arange(shape[0]) - origin[0],
+                                             np.arange(shape[1]) - origin[1],
+                                             np.arange(shape[2]) - origin[2]
                                              )
 
         distance = np.sqrt(np.square(grid_x) + np.square(grid_y) + np.square(grid_z))
 
-        distance_bins =
+        distance_bins = np.linspace(np.min(distance) * 0.9, np.max(distance) * 1.1,
+                                    num=300, endpoint=True)
+
+        
