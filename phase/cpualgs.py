@@ -26,9 +26,6 @@ def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict
 
                         new density          -> This is the new density that will be used
 
-                        new density tmp      -> This is the new density derived from the diffraction
-                                                field with the magnitude constrain
-
                         new diffraction      -> This is the diffraction field derived from the
                                                 old density distribution
 
@@ -42,6 +39,9 @@ def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict
                         new diffraction magnitude   -> This is the magnitude of the diffraction
                                                         field before applying the magnitude
                                                         constrain
+
+                        new density tmp      -> This is the new density derived from the diffraction
+                                                field with the magnitude constrain
 
                         phase holder          -> This is the phase of the derived diffraction
                                                     field
@@ -122,7 +122,7 @@ def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict
 
     tmp_1 = holder_dict['tmp holder 1']
 
-    phase = holder_dict['phase']
+    phase = holder_dict['phase holder']
 
     # Step 1: Calculate the fourier transformation of the density
     ndiff_c[:] = np.fft.fftn(odens)
@@ -138,7 +138,7 @@ def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict
     np.multiply(mag[mag_m], phase[mag_m], out=ndiff_c[mag_m])
 
     # Step 3: Get the updated density
-    ndens_t[:] = np.fft.ifftn(ndiff_c)
+    ndens_t[:] = np.fft.ifftn(ndiff_c).real
 
     # Step 4: Apply real space constrain
     # Get the positions where to modify
@@ -335,7 +335,7 @@ def iterative_projection_approximate(input_dict, output_dict, holder_dict, param
               np.square(holder_2 + teps), out=holder_3)     # Intermediate results
 
     # Get the updated density
-    np.subtract(odens, np.fft.ifftn(holder_3), out=ndens_t)
+    np.subtract(odens, np.fft.ifftn(holder_3).real, out=ndens_t)
 
     # Step 3: Apply real space constrain
     # Get the positions where to modify
