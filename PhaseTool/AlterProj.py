@@ -4,7 +4,7 @@ import copy
 """
 This is the main interface to the applications.
 
-The basic idea is that, the use can create a object to do phase retrieval.
+The basic idea is that, the use can create a object to do PhaseTool retrieval.
 The reason that I would like to use class is that after a short discussion with Zhen,
 I realized that class makes it easier for the user to use. Also, in the algorithm, to
 accelerate the calculation, I need to initialize a lot of variables before the
@@ -13,7 +13,7 @@ methods for the users to use.
 """
 
 
-class BaseCDI:
+class BaseAlterProj:
     def __init__(self, device='cpu', source=None):
         """
         One can use this method to initialize a CDI object and can create a newer one
@@ -92,7 +92,7 @@ class BaseCDI:
                                 "constrain"): np.zeros((size, size), dtype=np.complex128),
                             "new diffraction magnitude": np.zeros((size, size), dtype=np.float64),
                             "new density tmp": np.zeros((size, size), dtype=np.float64),
-                            "phase holder": np.zeros((size, size), dtype=np.float64),
+                            "PhaseTool holder": np.zeros((size, size), dtype=np.float64),
                             "modified support": np.zeros((size, size), dtype=np.bool),
                             "tmp holder 1": np.zeros((size, size), dtype=np.float64),
                             "tmp holder 2": np.zeros((size, size), dtype=np.complex128),
@@ -117,8 +117,8 @@ class BaseCDI:
                                     initialize all properties according to the magnitude and the
                                     magnitude_mask assuming that
 
-                                    1. Use a random phase
-                                    2. Calculate the density from the diffraction with random phase
+                                    1. Use a random PhaseTool
+                                    2. Calculate the density from the diffraction with random PhaseTool
                                     3. Drive a support with auto-correlation function
                                     4. Use default RAAR algorithm with default decaying beta values
                                         and default iteration number
@@ -205,8 +205,33 @@ class BaseCDI:
 
         :return:
         """
+
+        # Step 1: Because there are a lot of gaps in the detector. Therefore, one should first
+
+
         autocorrelation = np.fft.ifftn(np.square(self.magnitude)).real
-        
+
+
+    def get_support_from_autocorrelation(self, threshold=0.04, fill_detector_gap=False):
+        """
+        Generate a support from the autocorrelation function calculated from the support info.
+
+        By default, this function will calculate the autocorrelation from the self magnitude array.
+        However, because there are some gaps in the detector, it can be desirable to fill those
+        gaps before calculating the autocorrelation.
+
+        :param threshold: The threshold that is used to decided whether the specific pixel is
+                            in the support or not. Specifically,
+
+                            span = max(auto) - min(auto)
+                            if val(pixel) >= threshold * span + min(auto):
+                                sup(pixel) = True
+
+        :param fill_detector_gap: Whether to fill those gaps in the detecotr. 
+        :return:
+        """
+        autocorrelation = np.fft.ifftn(np.square(self.magnitude)).real
+
 
     def initialize_data(self, support):
         pass

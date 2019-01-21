@@ -13,7 +13,7 @@ def apply_hio_with_wrap_shrink(magnitude_constrain,
                                sigma_stop=0.5,
                                support_decay_rate=50):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
+    This function calculate the retrieved PhaseTool and the corresponding real space electron density
     in n-dimension.
 
     :param magnitude_constrain: This is the magnitude measured by the detector. This has to be
@@ -141,7 +141,7 @@ def apply_hio_no_wrap_shrink(magnitude_constrain,
                              beta=0.8,
                              iter_num=1000):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
+    This function calculate the retrieved PhaseTool and the corresponding real space electron density
     in n-dimension.
 
     :param magnitude_constrain: This is the magnitude measured by the detector. This has to be
@@ -236,7 +236,7 @@ def apply_hio_with_specified_initial_condition(magnitude_constrain,
                                                beta=0.8,
                                                iter_num=1000):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
+    This function calculate the retrieved PhaseTool and the corresponding real space electron density
     in n-dimension.
 
     :param magnitude_constrain: This is the magnitude measured by the detector. This has to be

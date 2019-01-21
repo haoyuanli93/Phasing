@@ -4,8 +4,8 @@ from pyculib import fft as pfft
 import scipy.ndimage as sn
 import time
 import math
-import phase.gpufun2d as gpuutil2d
-import phase.gpufun3d as gpuutil3d
+import PhaseTool.gpufun2d as gpuutil2d
+import PhaseTool.gpufun3d as gpuutil3d
 
 
 #####################################################################################
@@ -23,7 +23,7 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
                                   support_decay_rate=50,
                                   thread_per_block=32):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
+    This function calculate the retrieved PhaseTool and the corresponding real space electron density
     in the 2d case.
 
     :param magnitude_constrain: This is the magnitude measured by the detector. This has to be
@@ -73,7 +73,7 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     diffract_no_magnitude_constrain = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                          dtype=np.complex128))
 
@@ -97,7 +97,7 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     density_with_constrain_complex = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                         dtype=np.complex128))
 
@@ -128,7 +128,7 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
     gpu_support_bool = cuda.to_device(support_bool)
     gpu_reciprocal_mask = cuda.to_device(reciprocal_mask)
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     gpu_diffract_no_magnitude_constrain = cuda.to_device(diffract_no_magnitude_constrain)
 
     # Variable containing the diffraction satisfies the magnitude constrain
@@ -146,7 +146,7 @@ def apply_2d_hio_with_wrap_shrink(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     gpu_density_with_constrain_complex = cuda.to_device(density_with_constrain_complex)
 
     # Containing the previous result of the density function with support constrain
@@ -261,7 +261,7 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
                                   support_decay_rate=50,
                                   thread_per_block=4):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
+    This function calculate the retrieved PhaseTool and the corresponding real space electron density
     in the 2d case.
 
     :param magnitude_constrain: This is the magnitude measured by the detector. This has to be
@@ -311,7 +311,7 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     diffract_no_magnitude_constrain = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                          dtype=np.complex128))
 
@@ -335,7 +335,7 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     density_with_constrain_complex = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                         dtype=np.complex128))
 
@@ -367,7 +367,7 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
     gpu_support_bool = cuda.to_device(support_bool)
     gpu_reciprocal_mask = cuda.to_device(reciprocal_mask)
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     gpu_diffract_no_magnitude_constrain = cuda.to_device(diffract_no_magnitude_constrain)
 
     # Variable containing the diffraction satisfies the magnitude constrain
@@ -385,7 +385,7 @@ def apply_3d_hio_with_wrap_shrink(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     gpu_density_with_constrain_complex = cuda.to_device(density_with_constrain_complex)
 
     # Containing the previous result of the density function with support constrain
@@ -504,7 +504,7 @@ def apply_2d_hio_no_wrap_shrink(magnitude_constrain,
                                 iter_num=100,
                                 thread_per_block=32):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
+    This function calculate the retrieved PhaseTool and the corresponding real space electron density
     in the 2d case.
 
     :param magnitude_constrain: This is the magnitude measured by the detector. This has to be
@@ -535,7 +535,7 @@ def apply_2d_hio_no_wrap_shrink(magnitude_constrain,
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     diffract_no_magnitude_constrain = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                          dtype=np.complex128))
 
@@ -559,7 +559,7 @@ def apply_2d_hio_no_wrap_shrink(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     density_with_constrain_complex = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                         dtype=np.complex128))
 
@@ -590,7 +590,7 @@ def apply_2d_hio_no_wrap_shrink(magnitude_constrain,
     gpu_support_bool = cuda.to_device(support_bool)
     gpu_reciprocal_mask = cuda.to_device(reciprocal_mask)
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     gpu_diffract_no_magnitude_constrain = cuda.to_device(diffract_no_magnitude_constrain)
 
     # Variable containing the diffraction satisfies the magnitude constrain
@@ -608,7 +608,7 @@ def apply_2d_hio_no_wrap_shrink(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     gpu_density_with_constrain_complex = cuda.to_device(density_with_constrain_complex)
 
     # Containing the previous result of the density function with support constrain
@@ -698,7 +698,7 @@ def apply_3d_hio_no_wrap_shrink(magnitude_constrain,
                                 iter_num=100,
                                 thread_per_block=4):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
+    This function calculate the retrieved PhaseTool and the corresponding real space electron density
     in the 2d case.
 
     :param magnitude_constrain: This is the magnitude measured by the detector. This has to be
@@ -730,7 +730,7 @@ def apply_3d_hio_no_wrap_shrink(magnitude_constrain,
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     diffract_no_magnitude_constrain = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                          dtype=np.complex128))
 
@@ -754,7 +754,7 @@ def apply_3d_hio_no_wrap_shrink(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     density_with_constrain_complex = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                         dtype=np.complex128))
 
@@ -786,7 +786,7 @@ def apply_3d_hio_no_wrap_shrink(magnitude_constrain,
     gpu_support_bool = cuda.to_device(support_bool)
     gpu_reciprocal_mask = cuda.to_device(reciprocal_mask)
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     gpu_diffract_no_magnitude_constrain = cuda.to_device(diffract_no_magnitude_constrain)
 
     # Variable containing the diffraction satisfies the magnitude constrain
@@ -804,7 +804,7 @@ def apply_3d_hio_no_wrap_shrink(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     gpu_density_with_constrain_complex = cuda.to_device(density_with_constrain_complex)
 
     # Containing the previous result of the density function with support constrain
@@ -905,7 +905,7 @@ def apply_2d_hio_with_specified_initial_condition(magnitude_constrain,
                                                   iter_num=100,
                                                   thread_per_block=32):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
+    This function calculate the retrieved PhaseTool and the corresponding real space electron density
     in the 2d case.
 
     :param magnitude_constrain: This is the magnitude measured by the detector. This has to be
@@ -942,7 +942,7 @@ def apply_2d_hio_with_specified_initial_condition(magnitude_constrain,
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     diffract_no_magnitude_constrain = np.ascontiguousarray(
         initial_diffract_field.astype(np.complex128))
 
@@ -966,7 +966,7 @@ def apply_2d_hio_with_specified_initial_condition(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     density_with_constrain_complex = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                         dtype=np.complex128))
 
@@ -996,7 +996,7 @@ def apply_2d_hio_with_specified_initial_condition(magnitude_constrain,
     gpu_support_bool = cuda.to_device(support_bool)
     gpu_reciprocal_mask = cuda.to_device(reciprocal_mask)
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     gpu_diffract_no_magnitude_constrain = cuda.to_device(diffract_no_magnitude_constrain)
 
     # Variable containing the diffraction satisfies the magnitude constrain
@@ -1014,7 +1014,7 @@ def apply_2d_hio_with_specified_initial_condition(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     gpu_density_with_constrain_complex = cuda.to_device(density_with_constrain_complex)
 
     # Containing the previous result of the density function with support constrain
@@ -1106,7 +1106,7 @@ def apply_3d_hio_with_specified_initial_condition(magnitude_constrain,
                                                   iter_num=100,
                                                   thread_per_block=4):
     """
-    This function calculate the retrieved phase and the corresponding real space electron density
+    This function calculate the retrieved PhaseTool and the corresponding real space electron density
     in the 2d case.
 
     :param magnitude_constrain: This is the magnitude measured by the detector. This has to be
@@ -1144,7 +1144,7 @@ def apply_3d_hio_with_specified_initial_condition(magnitude_constrain,
 
     magnitude_constrain = np.ascontiguousarray(magnitude_constrain.astype(np.complex128))
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     diffract_no_magnitude_constrain = np.ascontiguousarray(
         initial_diffract_field.astype(np.complex128))
 
@@ -1168,7 +1168,7 @@ def apply_3d_hio_with_specified_initial_condition(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     density_with_constrain_complex = np.ascontiguousarray(np.zeros_like(magnitude_constrain,
                                                                         dtype=np.complex128))
 
@@ -1199,7 +1199,7 @@ def apply_3d_hio_with_specified_initial_condition(magnitude_constrain,
     gpu_support_bool = cuda.to_device(support_bool)
     gpu_reciprocal_mask = cuda.to_device(reciprocal_mask)
 
-    # Retrieved diffraction field with phase
+    # Retrieved diffraction field with PhaseTool
     gpu_diffract_no_magnitude_constrain = cuda.to_device(diffract_no_magnitude_constrain)
 
     # Variable containing the diffraction satisfies the magnitude constrain
@@ -1217,7 +1217,7 @@ def apply_3d_hio_with_specified_initial_condition(magnitude_constrain,
 
     # Cast the real density with support constrain in to complex variables
     # Then this variable is used to get the updated diffraction field which is used to get
-    # updated phase values.
+    # updated PhaseTool values.
     gpu_density_with_constrain_complex = cuda.to_device(density_with_constrain_complex)
 
     # Containing the previous result of the density function with support constrain

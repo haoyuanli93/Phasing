@@ -1,5 +1,5 @@
 import numpy as np
-from phase import util
+from PhaseTool import util
 
 
 def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict):
@@ -43,7 +43,7 @@ def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict
                         new density tmp      -> This is the new density derived from the diffraction
                                                 field with the magnitude constrain
 
-                        phase holder          -> This is the phase of the derived diffraction
+                        PhaseTool holder          -> This is the PhaseTool of the derived diffraction
                                                     field
 
                         modified support   -> In the algorithm, one needs to change pixels
@@ -122,7 +122,7 @@ def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict
 
     tmp_1 = holder_dict['tmp holder 1']
 
-    phase = holder_dict['phase holder']
+    phase = holder_dict['PhaseTool holder']
 
     # Step 1: Calculate the fourier transformation of the density
     ndiff_c[:] = np.fft.fftn(odens)
@@ -220,7 +220,7 @@ def iterative_projection_approximate(input_dict, output_dict, holder_dict, param
                                                         field before applying the magnitude
                                                         constrain
 
-                        phase holder          -> This is the phase of the derived diffraction
+                        PhaseTool holder          -> This is the PhaseTool of the derived diffraction
                                                     field
 
                         modified support   -> In the algorithm, one needs to change pixels

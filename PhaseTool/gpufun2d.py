@@ -60,7 +60,7 @@ def apply_magnitude_constrain(shape_0, shape_1, diffraction_constrain,
 
     # Make sure that the grid is not out of the pattern
     if i < shape_0 and j < shape_1:
-        # Keep the phase from the guess and
+        # Keep the PhaseTool from the guess and
         # apply the constrain from the diffraction pattern
         magnitude_constrain_pattern[i, j] = (diffraction_constrain[i, j] *
                                              cmath.exp(1j * cmath.phase(
@@ -92,7 +92,7 @@ def apply_magnitude_constrain_with_mask(shape_0, shape_1,
     if i < shape_0 and j < shape_1:
 
         if reciprocal_mask[i, j]:
-            # Keep the phase from the guess and
+            # Keep the PhaseTool from the guess and
             # apply the constrain from the diffraction pattern
             magnitude_constrain_pattern[i, j] = (diffraction_constrain[i, j] *
                                                  cmath.exp(1j * cmath.phase(
