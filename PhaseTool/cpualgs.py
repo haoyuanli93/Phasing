@@ -43,7 +43,7 @@ def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict
                         new density tmp      -> This is the new density derived from the diffraction
                                                 field with the magnitude constrain
 
-                        PhaseTool holder          -> This is the PhaseTool of the derived diffraction
+                        phase holder          -> This is the PhaseTool of the derived diffraction
                                                     field
 
                         modified support   -> In the algorithm, one needs to change pixels
@@ -151,7 +151,7 @@ def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict
     np.add(a * ndens_t[support_m], b * odens[support_m], out=ndens[support_m])
 
 
-def iterative_projection_approximate(input_dict, output_dict, holder_dict, param_dict):
+def iterative_projection_approx(input_dict, output_dict, holder_dict, param_dict):
     """
     This function carries out the iterative projection for one iteration.
 
@@ -220,7 +220,7 @@ def iterative_projection_approximate(input_dict, output_dict, holder_dict, param
                                                         field before applying the magnitude
                                                         constrain
 
-                        PhaseTool holder          -> This is the PhaseTool of the derived diffraction
+                        phase holder          -> This is the PhaseTool of the derived diffraction
                                                     field
 
                         modified support   -> In the algorithm, one needs to change pixels

@@ -1,5 +1,5 @@
 import numpy as np
-import scipy as sp
+from scipy import ndimage
 import numba
 
 """
@@ -28,12 +28,13 @@ def abs2(x):
     return x.real ** 2 + x.imag ** 2
 
 
-def calculate_radial_distribution_simple(pattern, origin, bin_num=300):
+def get_radial_info(pattern, pattern_mask, origin, bin_num=300):
     """
     This function will be used to provide values to fill those gaps in the detector when
     the user would like to use the auto-correlation as the initial support.
 
     :param pattern:
+    :param pattern_mask
     :param origin:
     :param bin_num:
     :return:
@@ -43,16 +44,30 @@ def calculate_radial_distribution_simple(pattern, origin, bin_num=300):
 
     if dim != origin.shape[0]:
         raise Exception("The length of the origin array has to be the same as the dimension number"
-                        "of the pattern array. i.e. len(pattern.shape)==origin.shape[0] ")
+                        "of the pattern array. i.e. len(pattern.shape)==origin.shape[0]")
 
     # Calculate the distance regardless of the
     distance = sum(np.meshgrid(*[np.square(np.arange(shape[x]) - origin[x]) for x in range(dim)]))
     np.sqrt(distance, out=distance)
 
     catmap, ends = get_category_map(value_pattern=distance, bin_num=bin_num)
+
+    # Add the mask info to the catmap variable. Because one would not want to calculate
+    # The average including the gaps.
+    catmap_masked = np.copy(catmap)
+    catmap_masked[np.logical_not(pattern_mask)] = bin_num
+
+    # Get the region where there are some valid pixels.
+    cat_start = np.min(catmap_masked)
+    cat_stop = np.max(catmap_masked)
+
+    # Get the mean value
     mean_holder = np.zeros(bin_num, dtype=np.float64)
-    for l in range(bin_num):
+    for l in range(cat_start, cat_stop):
         mean_holder[l] = np.mean(pattern[catmap == l])
+
+    # Set the lower region values to the same as the
+    mean_holder[:cat_start] = mean_holder[cat_start]
 
     return catmap, mean_holder, ends, distance
 
@@ -79,3 +94,99 @@ def get_category_map(value_pattern, bin_num):
         category_map[(value_pattern > ends[l, 0]) & (value_pattern <= ends[l, 1])] = l
 
     return category_map, ends
+
+
+def get_support_from_autocorrelation(magnitude, magnitude_mask, origin,
+                                     threshold=0.04,
+                                     gaussian_filter=True,
+                                     gaussian_sigma=1.,
+                                     flag_fill_detector_gap=False,
+                                     bin_num=300):
+    """
+
+    :param magnitude:
+    :param magnitude_mask:
+    :param origin:
+    :param threshold:
+    :param gaussian_filter:
+    :param gaussian_sigma:
+    :param flag_fill_detector_gap:
+    :param bin_num:
+    :return:
+    """
+
+    # Step 1. Check if I need to fix those gaps.
+    if flag_fill_detector_gap:
+        # Create a variable to handle both case at the same time
+        data_tmp = fill_detector_gap(magnitude=magnitude,
+                                     magnitude_mask=magnitude_mask,
+                                     origin=origin,
+                                     gaussian_filter=gaussian_filter,
+                                     gaussian_sigma=gaussian_sigma,
+                                     bin_num=bin_num)
+    else:
+        data_tmp = magnitude
+
+    # Step 2. Get the correlation
+    autocorrelation = np.fft.ifftn(np.square(data_tmp)).real
+
+    if gaussian_filter:
+        ndimage.gaussian_filter(input=autocorrelation,
+                                sigma=gaussian_sigma,
+                                output=autocorrelation)
+
+    # Step 3. Get the threshold and get the support.
+
+    # Set all the pixels with values lower than the threshold to be zero.
+    # Notice that here, the ture threshold (threshold_t) is low + threshold * span
+    low = np.min(autocorrelation)
+    span = np.max(autocorrelation) - low
+
+    threshold_t = low + threshold * span
+    support_holder = np.ones_like(magnitude_mask, dtype=np.bool)
+    support_holder[autocorrelation <= threshold_t] = False
+
+    return support_holder
+
+
+def fill_detector_gap(magnitude, magnitude_mask, origin, gaussian_filter=True,
+                      gaussian_sigma=1., bin_num=300):
+    """
+    Fill the gaps in the detector will the corresponding average value for that radial region.
+
+    :param magnitude:
+    :param magnitude_mask:
+    :param origin:
+    :param gaussian_filter:
+    :param gaussian_sigma:
+    :param bin_num:
+    :return:
+    """
+
+    # Get the radial info
+    (catmap,
+     mean_holder,
+     ends,
+     distance) = get_radial_info(pattern=magnitude,
+                                 pattern_mask=magnitude_mask,
+                                 origin=origin,
+                                 bin_num=bin_num)
+
+    # Fill the gaps
+    magnitude_filled = np.zeros_like(magnitude)
+
+    # Create a tmp mask for convenience
+    mask_tmp = np.zeros_like(magnitude, dtype=np.bool)
+    magmask_tmp = np.logical_not(magnitude_mask)
+
+    for l in range(bin_num):
+        mask_tmp[:] = False
+        mask_tmp[(catmap == bin_num) & magmask_tmp] = True
+
+        magnitude_filled[mask_tmp] = mean_holder[l]
+
+    if gaussian_filter:
+        magnitude_filled = ndimage.gaussian_filter(input=magnitude_filled,
+                                                   sigma=gaussian_sigma)
+
+    return magnitude_filled
