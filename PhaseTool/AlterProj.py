@@ -233,8 +233,47 @@ class BaseAlterProj:
         """
         self.iter_num = iter_num
 
-    def use_default_beta(self, iter_num=200, decaying=True):
-        pass
+    def use_default_beta_and_iter_num(self, iter_num=200, decaying=True):
+        """
+        According to the paper
+
+        Relaxed averaged alternating reflections for diffraction imaging
+
+        The following beta seems to be useful.
+
+        beta_n = beta_0 + (1 - beta_0) * (1 - exp( - (n/7)**3))
+
+        :param iter_num:
+        :param decaying:
+        :return:
+        """
+
+        beta_0 = 0.75
+        self.set_iteration_number(iter_num=iter_num)
+
+        if decaying:
+
+            tmp_list = np.divide(np.arange(self.iter_num, dtype=np.float64), 7)
+            tmp_list = np.multiply(1 - np.exp(-np.power(tmp_list, 3)), 1 - beta_0)
+            self.beta = beta_0 + tmp_list
+
+        else:
+
+            self.set_beta(beta=beta_0)
+
+    def set_algorithm(self, alg_name):
+
+        available_algs = ['HIO','RAAR','GIF-RAAR']
+
+        if alg_name in available_algs:
+            self.algorithm = alg_name
+            self.update_holder_dict()
+
+        else:
+
+            print("Currently, only the following algorithms are available.")
+            print(available_algs)
+            raise Exception("Please have a look at the info above.")
 
     def update_param_dict_with_beta(self):
         pass
@@ -539,9 +578,6 @@ class BaseAlterProj:
     ###################################
     def totally_customize_algorithm(self):
         pass
-
-    def set_algorithm(self, alg_name):
-        self.algorithm = alg_name
 
     def get_device(self):
         """
