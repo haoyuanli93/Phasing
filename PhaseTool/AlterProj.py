@@ -213,7 +213,7 @@ class BaseAlterProj:
     ################################################################################################
     # Algorithm manipulation and execution
     ################################################################################################
-    def set_beta(self, beta):
+    def set_beta_and_iter_num(self, beta, iter_num=None):
         """
         This function set the beta for the algorithm. In this algorithm, for simplicity, the
         iteration number has to be the same as the number of betas.
