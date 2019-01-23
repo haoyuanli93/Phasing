@@ -54,6 +54,7 @@ class BaseAlterProj:
         self.magnitude_mask = np.ones((size, size), dtype=np.bool)
 
         self.support = np.ones((size, size), np.bool)
+        self.support_not = np.logical_not(self.support)
 
         self.initial_density = np.ones((size, size))
         self.initial_diffraction = np.ones((size, size), dtype=np.complex128)
@@ -71,6 +72,7 @@ class BaseAlterProj:
                            "magnitude mask": self.magnitude_mask,
                            "magnitude mask not": np.logical_not(self.magnitude_mask),
                            "support": self.support,
+                           "support not": self.support_not,
                            "old diffraction": self.initial_diffraction,
                            "old density": self.initial_density,
                            "new diffraction flag": self.new_diffraction_flag
@@ -172,14 +174,26 @@ class BaseAlterProj:
         print("The return of this function if the support array. Please check it to "
               "make sure it makes sense.")
 
-        self.input_dict["magnitude mask not"] = np.logical_not(self.magnitude_mask)
+        self.support_not = np.logical_not(self.support)
+
+        # Update the input dictionary
+        self.input_dict["support"] = self.support
+        self.input_dict["support not"] = self.support_not
+
         return self.support
 
     def set_support(self, support):
+        """
+
+        :param support:
+        :return:
+        """
         self.support = support
+        self.support_not = np.logical_not(support)
 
         # Update the input dictionary.
-        self.update_input_dict()
+        self.input_dict["support"] = self.support
+        self.input_dict["support not"] = self.support_not
 
     def set_initial_density_and_diffraction(self, density=None, diffraction=None):
         """
@@ -262,8 +276,12 @@ class BaseAlterProj:
             self.set_beta(beta=beta_0)
 
     def set_algorithm(self, alg_name):
+        """
 
-        available_algs = ['HIO','RAAR','GIF-RAAR']
+        :param alg_name:
+        :return:
+        """
+        available_algs = ['HIO', 'RAAR', 'GIF-RAAR']
 
         if alg_name in available_algs:
             self.algorithm = alg_name
@@ -280,6 +298,15 @@ class BaseAlterProj:
 
     def execute_algorithm(self):
         pass
+
+    def _update_input_dict_execution(self):
+        """
+        This is an internal methods to update the infomation, I am not sure whether to keep this
+        or just to optimize the code further.
+
+        Give a second and I want to do something else first.
+        :return:
+        """
 
     ################################################################################################
     # Details

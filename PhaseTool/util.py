@@ -190,3 +190,41 @@ def fill_detector_gap(magnitude, magnitude_mask, origin, gaussian_filter=True,
                                                    sigma=gaussian_sigma)
 
     return magnitude_filled
+
+
+def approximate_magnitude_projection(dens, mag, epsilon):
+    """
+       This is a new operator to replace the original magnitude operator. According to professor
+    Luke in the paper
+
+        http://iopscience.iop.org/article/10.1088/0266-5611/21/1/004
+
+        Relaxed averaged alternating reflections for diffraction imaging
+
+    This new operator is more stable. Concrete formula is (34) in the paper. Notice that the
+    formula contains a typo. I here represents the identity operator and should be replaced by u.
+
+
+    :param dens: The old updated density.
+    :param mag: The magnitude array. Notice that, here, the magnitude array might not be the
+                original one. Because the original array have edges if one simply assign zeros to
+                the missing data, one might consider to assign values from the estimation to reduce
+                the artifical edges.
+    :param epsilon: A epsilon value used to calculate the true epsilon value. The detail should be
+                    find from the article.
+    :return:
+    """
+    # Get the fourier transform
+    holder_1 = np.fft.fftn(dens)
+
+    # Get the norm of the transformed data
+    holder_2 = abs2(holder_1)
+
+    # Calculate the true epsilon that should be used in the calculation
+    teps = (epsilon * np.max(holder_2)) ** 2
+
+    # Calculatet the output without truely return any array
+    holder_3 = np.divide(np.multiply(holder_2 - np.multiply(mag, np.sqrt(holder_2 + teps)),
+                                     np.multiply(holder_2 + 2 * teps, holder_1)),
+                         np.square(holder_2 + teps))
+    return dens - np.fft.ifftn(holder_3)

@@ -1,5 +1,4 @@
 import numpy as np
-from PhaseTool import util
 
 
 def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict):
@@ -149,6 +148,119 @@ def iterative_projection_normal(input_dict, output_dict, holder_dict, param_dict
 
     np.add(c * ndens_t, d * odens, out=ndens)
     np.add(a * ndens_t[support_m], b * odens[support_m], out=ndens[support_m])
+
+
+def error_reduction(input_dict, output_dict, holder_dict):
+    """
+    This function carries out the iterative projection for one iteration.
+
+    :param input_dict: This dictionary contains the following info
+
+                        magnitude array      -> The numpy array containing the magnitude array
+                        magnitude mask       -> The boolean mask for the magnitude array
+                        magnitude mask not   -> The boolean mask for the magnitude array.
+                                                This is simply
+                                                        not*magnitude_mask
+                        support              -> The boolean array for the support
+                        old diffraction      -> The diffraction field from previous step
+                                                 Notice that this is not essential. I include it
+                                                here only becase it can be useful for later usage.
+                        old density          -> The density from previous iteration
+                        new diffraction flag -> Whether to update the new diffraction or not
+
+
+    :param output_dict:
+                        This dictionary contains the following info
+
+                        new density          -> This is the new density that will be used
+
+                        new diffraction      -> This is the diffraction field derived from the
+                                                old density distribution
+
+    :param holder_dict:
+                        This dictionary contains intermediate results to reduce memory allocation
+                        time.
+
+                        new diffraction with magnitude constrain  -> This is the diffraction field
+                                                                     with magnitude constrain
+
+                        new diffraction magnitude   -> This is the magnitude of the diffraction
+                                                        field before applying the magnitude
+                                                        constrain
+
+                        new density tmp      -> This is the new density derived from the diffraction
+                                                field with the magnitude constrain
+
+                        phase holder          -> This is the PhaseTool of the derived diffraction
+                                                    field
+
+                        modified support   -> In the algorithm, one needs to change pixels
+                                                     in the support and in the same time
+                                                     satisfied some conditions
+
+                        tmp holder 1        -> Sorry I just reall can not think up a name for
+                                                this holder. It's used to store the information
+                                                before one calculate the modified support
+
+                        tmp holder 2        -> Sorry I just reall can not think up a name for
+                                                this holder. This is for the approximated
+                                                magnitude projection operator.
+                        tmp holder 3        -> Sorry I just reall can not think up a name for
+                                                this holder. This is for the approximated
+                                                magnitude projection operator.
+                        tmp holder 4        -> Sorry I just reall can not think up a name for
+                                                this holder. This is for the approximated
+                                                magnitude projection operator.
+
+    :return: None. The resut is directly saved to the dictionary. This is also the very reason
+            why I choose this mutable structure.
+    """
+
+    # Because this is a very basic function, I will not check paramters or counting the time
+
+    # Get input variables
+    mag = input_dict['magnitude array']
+    mag_m = input_dict['magnitude mask']
+
+    odens = input_dict['old density']
+
+    # Get output variables
+    ndens = output_dict['new density']
+    ndiff = output_dict['new diffraction']
+
+    # Get holder variables
+    support_n = holder_dict['support not']
+
+    ndens_t = holder_dict['new density tmp']
+    ndiff_m = holder_dict['new diffraction magnitude']
+    ndiff_c = holder_dict['new diffraction with magnitude constrain']
+
+    phase = holder_dict['PhaseTool holder']
+
+    # Step 1: Calculate the fourier transformation of the density
+    ndiff_c[:] = np.fft.fftn(odens)
+
+    if input_dict['new diffraction flag']:
+        ndiff[:] = ndiff_c[:]
+
+    # Step 2: Apply magnitude constrain to the diffraction
+    np.absolute(np.absolute(ndiff_c[mag_m]), out=ndiff_m[mag_m])
+    np.divide(ndiff_c[mag_m], ndiff_m[mag_m],
+              out=phase[mag_m], where=ndiff_m[mag_m] > 0)
+
+    np.multiply(mag[mag_m], phase[mag_m], out=ndiff_c[mag_m])
+
+    # Step 3: Get the updated density
+    ndens_t[:] = np.fft.ifftn(ndiff_c).real
+
+    # Step 4: Apply real space constrain
+    ndens[:] = ndens_t[:]
+
+    # If it's out of the support then, set it to zero
+    ndens[support_n] = 0.
+
+    # If it's negative, then set it to zero
+    ndens[ndens < 0] = 0
 
 
 def iterative_projection_approx(input_dict, output_dict, holder_dict, param_dict):
@@ -324,7 +436,7 @@ def iterative_projection_approx(input_dict, output_dict, holder_dict, param_dict
     Notice that even though I have implemented it separately, here, I still would like to 
     write the logic again to simplify the structure logic. 
     """
-    holder_1[:] = np.fft.fftn(odens)         # For fourier tranformation
+    holder_1[:] = np.fft.fftn(odens)  # For fourier tranformation
     np.add(np.square(holder_1.real),
            np.square(holder_1.imag), out=holder_2)  # For square of the magnitude
 
@@ -332,7 +444,7 @@ def iterative_projection_approx(input_dict, output_dict, holder_dict, param_dict
 
     np.divide(np.multiply(holder_2 - np.multiply(mag, np.sqrt(holder_2 + teps)),
                           np.multiply(holder_2 + 2 * teps, holder_1)),
-              np.square(holder_2 + teps), out=holder_3)     # Intermediate results
+              np.square(holder_2 + teps), out=holder_3)  # Intermediate results
 
     # Get the updated density
     np.subtract(odens, np.fft.ifftn(holder_3).real, out=ndens_t)
@@ -346,41 +458,3 @@ def iterative_projection_approx(input_dict, output_dict, holder_dict, param_dict
 
     np.add(c * ndens_t, d * odens, out=ndens)
     np.add(a * ndens_t[support_m], b * odens[support_m], out=ndens[support_m])
-
-
-def approximate_magnitude_projection(dens, mag, epsilon):
-    """
-       This is a new operator to replace the original magnitude operator. According to professor
-    Luke in the paper
-
-        http://iopscience.iop.org/article/10.1088/0266-5611/21/1/004
-
-        Relaxed averaged alternating reflections for diffraction imaging
-
-    This new operator is more stable. Concrete formula is (34) in the paper. Notice that the
-    formula contains a typo. I here represents the identity operator and should be replaced by u.
-
-
-    :param dens: The old updated density.
-    :param mag: The magnitude array. Notice that, here, the magnitude array might not be the
-                original one. Because the original array have edges if one simply assign zeros to
-                the missing data, one might consider to assign values from the estimation to reduce
-                the artifical edges.
-    :param epsilon: A epsilon value used to calculate the true epsilon value. The detail should be
-                    find from the article.
-    :return:
-    """
-    # Get the fourier transform
-    holder_1 = np.fft.fftn(dens)
-
-    # Get the norm of the transformed data
-    holder_2 = util.abs2(holder_1)
-
-    # Calculate the true epsilon that should be used in the calculation
-    teps = (epsilon * np.max(holder_2)) ** 2
-
-    # Calculatet the output without truely return any array
-    holder_3 = np.divide(np.multiply(holder_2 - np.multiply(mag, np.sqrt(holder_2 + teps)),
-                                     np.multiply(holder_2 + 2 * teps, holder_1)),
-                         np.square(holder_2 + teps))
-    return dens - np.fft.ifftn(holder_3)
