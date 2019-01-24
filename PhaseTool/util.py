@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import ndimage
+from skimage import morphology
 import numba
 
 """
@@ -13,7 +14,8 @@ def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, con
     """
     This function derive
 
-
+    :param density:
+    :param convex_hull:
     :param sigma:
     :param threshold_ratio:
     :param filling_holds:
@@ -28,10 +30,10 @@ def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, con
     support = np.copy(support_tmp)
 
     # Take a threshold
-    threshold = threshold_ratio*den_span + den_min
+    threshold = threshold_ratio * den_span + den_min
 
     # Apply the threshold
-    support_tmp[density_smooth>=threshold] = True
+    support_tmp[density_smooth >= threshold] = True
 
     # Check if additional conditions are available.
     if filling_holds:
@@ -40,11 +42,13 @@ def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, con
 
     elif convex_hull:
         print("As per request, use the convex hull of standard shrink-wrap result as the support.")
-        
+        support = morphology.convex_hull_image(support_tmp)
     else:
+        print("Using the result of the standard shrink-wrap as the new support array.")
         support = np.copy(support_tmp)
 
     return support
+
 
 def check_algorithm_configuritions():
     pass

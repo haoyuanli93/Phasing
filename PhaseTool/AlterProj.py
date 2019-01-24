@@ -30,13 +30,14 @@ class BaseAlterProj:
         self.device = device
 
         # Algorithm parameters
+        self.available_algorithms = ['HIO', 'HPR', 'RAAR', 'GIF-RAAR']
         self.algorithm = "RAAR"
-        self.param_dict = {"par_a": 0,
-                           "par_b": 0,
-                           "par_c": 0,
-                           "par_d": 0,
-                           "par_e": 0,
-                           "par_f": 0,
+        self.param_dict = {"par_a": 0.,
+                           "par_b": 0.,
+                           "par_c": 0.,
+                           "par_d": 0.,
+                           "par_e": 0.,
+                           "par_f": 0.,
                            }
 
         self.iter_num = 200
@@ -93,8 +94,25 @@ class BaseAlterProj:
         self.output_dict = {"new density": self.new_density,
                             "new diffraction": self.new_diffraction}
 
-        # Behavior flags
+        # Shrink wrap behavior
         self.shrink_wrap_on = False
+
+        self.support_fill_holes = False
+        self.support_convex_hull = False
+
+        # How many iterations before the threshold decay.
+        self.shrink_wrap_decay_rate = 50
+
+        self.shrink_wrap_sigma = 0.
+        self.shrink_wrap_sigma_decay_ratio = 0.9
+
+        self.shrink_wrap_threshold_retio = 0.04
+        self.shrink_wrap_threshold_decay_ratio = 0.9
+
+        self.shrink_wrap_hist = {'threshold rate history': [],
+                                 'sigma history': []}
+
+        self.shrink_wrap_counter = 0
 
         # Calculation counter
         self.iter_counter = 0
@@ -321,34 +339,140 @@ class BaseAlterProj:
         :param alg_name:
         :return:
         """
-        available_algs = ['HIO', 'RAAR', 'GIF-RAAR']
 
-        if alg_name in available_algs:
+        if alg_name in self.available_algorithms:
             self.algorithm = alg_name
             self.update_holder_dict()
+
+            # Initialize the parameter dictionary
+            if self.algorithm == 'HIO':
+                self.param_dict["par_a"] = 1.
+                self.param_dict["par_b"] = 0.
+                self.param_dict["par_c"] = - 0.87
+                self.param_dict["par_d"] = 1.
+                self.param_dict["par_e"] = 1.
+                self.param_dict["par_f"] = 0.
+            elif self.algorithm == 'HPR':
+                self.param_dict["par_a"] = 1.
+                self.param_dict["par_b"] = 0.
+                self.param_dict["par_c"] = - 0.87
+                self.param_dict["par_d"] = 1.
+                self.param_dict["par_e"] = 1.87
+                self.param_dict["par_f"] = -1.
+            elif self.algorithm == "RAAR":
+                self.param_dict["par_a"] = 1.
+                self.param_dict["par_b"] = 0.
+                self.param_dict["par_c"] = 1 - 2 * 0.87
+                self.param_dict["par_d"] = 0.87
+                self.param_dict["par_e"] = 2.
+                self.param_dict["par_f"] = -1.
+            elif self.algorithm == "GIF-RAAR":
+                self.param_dict["par_a"] = 1.87
+                self.param_dict["par_b"] = - 0.87
+                self.param_dict["par_c"] = 1 - 2 * 0.87
+                self.param_dict["par_d"] = 0.87
+                self.param_dict["par_e"] = 3.
+                self.param_dict["par_f"] = -1.
 
         else:
 
             print("Currently, only the following algorithms are available.")
-            print(available_algs)
+            print(self.available_algorithms)
             raise Exception("Please have a look at the info above.")
 
     def update_param_dict_with_beta(self):
+        if self.algorithm == "HIO":
+            self.param_dict["par_c"] = - self.beta[self.iter_counter]
+        elif self.algorithm == "HPR":
+            self.param_dict["par_c"] = - self.beta[self.iter_counter]
+            self.param_dict["par_e"] = 1 + self.beta[self.iter_counter]
+        elif self.algorithm == "HPR":
+            self.param_dict["par_c"] = - self.beta[self.iter_counter]
+            self.param_dict["par_e"] = 1 + self.beta[self.iter_counter]
+        elif self.algorithm == "HPR":
+            self.param_dict["par_c"] = - self.beta[self.iter_counter]
+            self.param_dict["par_e"] = 1 + self.beta[self.iter_counter]
+        else:
+            raise Exception("Algorithm {} is not available".format(self.algorithm) +
+                            " at present. Please set the " +
+                            "self.algorithm propoerty to be one of the following values:\n" +
+                            "{} with function".format(self.available_algorithms) +
+                            "self.set_algorithm.")
+
+    def execute_algorithm(self,
+                          algorithm=None,
+                          beta=None,
+                          iter_num=None,
+                          initial_density=None,
+                          shrink_wrap_on=False,
+                          ):
         pass
 
-    def execute_algorithm(self):
+    def shrink_warp_properties(self,
+                               threshold_ratio=None,
+                               sigma=None,
+                               decay_rate=None,
+                               threshold_ratio_decay_ratio=0.9,
+                               sigma_decay_ratio=0.9,
+                               filling_holes=None,
+                               convex_hull=None
+                               ):
+        """
+        This is just a temporary implementation of the shrink warp tuning function.
+        There are actually, quite a lot of parameters to tune and that has to be consistent with 
+        the total iteration number. Therefore, it's complicated. 
+        
+        So at, present, I will do the folloing things. Instead of getting an array with 
+         
+        :param threshold_ratio: 
+        :param sigma: 
+        :param decay_rate: 
+        :param threshold_ratio_decay_ratio: 
+        :param sigma_decay_ratio: 
+        :param filling_holes:
+        :param convex_hull:
+        :return: 
+        """
+        if threshold_ratio:
+            self.shrink_wrap_threshold_retio = threshold_ratio
+            print("The initial threshold ratio of the shrink warp algorithm is set to {}".format(
+                threshold_ratio))
+
+        if sigma:
+            self.shrink_wrap_sigma = sigma
+            print("The initial sigma of the shrink warp algorithm is set to {}".format(sigma))
+
+        if decay_rate:
+            self.shrink_wrap_decay_rate = int(decay_rate)
+            print("The decay_rate argument is set to be {}".format(decay_rate))
+            print("Therefore, the shrink wrap algorithm will be applied every {}".format(
+                decay_rate) +
+                  "iterations of the projections. The change of the parameters of the shrink" +
+                  " wrap function will occur after each application. Therefore, if you would like" +
+                  " to use a constant parameter for all shrink wraps, please set the " +
+                  "argument threshold_ratio_decay_ratio=1.0, and "
+                  "sigma_decay_ratio=1.0. By default, they are 0.9.")
+
+        if threshold_ratio_decay_ratio:
+            self.shrink_wrap_threshold_decay_ratio = threshold_ratio_decay_ratio
+            print("The threshold ratio will decay "
+                  "to {} * (current ratio)".format(threshold_ratio_decay_ratio) +
+                  "after each application of the shrink wrap algorithm. To stop this decaying,"
+                  "please set threshold_ratio_decay_ratio=1. when calling this funciton. ")
+
+        if sigma_decay_ratio:
+            self.shrink_wrap_sigma_decay_ratio = sigma_decay_ratio
+            print("The threshold ratio will decay "
+                  "to {} * (current ratio)".format(threshold_ratio_decay_ratio) +
+                  "after each application of the shrink wrap algorithm. To stop this decaying,"
+                  "please set threshold_ratio_decay_ratio=1. when calling this funciton. ")
+
+
+
+    def update_shrink_wrap_properties(self):
         pass
+        ################################################################################################
 
-    def _update_input_dict_execution(self):
-        """
-        This is an internal methods to update the infomation, I am not sure whether to keep this
-        or just to optimize the code further.
-
-        Give a second and I want to do something else first.
-        :return:
-        """
-
-    ################################################################################################
     # Details
     ################################################################################################
     ###################################
