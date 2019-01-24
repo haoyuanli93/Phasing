@@ -9,8 +9,17 @@ import numba
 """
 
 
-def shrink_wrap():
-    pass
+def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, convex_hull=False):
+    """
+    This function derive
+
+
+    :param sigma:
+    :param threshold_ratio:
+    :param filling_holds:
+    :return:
+    """
+
 
 
 def check_algorithm_configuritions():

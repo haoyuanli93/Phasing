@@ -42,7 +42,7 @@ class BaseAlterProj:
         self.iter_num = 200
         self.beta = 0.87 * np.ones(self.iter_num, dtype=np.float64)
 
-        # Whether to save teh final diffraction field.
+        # Whether to save the final diffraction field.
         self.new_diffraction_flag = True
 
         # Momentum space
@@ -92,6 +92,15 @@ class BaseAlterProj:
 
         self.output_dict = {"new density": self.new_density,
                             "new diffraction": self.new_diffraction}
+
+        # Behavior flags
+        self.shrink_wrap_on = False
+
+        # Calculation counter
+        self.iter_counter = 0
+
+        # History recorder
+        self.history = []
 
     ################################################################################################
     # Simplest initialization
@@ -204,8 +213,10 @@ class BaseAlterProj:
         """
         if density:
             self.initial_density = density
+            print("The initial density is updated.")
         if diffraction:
             self.initial_diffraction = diffraction
+            print("The initial diffraction is updated.")
 
         if density or diffraction:
             self.update_input_dict()
@@ -213,7 +224,7 @@ class BaseAlterProj:
     ################################################################################################
     # Algorithm manipulation and execution
     ################################################################################################
-    def set_beta_and_iter_num(self, beta, iter_num=None):
+    def set_beta_and_iter_num(self, beta=0.75, iter_num=200, decay=False, decay_rate=7):
         """
         This function set the beta for the algorithm. In this algorithm, for simplicity, the
         iteration number has to be the same as the number of betas.
@@ -229,25 +240,59 @@ class BaseAlterProj:
             self.iter_num = self.beta.shape[0]
 
         :param beta:
+        :param iter_num:
+        :param decay:
+        :param decay_rate:
         :return:
         """
-        self.beta = beta
+        try:
+            iter_num = int(iter_num)
+        except ValueError:
+            raise Exception("The iter_num argument has to be a positive integer.")
 
+        # Step 1: Check if the beta value is a list.
         if isinstance(beta, (list, tuple, np.ndarray)):
+
+            """
+            Case 1: The user specifies the beta values completely. Then ignore the other two 
+                    arguments and derive the iteration number from the beta values.
+            """
+
             self.beta = np.array(beta)
             self.iter_num = self.beta.shape[0]
+            print("The value of the beta argument is a {}".format(type(beta)))
+            print("Therefore, the 'decay' and 'iter_num' arguments are ignored.")
+            print("The iteration number is set to be the length of the beta array which "
+                  "currently is {}".format(beta.shape[0]))
         else:
-            self.beta = beta * np.ones(self.iter_num, dtype=np.float64)
 
-    def set_iteration_number(self, iter_num):
-        """
+            """
+            Case 2: The user only gives a constant number for beta
+            
+            """
+            if decay:
+                """
+                If decay == True, then create a decaying sequence.
+                """
+                self._use_decaying_beta(initial_beta=beta,
+                                        decay_rate=decay_rate,
+                                        iter_num=iter_num)
+                print("The user uses a constant value for the beta value. This values"
+                      "beta = {}".format(beta))
+                print("This values is recognized as the initial beta value for a list of "
+                      "decaying beta values. The length of this list is the iter_num value"
+                      "which is {}".format(iter_num))
 
-        :param iter_num:
-        :return:
-        """
-        self.iter_num = iter_num
+            else:
+                """
+                If decay == False, then create an array which is consists of the same values.
+                """
+                self.beta = beta * np.ones(iter_num)
+                self.iter_num = iter_num
+                print("The user uses a constant value for the beta argument. The argument "
+                      "decay is set to False. The iteration number is {}".format(iter_num))
 
-    def use_default_beta_and_iter_num(self, iter_num=200, decaying=True):
+    def _use_decaying_beta(self, initial_beta=0.75, decay_rate=7, iter_num=200):
         """
         According to the paper
 
@@ -258,22 +303,17 @@ class BaseAlterProj:
         beta_n = beta_0 + (1 - beta_0) * (1 - exp( - (n/7)**3))
 
         :param iter_num:
-        :param decaying:
+        :param decay_rate:
+        :param initial_beta:
         :return:
         """
 
-        beta_0 = 0.75
-        self.set_iteration_number(iter_num=iter_num)
+        beta_0 = initial_beta
+        self.iter_num = iter_num
 
-        if decaying:
-
-            tmp_list = np.divide(np.arange(self.iter_num, dtype=np.float64), 7)
-            tmp_list = np.multiply(1 - np.exp(-np.power(tmp_list, 3)), 1 - beta_0)
-            self.beta = beta_0 + tmp_list
-
-        else:
-
-            self.set_beta(beta=beta_0)
+        tmp_list = np.divide(np.arange(self.iter_num, dtype=np.float64), decay_rate)
+        tmp_list = np.multiply(1 - np.exp(-np.power(tmp_list, 3)), 1 - beta_0)
+        self.beta = beta_0 + tmp_list
 
     def set_algorithm(self, alg_name):
         """
