@@ -19,8 +19,32 @@ def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, con
     :param filling_holds:
     :return:
     """
+    density_smooth = ndimage.gaussian_filter(input=density, sigma=sigma)
+    den_min = np.min(density_smooth)
+    den_span = np.max(density_smooth) - den_min
 
+    # Get a holder for the support
+    support_tmp = np.zeros_like(density, dtype=np.bool)
+    support = np.copy(support_tmp)
 
+    # Take a threshold
+    threshold = threshold_ratio*den_span + den_min
+
+    # Apply the threshold
+    support_tmp[density_smooth>=threshold] = True
+
+    # Check if additional conditions are available.
+    if filling_holds:
+        print("As per request, fill holes in the support. The convex_hull argument is ignored.")
+        ndimage.binary_fill_holes(input=support_tmp, output=support)
+
+    elif convex_hull:
+        print("As per request, use the convex hull of standard shrink-wrap result as the support.")
+        
+    else:
+        support = np.copy(support_tmp)
+
+    return support
 
 def check_algorithm_configuritions():
     pass
