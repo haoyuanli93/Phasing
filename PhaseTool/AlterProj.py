@@ -1,6 +1,7 @@
 import numpy as np
 import copy
 from PhaseTool import util
+from PhaseTool import cpualgs
 
 """
 This is the main interface to the applications.
@@ -30,7 +31,7 @@ class BaseAlterProj:
         self.device = device
 
         # Algorithm parameters
-        self.available_algorithms = ['HIO', 'HPR', 'RAAR', 'GIF-RAAR']
+        self.available_algorithms = ['ER', 'HIO', 'HPR', 'RAAR', 'GIF-RAAR']
         self.algorithm = "RAAR"
         self.param_dict = {"par_a": 0.,
                            "par_b": 0.,
@@ -352,6 +353,13 @@ class BaseAlterProj:
                 self.param_dict["par_d"] = 1.
                 self.param_dict["par_e"] = 1.
                 self.param_dict["par_f"] = 0.
+            elif self.algorithm == 'ER':
+                self.param_dict["par_a"] = 1.
+                self.param_dict["par_b"] = 0.
+                self.param_dict["par_c"] = 0.
+                self.param_dict["par_d"] = 0.
+                self.param_dict["par_e"] = 1.
+                self.param_dict["par_f"] = 0.
             elif self.algorithm == 'HPR':
                 self.param_dict["par_a"] = 1.
                 self.param_dict["par_b"] = 0.
@@ -399,25 +407,96 @@ class BaseAlterProj:
                             "{} with function".format(self.available_algorithms) +
                             "self.set_algorithm.")
 
-    def execute_algorithm(self,
-                          algorithm=None,
-                          beta=None,
-                          iter_num=None,
-                          initial_density=None,
-                          shrink_wrap_on=False,
-                          ):
-        pass
+    def execute_algorithm(self, algorithm=None, beta=None, iter_num=None, beta_decay=False,
+                          beta_decay_rate=7, initial_density=None, shrink_wrap_on=False, ):
+        """
 
-    def shrink_warp_properties(self,
-                               on=False,
-                               threshold_ratio=None,
-                               sigma=None,
-                               decay_rate=None,
-                               threshold_ratio_decay_ratio=0.9,
-                               sigma_decay_ratio=0.9,
-                               filling_holes=None,
-                               convex_hull=None
-                               ):
+        :param algorithm:
+        :param beta:
+        :param iter_num:
+        :param beta_decay:
+        :param beta_decay_rate:
+        :param initial_density:
+        :param shrink_wrap_on:
+        :return:
+        """
+        if type(algorithm) == str:
+            self.set_algorithm(alg_name=algorithm)
+        if beta or iter_num:
+            self.set_beta_and_iter_num(beta=beta, iter_num=iter_num,
+                                       decay=beta_decay,
+                                       decay_rate=beta_decay_rate)
+        if initial_density:
+            self.set_initial_density_and_diffraction(density=initial_density)
+        if type(shrink_wrap_on) is bool:
+            if shrink_wrap_on:
+                self.shrink_wrap_on = True
+            else:
+                self.shrink_wrap_on = False
+
+        # One should initialize the iteration number since the beta value is tricky to tune.
+        self.iter_num = 0
+        print("The self.iter_num is set to 0.")
+
+        # Switch between different algorithms
+        if not (self.algorithm in self.available_algorithms):
+            raise Exception("There is something wrong with the self.algorithm property." +
+                            "At present, the only available algorithms are " +
+                            "{}".format(self.available_algorithms))
+        else:
+            if self.algorithm == "ER":
+
+                for idx in range(self.iter_num):
+
+                    # Step 1: Execute the ER
+                    cpualgs.error_reduction(input_dict=self.input_dict,
+                                            holder_dict=self.holder_dict,
+                                            output_dict=self.output_dict)
+
+                    # Step 2:increase the counter
+                    self.iter_counter += 1
+
+                    # Step 3: Check if one should apply the shrink wrap
+                    if self.shrink_wrap_on:
+                        if np.mod(self.iter_counter, self.shrink_wrap_decay_rate) == 0:
+                            tmp = util.shrink_wrap(
+                                density=self.input_dict["initial density"],
+                                sigma=self.shrink_wrap_sigma,
+                                threshold_ratio=self.shrink_wrap_threshold_retio,
+                                filling_holds=self.support_fill_holes,
+                                convex_hull=self.support_convex_hull)
+
+                            self.set_support(support=tmp)
+
+            else:
+
+                # Step 1: Execute the alternating projections
+                cpualgs.iterative_projection_normal(input_dict=self.input_dict,
+                                                    holder_dict=self.holder_dict,
+                                                    output_dict=self.output_dict,
+                                                    param_dict=self.param_dict)
+
+                # Step 2:increase the counter
+                self.iter_counter += 1
+
+                # Step 3: Update the beta parameter
+                self.update_param_dict_with_beta()
+
+                # Step 4: Check if one should apply the shrink wrap
+                if self.shrink_wrap_on:
+                    if np.mod(self.iter_counter, self.shrink_wrap_decay_rate) == 0:
+                        tmp = util.shrink_wrap(
+                            density=self.input_dict["initial density"],
+                            sigma=self.shrink_wrap_sigma,
+                            threshold_ratio=self.shrink_wrap_threshold_retio,
+                            filling_holds=self.support_fill_holes,
+                            convex_hull=self.support_convex_hull)
+
+                        self.set_support(support=tmp)
+
+    def shrink_warp_properties(self, on=False, threshold_ratio=None, sigma=None, decay_rate=None,
+                               threshold_ratio_decay_ratio=0.9, sigma_decay_ratio=0.9,
+                               filling_holes=None, convex_hull=None):
         """
         This is just a temporary implementation of the shrink warp tuning function.
         There are actually, quite a lot of parameters to tune and that has to be consistent with 
@@ -763,10 +842,6 @@ class BaseAlterProj:
     # TODO
     def check_fredel_symmetry(self):
         pass
-
-    ###################################
-    # Set beta and iteration number
-    ###################################
 
     ###################################
     # Momentum space
