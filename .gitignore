@@ -1,3 +1,7 @@
 
 *.xml
 *.iml
+*.pyc
+*.pyc
+*.pyc
+notebooks/.ipynb_checkpoints/CPU Test 2D No Noise-checkpoint.ipynb

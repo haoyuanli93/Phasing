@@ -265,3 +265,16 @@ def approximate_magnitude_projection(dens, mag, epsilon):
                                      np.multiply(holder_2 + 2 * teps, holder_1)),
                          np.square(holder_2 + teps))
     return dens - np.fft.ifftn(holder_3)
+
+
+
+
+####################################################################################################
+#  For test
+####################################################################################################
+@numba.jit
+def create_disk(space, center, radius):
+
+    for l in range(center[0] - radius, center[0] + radius):
+        for m in range(center[1] - radius, center[1] + radius):
+            space[l, m] = 
