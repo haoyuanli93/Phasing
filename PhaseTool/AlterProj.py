@@ -30,20 +30,6 @@ class BaseAlterProj:
         self.data_shape = (size, size)  # The shape of the data in this problem
         self.device = device
 
-        # Algorithm parameters
-        self.available_algorithms = ['ER', 'HIO', 'HPR', 'RAAR', 'GIF-RAAR']
-        self.algorithm = "RAAR"
-        self.param_dict = {"par_a": 0.,
-                           "par_b": 0.,
-                           "par_c": 0.,
-                           "par_d": 0.,
-                           "par_e": 0.,
-                           "par_f": 0.,
-                           }
-
-        self.iter_num = 200
-        self.beta = 0.87 * np.ones(self.iter_num, dtype=np.float64)
-
         # Whether to save the final diffraction field.
         self.new_diffraction_flag = True
 
@@ -56,55 +42,28 @@ class BaseAlterProj:
         self.magnitude_mask = np.ones((size, size), dtype=np.bool)
 
         self.support = np.ones((size, size), np.bool)
-        self.support_not = np.logical_not(self.support)
 
         self.initial_density = np.ones((size, size))
         self.initial_diffraction = np.ones((size, size), dtype=np.complex128)
 
-        self.new_density = np.zeros((size, size), dtype=np.float64)
-        self.new_diffraction = np.zeros((size, size), dtype=np.complex128)
+        # Calculation counter
+        self.iter_counter = 0
 
-        # Initialize the dictionaries
-        """
-        Here, the input, output and parameter dictionaries are important because the user might 
-        inspect them. However the holder dictionary is not very important since I have created them
-        mainly to reduce the memory allocation time. 
-        """
-        self.input_dict = {"magnitude array": self.magnitude,
-                           "magnitude mask": self.magnitude_mask,
-                           "magnitude mask not": np.logical_not(self.magnitude_mask),
-                           "support": self.support,
-                           "support not": self.support_not,
-                           "old diffraction": self.initial_diffraction,
-                           "old density": self.initial_density,
-                           "new diffraction flag": self.new_diffraction_flag
-                           }
+        # History recorder
+        self.history = []
 
-        self.holder_dict = {str("new diffraction with magnitude" +
-                                "constrain"): np.zeros((size, size), dtype=np.complex128),
-                            "new diffraction magnitude": np.zeros((size, size), dtype=np.float64),
-                            "new density tmp": np.zeros((size, size), dtype=np.float64),
-                            "phase holder": np.zeros((size, size), dtype=np.float64),
-                            "modified support": np.zeros((size, size), dtype=np.bool),
-                            "tmp holder 1": np.zeros((size, size), dtype=np.float64),
-                            "tmp holder 2": np.zeros((size, size), dtype=np.complex128),
-                            "tmp holder 3": np.zeros((size, size), dtype=np.float64),
-                            "tmp holder 4": np.zeros((size, size), dtype=np.complex128)
-                            }
-
-        self.output_dict = {"new density": self.new_density,
-                            "new diffraction": self.new_diffraction}
-
-        # Shrink wrap behavior
+        ########################
+        # Shrink Wrap Parameters
+        ########################
         self.shrink_wrap_on = False
-
         self.support_fill_holes = False
         self.support_convex_hull = False
+        self.shrink_wrap_counter = 0
 
-        # How many iterations before the threshold decay.
-        self.shrink_wrap_decay_rate = 50
+        self.shrink_wrap_rate = 50  # The number of iterations before the shrink wrap occurs.
+        self.shrink_wrap_sigma = 0.  # The sigma in the gaussian filter in the process.
 
-        self.shrink_wrap_sigma = 0.
+        # The ratio the sigma decays after each application
         self.shrink_wrap_sigma_decay_ratio = 0.9
 
         self.shrink_wrap_threshold_retio = 0.04
@@ -113,13 +72,55 @@ class BaseAlterProj:
         self.shrink_wrap_hist = {'threshold rate history': [],
                                  'sigma history': []}
 
-        self.shrink_wrap_counter = 0
+        ########################
+        # Alternating Projection parameters
+        ########################
+        self.available_algorithms = ['ER', 'HIO', 'HPR', 'RAAR', 'GIF-RAAR']
+        self.algorithm = "RAAR"
+        self.param_dict = {"par_a": 0.,
+                           "par_b": 0.,
+                           "par_c": 0.,
+                           "par_d": 0.,
+                           "par_e": 0.,
+                           "par_f": 0.,
+                           "epsilon": 1e-15}
 
-        # Calculation counter
-        self.iter_counter = 0
+        self.iter_num = 200
+        self.beta = 0.87 * np.ones(self.iter_num, dtype=np.float64)
 
-        # History recorder
-        self.history = []
+        ########################
+        # Dictionaries
+        ########################
+        """
+        Here, the input, output and parameter dictionaries are important because the user might 
+        inspect them. However the holder dictionary is not very important since I have created them
+        mainly to reduce the memory allocation time. 
+        """
+        self.data_dict = {"magnitude array": self.magnitude,
+                          "magnitude mask": self.magnitude_mask,
+
+                          "support": self.support,
+
+                          "diffraction": self.initial_diffraction,
+                          "density": self.initial_density
+                          }
+
+        self.holder_dict = {"magnitude mask not": np.logical_not(self.magnitude_mask),
+                            "diffraction with magnitude constrain": np.zeros((size, size),
+                                                                             dtype=np.complex128),
+
+                            "new diffraction magnitude": np.zeros((size, size), dtype=np.float64),
+                            "new density tmp": np.zeros((size, size), dtype=np.float64),
+                            "phase holder": np.zeros((size, size), dtype=np.float64),
+
+                            "modified support": np.zeros((size, size), dtype=np.bool),
+                            "support not": np.logical_not(self.support),
+                            "support holder temporary": np.zeros((size, size), dtype=np.float64),
+
+                            "tmp holder 2": np.zeros((size, size), dtype=np.complex128),
+                            "tmp holder 3": np.zeros((size, size), dtype=np.float64),
+                            "tmp holder 4": np.zeros((size, size), dtype=np.complex128)
+                            }
 
     ################################################################################################
     # Simplest initialization
@@ -202,11 +203,9 @@ class BaseAlterProj:
         print("The return of this function if the support array. Please check it to "
               "make sure it makes sense.")
 
-        self.support_not = np.logical_not(self.support)
-
         # Update the input dictionary
-        self.input_dict["support"] = self.support
-        self.input_dict["support not"] = self.support_not
+        self.data_dict["support"] = self.support
+        self.holder_dict["support not"] = np.logical_not(self.support)
 
         return self.support
 
@@ -217,11 +216,10 @@ class BaseAlterProj:
         :return:
         """
         self.support = support
-        self.support_not = np.logical_not(support)
 
         # Update the input dictionary.
-        self.input_dict["support"] = self.support
-        self.input_dict["support not"] = self.support_not
+        self.data_dict["support"] = self.support
+        self.holder_dict["support not"] = np.logical_not(self.support)
 
     def set_initial_density_and_diffraction(self, density=None, diffraction=None):
         """
@@ -449,18 +447,17 @@ class BaseAlterProj:
                 for idx in range(self.iter_num):
 
                     # Step 1: Execute the ER
-                    CpuUtil.error_reduction(input_dict=self.input_dict,
-                                            holder_dict=self.holder_dict,
-                                            output_dict=self.output_dict)
+                    CpuUtil.error_reduction(data_dict=self.data_dict,
+                                            holder_dict=self.holder_dict)
 
                     # Step 2:increase the counter
                     self.iter_counter += 1
 
                     # Step 3: Check if one should apply the shrink wrap
                     if self.shrink_wrap_on:
-                        if np.mod(self.iter_counter, self.shrink_wrap_decay_rate) == 0:
+                        if np.mod(self.iter_counter, self.shrink_wrap_rate) == 0:
                             tmp = util.shrink_wrap(
-                                density=self.input_dict["initial density"],
+                                density=self.data_dict["initial density"],
                                 sigma=self.shrink_wrap_sigma,
                                 threshold_ratio=self.shrink_wrap_threshold_retio,
                                 filling_holds=self.support_fill_holes,
@@ -471,10 +468,14 @@ class BaseAlterProj:
             else:
 
                 # Step 1: Execute the alternating projections
-                CpuUtil.iterative_projection_normal(input_dict=self.input_dict,
+                CpuUtil.iterative_projection_normal(data_dict=self.data_dict,
                                                     holder_dict=self.holder_dict,
-                                                    output_dict=self.output_dict,
-                                                    param_dict=self.param_dict)
+                                                    a=self.param_dict["par_a"],
+                                                    b=self.param_dict["par_b"],
+                                                    c=self.param_dict["par_c"],
+                                                    d=self.param_dict["par_d"],
+                                                    e=self.param_dict["par_e"],
+                                                    f=self.param_dict["par_f"])
 
                 # Step 2:increase the counter
                 self.iter_counter += 1
@@ -484,9 +485,9 @@ class BaseAlterProj:
 
                 # Step 4: Check if one should apply the shrink wrap
                 if self.shrink_wrap_on:
-                    if np.mod(self.iter_counter, self.shrink_wrap_decay_rate) == 0:
+                    if np.mod(self.iter_counter, self.shrink_wrap_rate) == 0:
                         tmp = util.shrink_wrap(
-                            density=self.input_dict["initial density"],
+                            density=self.data_dict["initial density"],
                             sigma=self.shrink_wrap_sigma,
                             threshold_ratio=self.shrink_wrap_threshold_retio,
                             filling_holds=self.support_fill_holes,
@@ -528,7 +529,7 @@ class BaseAlterProj:
             print("The initial sigma of the shrink warp algorithm is set to {}".format(sigma))
 
         if decay_rate:
-            self.shrink_wrap_decay_rate = int(decay_rate)
+            self.shrink_wrap_rate = int(decay_rate)
             print("The decay_rate argument is set to be {}".format(decay_rate))
             print("Therefore, the shrink wrap algorithm will be applied every {}".format(
                 decay_rate) +
@@ -597,12 +598,9 @@ class BaseAlterProj:
         :return:
         """
 
-        self.new_density = np.zeros_like(self.magnitude, dtype=np.float64)
-        self.new_diffraction = np.zeros_like(self.magnitude, dtype=np.complex128)
-
-        self.input_dict["magnitude array"] = self.magnitude
-        self.input_dict["magnitude mask"] = self.magnitude_mask
-        self.input_dict["magnitude mask not"] = np.logical_not(self.magnitude_mask)
+        self.data_dict["magnitude array"] = self.magnitude
+        self.data_dict["magnitude mask"] = self.magnitude_mask
+        self.data_dict["magnitude mask not"] = np.logical_not(self.magnitude_mask)
 
         # Abstract info
         self.data_shape = copy.deepcopy(self.magnitude.shape)
@@ -635,7 +633,6 @@ class BaseAlterProj:
         # Step 4: Initialize the holder variables.
         self.update_input_dict()
         self.update_holder_dict()
-        self.update_output_dict()
 
     def update_holder_dict(self):
         """
@@ -650,7 +647,7 @@ class BaseAlterProj:
                             "new density tmp": np.zeros(self.data_shape, dtype=np.float64),
                             "phase holder": np.zeros(self.data_shape, dtype=np.float64),
                             "modified support": np.zeros(self.data_shape, dtype=np.bool),
-                            "tmp holder 1": np.zeros(self.data_shape, dtype=np.float64),
+                            "support holder temporary": np.zeros(self.data_shape, dtype=np.float64),
                             "tmp holder 2": np.zeros(self.data_shape, dtype=np.complex128),
                             "tmp holder 3": np.zeros(self.data_shape, dtype=np.float64),
                             "tmp holder 4": np.zeros(self.data_shape, dtype=np.complex128)
@@ -661,22 +658,14 @@ class BaseAlterProj:
         Create variables with proper values and data shaps.
         :return:
         """
-        self.input_dict = {"magnitude array": self.magnitude,
-                           "magnitude mask": self.magnitude_mask,
-                           "magnitude mask not": np.logical_not(self.magnitude_mask),
-                           "support": self.support,
-                           "old diffraction": self.initial_diffraction,
-                           "old density": self.initial_density,
-                           "new diffraction flag": self.new_diffraction_flag
-                           }
-
-    def update_output_dict(self):
-        """
-
-        :return:
-        """
-        self.output_dict = {"new density": self.new_density,
-                            "new diffraction": self.new_diffraction}
+        self.data_dict = {"magnitude array": self.magnitude,
+                          "magnitude mask": self.magnitude_mask,
+                          "magnitude mask not": np.logical_not(self.magnitude_mask),
+                          "support": self.support,
+                          "old diffraction": self.initial_diffraction,
+                          "old density": self.initial_density,
+                          "new diffraction flag": self.new_diffraction_flag
+                          }
 
     def set_zeroth_iteration_value(self, fill_detector_gap=False, phase="Random"):
 
@@ -749,24 +738,20 @@ class BaseAlterProj:
                       self.initial_diffraction.shape,
                       self.initial_density.shape,
                       self.support.shape,
-                      self.new_density.shape,
-                      self.new_diffraction.shape,
-                      self.input_dict["magnitude array"].shape,
-                      self.input_dict["magnitude mask"].shape,
-                      self.input_dict["magnitude mask not"].shape,
-                      self.input_dict["support"].shape,
-                      self.input_dict["old diffraction"].shape,
-                      self.input_dict["old density"].shape,
-                      self.holder_dict["new diffraction with magnitude constrain"].shape,
+                      self.data_dict["magnitude array"].shape,
+                      self.data_dict["magnitude mask"].shape,
+                      self.data_dict["magnitude mask not"].shape,
+                      self.data_dict["support"].shape,
+                      self.data_dict["old diffraction"].shape,
+                      self.data_dict["old density"].shape,
+                      self.holder_dict["diffraction with magnitude constrain"].shape,
                       self.holder_dict["new diffraction magnitude"].shape,
                       self.holder_dict["phase holder"].shape,
                       self.holder_dict["modified support"].shape,
-                      self.holder_dict["tmp holder 1"].shape,
+                      self.holder_dict["support holder temporary"].shape,
                       self.holder_dict["tmp holder 2"].shape,
                       self.holder_dict["tmp holder 3"].shape,
                       self.holder_dict["tmp holder 4"].shape,
-                      self.output_dict["new diffraction"].shape,
-                      self.output_dict["new density"].shape
                       ]
 
         if len(set(shape_list)) != 1:
@@ -777,24 +762,20 @@ class BaseAlterProj:
                   "self.initial_diffraction.shape\n" +
                   "self.initial_density.shape\n" +
                   "self.support.shape\n" +
-                  "self.new_density.shape\n" +
-                  "self.new_diffraction.shape\n" +
-                  "self.input_dict[\"magnitude array\"].shape\n" +
-                  "self.input_dict[\"magnitude mask\"].shape\n" +
-                  "self.input_dict[\"magnitude mask not\"].shape\n" +
-                  "self.input_dict[\"support\"].shape\n" +
-                  "self.input_dict[\"old diffraction\"].shape\n" +
-                  "self.input_dict[\"old density\"].shape\n" +
-                  "self.holder_dict[\"new diffraction with magnitude constrain\"].shape\n" +
+                  "self.data_dict[\"magnitude array\"].shape\n" +
+                  "self.data_dict[\"magnitude mask\"].shape\n" +
+                  "self.data_dict[\"magnitude mask not\"].shape\n" +
+                  "self.data_dict[\"support\"].shape\n" +
+                  "self.data_dict[\"old diffraction\"].shape\n" +
+                  "self.data_dict[\"old density\"].shape\n" +
+                  "self.holder_dict[\"diffraction with magnitude constrain\"].shape\n" +
                   "self.holder_dict[\"new diffraction magnitude\"].shape\n" +
                   "self.holder_dict[\"phase holder\"].shape\n" +
                   "self.holder_dict[\"modified support\"].shape\n" +
-                  "self.holder_dict[\"tmp holder 1\"].shape\n" +
+                  "self.holder_dict[\"support holder temporary\"].shape\n" +
                   "self.holder_dict[\"tmp holder 2\"].shape\n" +
                   "self.holder_dict[\"tmp holder 3\"].shape\n" +
-                  "self.holder_dict[\"tmp holder 4\"].shape\n" +
-                  "self.output_dict[\"new diffraction\"].shape\n" +
-                  "self.output_dict[\"new density\"].shape\n"
+                  "self.holder_dict[\"tmp holder 4\"].shape\n"
                   )
             print("Their corresponding values are :")
             for l in range(len(shape_list)):
