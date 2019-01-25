@@ -1,7 +1,7 @@
 import numpy as np
 import copy
 from PhaseTool import util
-from PhaseTool import cpualgs
+from PhaseTool import CpuUtil
 
 """
 This is the main interface to the applications.
@@ -449,7 +449,7 @@ class BaseAlterProj:
                 for idx in range(self.iter_num):
 
                     # Step 1: Execute the ER
-                    cpualgs.error_reduction(input_dict=self.input_dict,
+                    CpuUtil.error_reduction(input_dict=self.input_dict,
                                             holder_dict=self.holder_dict,
                                             output_dict=self.output_dict)
 
@@ -471,7 +471,7 @@ class BaseAlterProj:
             else:
 
                 # Step 1: Execute the alternating projections
-                cpualgs.iterative_projection_normal(input_dict=self.input_dict,
+                CpuUtil.iterative_projection_normal(input_dict=self.input_dict,
                                                     holder_dict=self.holder_dict,
                                                     output_dict=self.output_dict,
                                                     param_dict=self.param_dict)

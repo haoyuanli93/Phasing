@@ -1,3 +1,3 @@
 import PhaseTool.gpualgs
-import PhaseTool.cpualgs
+import PhaseTool.CpuUtil
 import PhaseTool.util
