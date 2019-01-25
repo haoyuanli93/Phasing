@@ -26,31 +26,32 @@ class BaseAlterProj:
 
         # Meta parameters
         size = 64
-        self.dim = 2  # The dimension of the data
-        self.data_shape = (size, size)  # The shape of the data in this problem
         self.device = device
+        # History recorder
+        self.history = []
 
-        # Whether to save the final diffraction field.
-        self.new_diffraction_flag = True
+        ########################
+        # Data Parameters
+        ########################
+        # The dimension of the data
+        self.dim = 2
 
-        # Momentum space
+        # The shape of the data in this problem
+        self.data_shape = (size, size)
+
         # The position of the center of the diffraction measured in pixel
         self.center_in_pixel = np.array([32., 32.], dtype=np.float64)
 
         # IO variables
         self.magnitude = np.zeros((size, size), dtype=np.float64)
         self.magnitude_mask = np.ones((size, size), dtype=np.bool)
-
         self.support = np.ones((size, size), np.bool)
+        self.density = np.ones((size, size))
 
-        self.initial_density = np.ones((size, size))
-        self.initial_diffraction = np.ones((size, size), dtype=np.complex128)
-
-        # Calculation counter
-        self.iter_counter = 0
-
-        # History recorder
-        self.history = []
+        ########################
+        # Important holder
+        ########################
+        self.diffraction = np.ones((size, size), dtype=np.complex128)
 
         ########################
         # Shrink Wrap Parameters
@@ -75,8 +76,28 @@ class BaseAlterProj:
         ########################
         # Alternating Projection parameters
         ########################
+        # Calculation counter
+        self.iter_counter = 0
+
         self.available_algorithms = ['ER', 'HIO', 'HPR', 'RAAR', 'GIF-RAAR']
         self.algorithm = "RAAR"
+        """
+        In the following dictionary
+
+        epsilon :               -> parameter for the approximation
+
+        [par_a par_b par_c par_d par_e par_f] are complicated. They defines the structure of the
+        projections.
+
+        Below, I use u_(n+1) to denote the new density, then in general,
+        the algorithm can be represented as
+
+                     par_c * P(u_n)(x) + par_d * u_n(x)
+        u_(n+1)(x) =
+                     par_a * P(u_n)(x) + par_b * u_n(x)     for x (in support) and
+                                                            par_e * P(u_n)(x) >
+                                                            par_f * u_n(x)
+        """
         self.param_dict = {"par_a": 0.,
                            "par_b": 0.,
                            "par_c": 0.,
@@ -92,29 +113,65 @@ class BaseAlterProj:
         # Dictionaries
         ########################
         """
-        Here, the input, output and parameter dictionaries are important because the user might 
-        inspect them. However the holder dictionary is not very important since I have created them
-        mainly to reduce the memory allocation time. 
+        The following two dictionaries are the core of this class. The data class contains all 
+        the external IO information and it used to facilitate the IO.
+        
+        The data_dict dictionary contains five items
+        
+        "magnitude array": self.magnitude,
+        "magnitude mask": self.magnitude_mask,
+        "support": self.support,
+        "diffraction": self.diffraction,
+        "density": self.density
+        
+        They are respectively the corresponding properties of this class. Their meaning is 
+        obvious, therefore, I'll not give more explanation.
+        
+        
+        The holder_dict contains variables to reduce the memory allocation time. It contains the 
+        following entries.
+        
+        
+        "magnitude mask not": np.logical_not(self.magnitude_mask),
+        "support not": np.logical_not(self.support),
+        
+        
+        "diffraction": self.diffraction,           -> The fourier of the initial density
+        "new diffraction magnitude":               -> np.abs(diffraction)
+        "phase holder":                            -> The phase of the diffraction
+        "diffraction with magnitude constrain":    -> Diffraction with the magnitude constrain
+        
+        
+        "new density tmp":                         -> Real part of the fourier trans of the 
+                                                      diffraction with magnitude constrain
+        
+        "support holder temporary":                -> Holder when getting new support for update
+        "modified support":                        -> Support combined with Algorithm constrain
+        "modified support not":                    -> np.logical_not(modified support)
+
+
+        "tmp holder 2": dtype=np.complex128,       -> For approximated projection
+        "tmp holder 3": dtype=np.float64           -> For approximated projection
+        "tmp holder 4": dtype=np.complex128        -> For approximated projection
         """
         self.data_dict = {"magnitude array": self.magnitude,
                           "magnitude mask": self.magnitude_mask,
-
                           "support": self.support,
-
-                          "diffraction": self.initial_diffraction,
-                          "density": self.initial_density
-                          }
+                          "density": self.density}
 
         self.holder_dict = {"magnitude mask not": np.logical_not(self.magnitude_mask),
+                            "support not": np.logical_not(self.support),
+
+                            "diffraction": self.diffraction,
+                            "new diffraction magnitude": np.zeros((size, size), dtype=np.float64),
+                            "phase holder": np.zeros((size, size), dtype=np.float64),
                             "diffraction with magnitude constrain": np.zeros((size, size),
                                                                              dtype=np.complex128),
 
-                            "new diffraction magnitude": np.zeros((size, size), dtype=np.float64),
                             "new density tmp": np.zeros((size, size), dtype=np.float64),
-                            "phase holder": np.zeros((size, size), dtype=np.float64),
 
                             "modified support": np.zeros((size, size), dtype=np.bool),
-                            "support not": np.logical_not(self.support),
+                            "modified support not": np.ones((size, size), dtype=np.bool),
                             "support holder temporary": np.zeros((size, size), dtype=np.float64),
 
                             "tmp holder 2": np.zeros((size, size), dtype=np.complex128),
@@ -123,7 +180,7 @@ class BaseAlterProj:
                             }
 
     ################################################################################################
-    # Simplest initialization
+    # Initialize and update
     ################################################################################################
     def initialize_easy(self, magnitude, magnitude_mask, full_initialization=True):
         """
@@ -161,12 +218,8 @@ class BaseAlterProj:
         else:
             self._init_from_initez()
 
-    def derive_support_from_autocorrelation(self,
-                                            threshold=0.04,
-                                            gaussian_filter=True,
-                                            sigma=1.0,
-                                            fill_detector_gap=False,
-                                            bin_num=300):
+    def derive_support_from_autocorrelation(self, threshold=0.04, gaussian_filter=True,
+                                            sigma=1.0, fill_detector_gap=False, bin_num=300):
         """
         Generate a support from the autocorrelation function calculated from the support info.
 
@@ -221,22 +274,53 @@ class BaseAlterProj:
         self.data_dict["support"] = self.support
         self.holder_dict["support not"] = np.logical_not(self.support)
 
-    def set_initial_density_and_diffraction(self, density=None, diffraction=None):
+    def set_initial_density(self, density):
         """
+        Set the initial density and update the input dictionary for the algorithm.
 
         :param density:
-        :param diffraction:
         :return:
         """
-        if density:
-            self.initial_density = density
-            print("The initial density is updated.")
-        if diffraction:
-            self.initial_diffraction = diffraction
-            print("The initial diffraction is updated.")
+        self.density = density
+        self.data_dict["density"] = self.density
+        print("The initial density is updated.")
 
-        if density or diffraction:
-            self.update_input_dict()
+    def update_holder_dict(self):
+        """
+        Create variables with proper data shape.
+        :return:
+        """
+        # Create different variables
+        self.holder_dict = {"magnitude mask not": np.logical_not(self.magnitude_mask),
+                            "support not": np.logical_not(self.support),
+
+                            "diffraction": self.diffraction,
+                            "new diffraction magnitude": np.zeros(self.data_shape,
+                                                                  dtype=np.float64),
+                            "phase holder": np.zeros(self.data_shape, dtype=np.float64),
+                            "diffraction with magnitude constrain": np.zeros(self.data_shape,
+                                                                             dtype=np.complex128),
+
+                            "new density tmp": np.zeros(self.data_shape, dtype=np.float64),
+
+                            "modified support": np.zeros(self.data_shape, dtype=np.bool),
+                            "modified support not": np.zeros(self.data_shape, dtype=np.bool),
+                            "support holder temporary": np.zeros(self.data_shape, dtype=np.float64),
+
+                            "tmp holder 2": np.zeros(self.data_shape, dtype=np.complex128),
+                            "tmp holder 3": np.zeros(self.data_shape, dtype=np.float64),
+                            "tmp holder 4": np.zeros(self.data_shape, dtype=np.complex128)
+                            }
+
+    def update_input_dict(self):
+        """
+        Create variables with proper values and data shaps.
+        :return:
+        """
+        self.data_dict = {"magnitude array": self.magnitude,
+                          "magnitude mask": self.magnitude_mask,
+                          "support": self.support,
+                          "density": self.density}
 
     ################################################################################################
     # Algorithm manipulation and execution
@@ -386,18 +470,20 @@ class BaseAlterProj:
             print(self.available_algorithms)
             raise Exception("Please have a look at the info above.")
 
-    def update_param_dict_with_beta(self):
+    def update_param_dict_with_beta(self, beta):
         if self.algorithm == "HIO":
-            self.param_dict["par_c"] = - self.beta[self.iter_counter]
+            self.param_dict["par_c"] = - beta
         elif self.algorithm == "HPR":
-            self.param_dict["par_c"] = - self.beta[self.iter_counter]
-            self.param_dict["par_e"] = 1 + self.beta[self.iter_counter]
-        elif self.algorithm == "HPR":
-            self.param_dict["par_c"] = - self.beta[self.iter_counter]
-            self.param_dict["par_e"] = 1 + self.beta[self.iter_counter]
-        elif self.algorithm == "HPR":
-            self.param_dict["par_c"] = - self.beta[self.iter_counter]
-            self.param_dict["par_e"] = 1 + self.beta[self.iter_counter]
+            self.param_dict["par_c"] = - beta
+            self.param_dict["par_e"] = 1 + beta
+        elif self.algorithm == "RAAR":
+            self.param_dict["par_c"] = 1 - 2 * beta
+            self.param_dict["par_d"] = beta
+        elif self.algorithm == "GIF-HPR":
+            self.param_dict["par_a"] = 1 + beta
+            self.param_dict["par_b"] = - beta
+            self.param_dict["par_c"] = 1 - 2 * beta
+            self.param_dict["par_d"] = beta
         else:
             raise Exception("Algorithm {} is not available".format(self.algorithm) +
                             " at present. Please set the " +
@@ -418,17 +504,25 @@ class BaseAlterProj:
         :param shrink_wrap_on:
         :return:
         """
+
+        # Set Algorithem
         if type(algorithm) == str:
             self.set_algorithm(alg_name=algorithm)
+
+        # Set beta
         if beta or iter_num:
             self.set_beta_and_iter_num(beta=beta, iter_num=iter_num,
                                        decay=beta_decay,
                                        decay_rate=beta_decay_rate)
+
+        # Set initial density
         if initial_density:
-            self.set_initial_density_and_diffraction(density=initial_density)
+            self.set_initial_density(density=initial_density)
+
+        # Set the shrink wrap behavior
         if type(shrink_wrap_on) is bool:
             if shrink_wrap_on:
-                self.shrink_wrap_on = True
+                self.shrink_warp_properties(on=True, filling_holes=True)
             else:
                 self.shrink_wrap_on = False
 
@@ -436,12 +530,13 @@ class BaseAlterProj:
         self.iter_num = 0
         print("The self.iter_num is set to 0.")
 
-        # Switch between different algorithms
-        if not (self.algorithm in self.available_algorithms):
-            raise Exception("There is something wrong with the self.algorithm property." +
-                            "At present, the only available algorithms are " +
-                            "{}".format(self.available_algorithms))
-        else:
+        # Begin Calculation
+        if self.algorithm in self.available_algorithms:
+
+            # Check self consistency
+            self.check_consistency_short()
+
+            # Begin
             if self.algorithm == "ER":
 
                 for idx in range(self.iter_num):
@@ -457,7 +552,38 @@ class BaseAlterProj:
                     if self.shrink_wrap_on:
                         if np.mod(self.iter_counter, self.shrink_wrap_rate) == 0:
                             tmp = util.shrink_wrap(
-                                density=self.data_dict["initial density"],
+                                density=self.data_dict["density"],
+                                sigma=self.shrink_wrap_sigma,
+                                threshold_ratio=self.shrink_wrap_threshold_retio,
+                                filling_holds=self.support_fill_holes,
+                                convex_hull=self.support_convex_hull)
+
+                            self.set_support(support=tmp)
+                            self.update_shrink_wrap_properties()
+
+            else:
+                for idx in range(self.iter_num):
+                    # Step 1: Execute the alternating projections
+                    CpuUtil.iterative_projection_normal(data_dict=self.data_dict,
+                                                        holder_dict=self.holder_dict,
+                                                        a=self.param_dict["par_a"],
+                                                        b=self.param_dict["par_b"],
+                                                        c=self.param_dict["par_c"],
+                                                        d=self.param_dict["par_d"],
+                                                        e=self.param_dict["par_e"],
+                                                        f=self.param_dict["par_f"])
+
+                    # Step 2:increase the counter
+                    self.iter_counter += 1
+
+                    # Step 3: Update the beta parameter
+                    self.update_param_dict_with_beta(beta=self.beta[self.iter_counter])
+
+                    # Step 4: Check if one should apply the shrink wrap
+                    if self.shrink_wrap_on:
+                        if np.mod(self.iter_counter, self.shrink_wrap_rate) == 0:
+                            tmp = util.shrink_wrap(
+                                density=self.data_dict["density"],
                                 sigma=self.shrink_wrap_sigma,
                                 threshold_ratio=self.shrink_wrap_threshold_retio,
                                 filling_holds=self.support_fill_holes,
@@ -465,35 +591,11 @@ class BaseAlterProj:
 
                             self.set_support(support=tmp)
 
-            else:
-
-                # Step 1: Execute the alternating projections
-                CpuUtil.iterative_projection_normal(data_dict=self.data_dict,
-                                                    holder_dict=self.holder_dict,
-                                                    a=self.param_dict["par_a"],
-                                                    b=self.param_dict["par_b"],
-                                                    c=self.param_dict["par_c"],
-                                                    d=self.param_dict["par_d"],
-                                                    e=self.param_dict["par_e"],
-                                                    f=self.param_dict["par_f"])
-
-                # Step 2:increase the counter
-                self.iter_counter += 1
-
-                # Step 3: Update the beta parameter
-                self.update_param_dict_with_beta()
-
-                # Step 4: Check if one should apply the shrink wrap
-                if self.shrink_wrap_on:
-                    if np.mod(self.iter_counter, self.shrink_wrap_rate) == 0:
-                        tmp = util.shrink_wrap(
-                            density=self.data_dict["initial density"],
-                            sigma=self.shrink_wrap_sigma,
-                            threshold_ratio=self.shrink_wrap_threshold_retio,
-                            filling_holds=self.support_fill_holes,
-                            convex_hull=self.support_convex_hull)
-
-                        self.set_support(support=tmp)
+        # If the algorithm is not available, give an error.
+        else:
+            raise Exception("There is something wrong with the self.algorithm property." +
+                            "At present, the only available algorithms are " +
+                            "{}".format(self.available_algorithms))
 
     def shrink_warp_properties(self, on=False, threshold_ratio=None, sigma=None, decay_rate=None,
                                threshold_ratio_decay_ratio=0.9, sigma_decay_ratio=0.9,
@@ -518,6 +620,10 @@ class BaseAlterProj:
         if on:
             self.shrink_wrap_on = on
             print("Enable shrink wrap functions.")
+        else:
+            self.shrink_wrap_on = on
+            threshold_ratio_decay_ratio = 1.0
+            sigma_decay_ratio = 1.0
 
         if threshold_ratio:
             self.shrink_wrap_threshold_retio = threshold_ratio
@@ -600,7 +706,7 @@ class BaseAlterProj:
 
         self.data_dict["magnitude array"] = self.magnitude
         self.data_dict["magnitude mask"] = self.magnitude_mask
-        self.data_dict["magnitude mask not"] = np.logical_not(self.magnitude_mask)
+        self.holder_dict["magnitude mask not"] = np.logical_not(self.magnitude_mask)
 
         # Abstract info
         self.data_shape = copy.deepcopy(self.magnitude.shape)
@@ -634,39 +740,6 @@ class BaseAlterProj:
         self.update_input_dict()
         self.update_holder_dict()
 
-    def update_holder_dict(self):
-        """
-        Create variables with proper data shape.
-        :return:
-        """
-        # Create different variables
-        self.holder_dict = {str("new diffraction with magnitude" +
-                                "constrain"): np.zeros(self.data_shape, dtype=np.complex128),
-                            "new diffraction magnitude": np.zeros(self.data_shape,
-                                                                  dtype=np.float64),
-                            "new density tmp": np.zeros(self.data_shape, dtype=np.float64),
-                            "phase holder": np.zeros(self.data_shape, dtype=np.float64),
-                            "modified support": np.zeros(self.data_shape, dtype=np.bool),
-                            "support holder temporary": np.zeros(self.data_shape, dtype=np.float64),
-                            "tmp holder 2": np.zeros(self.data_shape, dtype=np.complex128),
-                            "tmp holder 3": np.zeros(self.data_shape, dtype=np.float64),
-                            "tmp holder 4": np.zeros(self.data_shape, dtype=np.complex128)
-                            }
-
-    def update_input_dict(self):
-        """
-        Create variables with proper values and data shaps.
-        :return:
-        """
-        self.data_dict = {"magnitude array": self.magnitude,
-                          "magnitude mask": self.magnitude_mask,
-                          "magnitude mask not": np.logical_not(self.magnitude_mask),
-                          "support": self.support,
-                          "old diffraction": self.initial_diffraction,
-                          "old density": self.initial_density,
-                          "new diffraction flag": self.new_diffraction_flag
-                          }
-
     def set_zeroth_iteration_value(self, fill_detector_gap=False, phase="Random"):
 
         # Step 1: Get the phase
@@ -698,8 +771,8 @@ class BaseAlterProj:
             magnitude_tmp = self.magnitude
 
         # Step 3: Get all the values
-        self.initial_diffraction = np.multiply(phase_array, magnitude_tmp)
-        self.initial_density = np.fft.ifftn(self.initial_diffraction).real
+        self.diffraction = np.multiply(phase_array, magnitude_tmp)
+        self.density = np.fft.ifftn(self.diffraction).real
 
     ###################################
     # Parameter & consistency check
@@ -735,20 +808,27 @@ class BaseAlterProj:
         shape_list = [self.data_shape,
                       self.magnitude.shape,
                       self.magnitude_mask.shape,
-                      self.initial_diffraction.shape,
-                      self.initial_density.shape,
+                      self.diffraction.shape,
+                      self.density.shape,
                       self.support.shape,
+
                       self.data_dict["magnitude array"].shape,
                       self.data_dict["magnitude mask"].shape,
-                      self.data_dict["magnitude mask not"].shape,
                       self.data_dict["support"].shape,
-                      self.data_dict["old diffraction"].shape,
-                      self.data_dict["old density"].shape,
+                      self.data_dict["density"].shape,
+
+                      self.holder_dict["magnitude mask not"].shape,
+                      self.holder_dict["support not"].shape,
+
+                      self.holder_dict["diffraction"].shape,
                       self.holder_dict["diffraction with magnitude constrain"].shape,
                       self.holder_dict["new diffraction magnitude"].shape,
                       self.holder_dict["phase holder"].shape,
+
                       self.holder_dict["modified support"].shape,
+                      self.holder_dict["modified support not"].shape,
                       self.holder_dict["support holder temporary"].shape,
+
                       self.holder_dict["tmp holder 2"].shape,
                       self.holder_dict["tmp holder 3"].shape,
                       self.holder_dict["tmp holder 4"].shape,
@@ -756,26 +836,30 @@ class BaseAlterProj:
 
         if len(set(shape_list)) != 1:
             print("The data whose shapes that I have checked are :")
-            print("self.data_shape,\n" +
-                  "self.magnitude.shape,\n" +
-                  "self.magnitude_mask.shape\n" +
-                  "self.initial_diffraction.shape\n" +
-                  "self.initial_density.shape\n" +
-                  "self.support.shape\n" +
-                  "self.data_dict[\"magnitude array\"].shape\n" +
-                  "self.data_dict[\"magnitude mask\"].shape\n" +
-                  "self.data_dict[\"magnitude mask not\"].shape\n" +
-                  "self.data_dict[\"support\"].shape\n" +
-                  "self.data_dict[\"old diffraction\"].shape\n" +
-                  "self.data_dict[\"old density\"].shape\n" +
-                  "self.holder_dict[\"diffraction with magnitude constrain\"].shape\n" +
-                  "self.holder_dict[\"new diffraction magnitude\"].shape\n" +
-                  "self.holder_dict[\"phase holder\"].shape\n" +
-                  "self.holder_dict[\"modified support\"].shape\n" +
-                  "self.holder_dict[\"support holder temporary\"].shape\n" +
-                  "self.holder_dict[\"tmp holder 2\"].shape\n" +
-                  "self.holder_dict[\"tmp holder 3\"].shape\n" +
-                  "self.holder_dict[\"tmp holder 4\"].shape\n"
+            print("self.data_shape, \n" +
+                  "self.magnitude.shape, \n" +
+                  "self.magnitude_mask.shape, \n" +
+                  "self.diffraction.shape, \n" +
+                  "self.density.shape, \n" +
+                  "self.support.shape, \n" +
+
+                  "self.data_dict[\"magnitude array\"].shape, \n" +
+                  "self.data_dict[\"magnitude mask\"].shape, \n" +
+                  "self.data_dict[\"support\"].shape, \n" +
+                  "self.data_dict[\"density\"].shape, \n" +
+
+                  "self.holder_dict[\"magnitude mask not\"].shape, \n" +
+                  "self.holder_dict[\"support not\"].shape, \n" +
+                  "self.holder_dict[\"diffraction\"].shape, \n" +
+                  "self.holder_dict[\"diffraction with magnitude constrain\"].shape, \n" +
+                  "self.holder_dict[\"new diffraction magnitude\"].shape, \n" +
+                  "self.holder_dict[\"phase holder\"].shape, \n" +
+                  "self.holder_dict[\"modified support\"].shape, \n" +
+                  "self.holder_dict[\"modified support not\"].shape, \n" +
+                  "self.holder_dict[\"support holder temporary\"].shape, \n" +
+                  "self.holder_dict[\"tmp holder 2\"].shape, \n" +
+                  "self.holder_dict[\"tmp holder 3\"].shape, \n" +
+                  "self.holder_dict[\"tmp holder 4\"].shape,"
                   )
             print("Their corresponding values are :")
             for l in range(len(shape_list)):

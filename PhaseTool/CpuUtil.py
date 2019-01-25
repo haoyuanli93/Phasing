@@ -5,88 +5,42 @@ def iterative_projection_normal(data_dict, holder_dict, a, b, c, d, e, f):
     """
     This function carries out the iterative projection for one iteration.
 
-    :param data_dict: This dictionary contains the following info
-
-                        magnitude array      -> The numpy array containing the magnitude array
-
-                        magnitude mask       -> The boolean mask for the magnitude array
-
-                        support              -> The boolean array for the support
-
-                        diffraction      -> The diffraction field from previous step
-                                            Notice that this is not essential. I include it
-                                            here only becase it can be useful for later usage.
-
-                        density          -> The density from previous iteration
-
+    :param data_dict:
+                        "magnitude array": self.magnitude,
+                        "magnitude mask": self.magnitude_mask,
+                        "support": self.support,
+                        "diffraction": self.diffraction,
+                        "density": self.density
 
     :param holder_dict:
-                        This dictionary contains intermediate results to reduce memory allocation
-                        time.
 
-                        new diffraction with magnitude constrain  -> This is the diffraction field
-                                                                     with magnitude constrain
+        "magnitude mask not": np.logical_not(self.magnitude_mask),
+        "support not": np.logical_not(self.support),
 
-                        new diffraction magnitude   -> This is the magnitude of the diffraction
-                                                        field before applying the magnitude
-                                                        constrain
 
-                        new density tmp      -> This is the new density derived from the diffraction
-                                                field with the magnitude constrain
+        "diffraction": self.diffraction,           -> The fourier of the initial density
+        "new diffraction magnitude":               -> np.abs(diffraction)
+        "phase holder":                            -> The phase of the diffraction
+        "diffraction with magnitude constrain":    -> Diffraction with the magnitude constrain
 
-                        phase holder          -> This is the PhaseTool of the derived diffraction
-                                                    field
 
-                        support not           -> not*support
+        "new density tmp":                         -> Real part of the fourier trans of the
+                                                      diffraction with magnitude constrain
 
-                        magnitude mask not   -> The boolean mask for the magnitude array.
-                                                This is simply
-                                                        not*magnitude_mask
+        "support holder temporary":                -> Holder when getting new support for update
+        "modified support":                        -> Support combined with Algorithm constrain
 
-                        modified support   -> In the algorithm, one needs to change pixels
-                                                     in the support and in the same time
-                                                     satisfied some conditions
 
-                        modified support not  ->  np.logical_not(modified support)
+        "tmp holder 2": dtype=np.complex128,       -> For approximated projection
+        "tmp holder 3": dtype=np.float64           -> For approximated projection
+        "tmp holder 4": dtype=np.complex128        -> For approximated projection
 
-                        support holder temporary  ->  A temporary holder when calculating the
-                                                     modified support.
-
-                        tmp holder 2        -> Sorry I just really can not think up a name for
-                                                this holder. This is for the approximated
-                                                magnitude projection operator.
-                        tmp holder 3        -> Sorry I just really can not think up a name for
-                                                this holder. This is for the approximated
-                                                magnitude projection operator.
-                        tmp holder 4        -> Sorry I just really can not think up a name for
-                                                this holder. This is for the approximated
-                                                magnitude projection operator.
     :param a:
     :param b:
     :param c:
     :param d:
     :param e:
     :param f:
-    
-                        These six parameters are complicated.
-
-                        epsilon : This is the parameter for the approximation
-
-
-                        par_a
-                        par_b
-                        par_c
-                        par_d
-                        par_e
-                        par_f
-
-
-                       The last six entries are complicated. They defines the structure of the
-                       projections.
-
-                       Below, I use u_(n+1) to denote the new density, then in general,
-                       the algorithm can be represented as
-
                                      par_c * P(u_n)(x) + par_d * u_n(x)
                        u_(n+1)(x) =
                                      par_a * P(u_n)(x) + par_b * u_n(x)     for x (in support) and
@@ -102,7 +56,6 @@ def iterative_projection_normal(data_dict, holder_dict, a, b, c, d, e, f):
     # Get data variables
     mag = data_dict['magnitude array']
     mag_m = data_dict['magnitude mask']
-
     density = data_dict['density']
     support = data_dict['support']
 
@@ -114,7 +67,7 @@ def iterative_projection_normal(data_dict, holder_dict, a, b, c, d, e, f):
     ndens_t = holder_dict['new density tmp']
 
     ndiff_m = holder_dict['new diffraction magnitude']
-    ndiff_c = holder_dict['new diffraction with magnitude constrain']
+    ndiff_c = holder_dict['diffraction with magnitude constrain']
     phase = holder_dict['phase holder']
 
     # Step 1: Calculate the fourier transformation of the density
@@ -149,56 +102,35 @@ def error_reduction(data_dict, holder_dict):
     """
     This function carries out the iterative projection for one iteration.
 
-    :param data_dict: This dictionary contains the following info
-
-                        magnitude array      -> The numpy array containing the magnitude array
-                        magnitude mask       -> The boolean mask for the magnitude array
-                        magnitude mask not   -> The boolean mask for the magnitude array.
-                                                This is simply
-                                                        not*magnitude_mask
-                        support              -> The boolean array for the support
-                        diffraction      -> The diffraction field from previous step
-                                                 Notice that this is not essential. I include it
-                                                here only becase it can be useful for later usage.
-                        density          -> The density from previous iteration
-                        new diffraction flag -> Whether to update the new diffraction or not
+    :param data_dict:
+                        "magnitude array": self.magnitude,
+                        "magnitude mask": self.magnitude_mask,
+                        "support": self.support,
+                        "diffraction": self.diffraction,
+                        "density": self.density
 
     :param holder_dict:
-                        This dictionary contains intermediate results to reduce memory allocation
-                        time.
 
-                        new diffraction with magnitude constrain  -> This is the diffraction field
-                                                                     with magnitude constrain
+        "magnitude mask not": np.logical_not(self.magnitude_mask),
+        "support not": np.logical_not(self.support),
 
-                        new diffraction magnitude   -> This is the magnitude of the diffraction
-                                                        field before applying the magnitude
-                                                        constrain
 
-                        new density tmp      -> This is the new density derived from the diffraction
-                                                field with the magnitude constrain
+        "diffraction": self.diffraction,           -> The fourier of the initial density
+        "new diffraction magnitude":               -> np.abs(diffraction)
+        "phase holder":                            -> The phase of the diffraction
+        "diffraction with magnitude constrain":    -> Diffraction with the magnitude constrain
 
-                        phase holder          -> This is the PhaseTool of the derived diffraction
-                                                    field
 
-                        support not        -> np.logic_not(support)
+        "new density tmp":                         -> Real part of the fourier trans of the
+                                                      diffraction with magnitude constrain
 
-                        modified support   -> In the algorithm, one needs to change pixels
-                                                     in the support and in the same time
-                                                     satisfied some conditions
+        "support holder temporary":                -> Holder when getting new support for update
+        "modified support":                        -> Support combined with Algorithm constrain
 
-                        support holder temporary        -> Sorry I just reall can not think up a name for
-                                                this holder. It's used to store the information
-                                                before one calculate the modified support
 
-                        tmp holder 2        -> Sorry I just reall can not think up a name for
-                                                this holder. This is for the approximated
-                                                magnitude projection operator.
-                        tmp holder 3        -> Sorry I just reall can not think up a name for
-                                                this holder. This is for the approximated
-                                                magnitude projection operator.
-                        tmp holder 4        -> Sorry I just reall can not think up a name for
-                                                this holder. This is for the approximated
-                                                magnitude projection operator.
+        "tmp holder 2": dtype=np.complex128,       -> For approximated projection
+        "tmp holder 3": dtype=np.float64           -> For approximated projection
+        "tmp holder 4": dtype=np.complex128        -> For approximated projection
 
     :return: None. The resut is directly saved to the dictionary. This is also the very reason
             why I choose this mutable structure.
@@ -215,9 +147,9 @@ def error_reduction(data_dict, holder_dict):
     support_n = holder_dict['support not']
 
     ndiff_m = holder_dict['new diffraction magnitude']
-    ndiff_c = holder_dict['new diffraction with magnitude constrain']
+    ndiff_c = holder_dict['diffraction with magnitude constrain']
 
-    phase = holder_dict['PhaseTool holder']
+    phase = holder_dict['phase holder']
 
     # Step 1: Calculate the fourier transformation of the density
     ndiff_c[:] = np.fft.fftn(density)
