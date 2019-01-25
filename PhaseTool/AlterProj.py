@@ -409,6 +409,7 @@ class BaseAlterProj:
         pass
 
     def shrink_warp_properties(self,
+                               on=False,
                                threshold_ratio=None,
                                sigma=None,
                                decay_rate=None,
@@ -423,7 +424,8 @@ class BaseAlterProj:
         the total iteration number. Therefore, it's complicated. 
         
         So at, present, I will do the folloing things. Instead of getting an array with 
-         
+
+        :param on:
         :param threshold_ratio: 
         :param sigma: 
         :param decay_rate: 
@@ -433,6 +435,10 @@ class BaseAlterProj:
         :param convex_hull:
         :return: 
         """
+        if on:
+            self.shrink_wrap_on = on
+            print("Enable shrink wrap functions.")
+
         if threshold_ratio:
             self.shrink_wrap_threshold_retio = threshold_ratio
             print("The initial threshold ratio of the shrink warp algorithm is set to {}".format(
@@ -467,12 +473,36 @@ class BaseAlterProj:
                   "after each application of the shrink wrap algorithm. To stop this decaying,"
                   "please set threshold_ratio_decay_ratio=1. when calling this funciton. ")
 
+        if type(filling_holes) == bool:
+            if filling_holes:
+                self.support_fill_holes = True
+                print("Filling holes in the support derived from standard shrink wrap algorithm.")
+            else:
+                self.support_fill_holes = False
 
+        if type(convex_hull) == bool:
+            if convex_hull:
+                self.support_convex_hull = True
+                print("Use the convex hull of the result of the standard shrink wrap algorithm "
+                      "as the suuport.")
+            else:
+                self.support_convex_hull = False
 
     def update_shrink_wrap_properties(self):
-        pass
-        ################################################################################################
+        """
+        Update some properties and keep track of the history.
 
+        :return:
+        """
+        self.shrink_wrap_hist['threshold rate history'].append(self.shrink_wrap_threshold_retio)
+        self.shrink_wrap_hist['sigma history'].append(self.shrink_wrap_sigma)
+
+        self.shrink_wrap_sigma *= self.shrink_wrap_sigma_decay_ratio
+        self.shrink_wrap_threshold_retio *= self.shrink_wrap_threshold_decay_ratio
+
+        self.shrink_wrap_counter += 1
+
+    ################################################################################################
     # Details
     ################################################################################################
     ###################################
