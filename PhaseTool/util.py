@@ -282,10 +282,10 @@ def create_disk(space, center, radius, radius_square):
     :param radius_square:
     :return:
     """
-    for l in range(center[0] - radius, center[0] + radius):
-        for m in range(center[1] - radius, center[1] + radius):
+    for l in range(- radius, radius):
+        for m in range( - radius, radius):
             if l * l + m * m <= radius_square:
-                space[l, m] += 1.
+                space[l + center[0], m + center[1]] += 1.
 
 
 def get_smooth_sample(space_length=128, support_length=48, obj_num=50):
@@ -312,10 +312,10 @@ def get_smooth_sample(space_length=128, support_length=48, obj_num=50):
     space = np.zeros((space_length, space_length), dtype=np.float64)
 
     for l in range(obj_num):
-        create_disk(space=space,
-                    center=center_list[l],
-                    radius=radius_list[l],
-                    radius_square=radius_square[l])
+        space = create_disk(space=space,
+                            center=center_list[l],
+                            radius=radius_list[l],
+                            radius_square=radius_square[l])
 
     ndimage.gaussian_filter(input=space, sigma=2, output=space)
     return space
