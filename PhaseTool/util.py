@@ -2,6 +2,7 @@ import numpy as np
 from scipy import ndimage
 from skimage import morphology
 import numba
+from numba import float64, int64, void
 
 """
     Some functions are shared by both cpu and gpu algorithms,
@@ -267,14 +268,54 @@ def approximate_magnitude_projection(dens, mag, epsilon):
     return dens - np.fft.ifftn(holder_3)
 
 
-
-
 ####################################################################################################
 #  For test
 ####################################################################################################
-@numba.jit
-def create_disk(space, center, radius):
+@numba.jit(void(float64[:, :], int64[:], int64, int64), nopython=True, parallel=True)
+def create_disk(space, center, radius, radius_square):
+    """
+    This function create a disk.
 
+    :param space:
+    :param center:
+    :param radius:
+    :param radius_square:
+    :return:
+    """
     for l in range(center[0] - radius, center[0] + radius):
         for m in range(center[1] - radius, center[1] + radius):
-            space[l, m] = 
+            if l * l + m * m <= radius_square:
+                space[l, m] += 1.
+
+
+def get_smooth_sample(space_length=128, support_length=48, obj_num=50):
+    """
+    This function returns a smooth sample for test.
+    :param space_length:
+    :param support_length:
+    :param obj_num:
+    :return:
+    """
+    # Step 1: Get the center of the space and change the format.
+    obj_num = int(obj_num)
+    center = (int(space_length / 2.), int(space_length / 2.0))
+
+    # Step 2: Generate 50 random center position and 50 random length
+    center_list = np.random.randint(low=center[0] - int(support_length / 2.0),
+                                    high=center[0] + int(support_length / 2.0),
+                                    size=(obj_num, 2),
+                                    dtype=np.int64)
+    radius_list = np.random.randint(low=1, high=5, size=obj_num)
+    radius_square = np.square(radius_list)
+
+    # Step 3: Use the create_disk function to create these objects in the space
+    space = np.zeros((space_length, space_length), dtype=np.float64)
+
+    for l in range(obj_num):
+        create_disk(space=space,
+                    center=center_list[l],
+                    radius=radius_list[l],
+                    radius_square=radius_square[l])
+
+    ndimage.gaussian_filter(input=space, sigma=2, output=space)
+    return space
