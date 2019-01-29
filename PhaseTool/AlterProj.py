@@ -253,8 +253,6 @@ class BaseAlterProj:
             flag_fill_detector_gap=fill_detector_gap,
             bin_num=bin_num
         )
-        print("The return of this function if the support array. Please check it to "
-              "make sure it makes sense.")
 
         # Update the input dictionary
         self.data_dict["support"] = self.support
@@ -296,8 +294,8 @@ class BaseAlterProj:
 
                             "diffraction": self.diffraction,
                             "new diffraction magnitude": np.zeros(self.data_shape,
-                                                                  dtype=np.float64),
-                            "phase holder": np.zeros(self.data_shape, dtype=np.float64),
+                                                                  dtype=np.complex128),
+                            "phase holder": np.zeros(self.data_shape, dtype=np.complex128),
                             "diffraction with magnitude constrain": np.zeros(self.data_shape,
                                                                              dtype=np.complex128),
 
@@ -492,7 +490,8 @@ class BaseAlterProj:
                             "self.set_algorithm.")
 
     def execute_algorithm(self, algorithm=None, beta=None, iter_num=None, beta_decay=False,
-                          beta_decay_rate=7, initial_density=None, shrink_wrap_on=False, ):
+                          beta_decay_rate=7, initial_density=None, shrink_wrap_on=None,
+                          test=False):
         """
 
         :param algorithm:
@@ -502,11 +501,13 @@ class BaseAlterProj:
         :param beta_decay_rate:
         :param initial_density:
         :param shrink_wrap_on:
+        :param test: Enable some test features
+
         :return:
         """
 
         # Set Algorithem
-        if type(algorithm) == str:
+        if algorithm:
             self.set_algorithm(alg_name=algorithm)
 
         # Set beta
@@ -527,14 +528,16 @@ class BaseAlterProj:
                 self.shrink_wrap_on = False
 
         # One should initialize the iteration number since the beta value is tricky to tune.
-        self.iter_num = 0
-        print("The self.iter_num is set to 0.")
+        self.iter_counter = 0
+        print("The self.iter_counter is set to 0.")
 
         # Begin Calculation
         if self.algorithm in self.available_algorithms:
+            print("Using algorithm {}".format(self.algorithm))
 
             # Check self consistency
             self.check_consistency_short()
+            print("Finishes self-consistency check.")
 
             # Begin
             if self.algorithm == "ER":
@@ -545,10 +548,7 @@ class BaseAlterProj:
                     CpuUtil.error_reduction(data_dict=self.data_dict,
                                             holder_dict=self.holder_dict)
 
-                    # Step 2:increase the counter
-                    self.iter_counter += 1
-
-                    # Step 3: Check if one should apply the shrink wrap
+                    # Step 2: Check if one should apply the shrink wrap
                     if self.shrink_wrap_on:
                         if np.mod(self.iter_counter, self.shrink_wrap_rate) == 0:
                             tmp = util.shrink_wrap(
@@ -561,8 +561,16 @@ class BaseAlterProj:
                             self.set_support(support=tmp)
                             self.update_shrink_wrap_properties()
 
+                    # Step 3:increase the counter
+                    self.iter_counter += 1
+
             else:
+
                 for idx in range(self.iter_num):
+
+                    if np.mod(idx, 100) == 0:
+                        print("iteration number: {}".format(idx))
+
                     # Step 1: Execute the alternating projections
                     CpuUtil.iterative_projection_normal(data_dict=self.data_dict,
                                                         holder_dict=self.holder_dict,
@@ -572,9 +580,6 @@ class BaseAlterProj:
                                                         d=self.param_dict["par_d"],
                                                         e=self.param_dict["par_e"],
                                                         f=self.param_dict["par_f"])
-
-                    # Step 2:increase the counter
-                    self.iter_counter += 1
 
                     # Step 3: Update the beta parameter
                     self.update_param_dict_with_beta(beta=self.beta[self.iter_counter])
@@ -590,6 +595,9 @@ class BaseAlterProj:
                                 convex_hull=self.support_convex_hull)
 
                             self.set_support(support=tmp)
+
+                    # Step 3:increase the counter
+                    self.iter_counter += 1
 
         # If the algorithm is not available, give an error.
         else:
@@ -654,8 +662,8 @@ class BaseAlterProj:
 
         if sigma_decay_ratio:
             self.shrink_wrap_sigma_decay_ratio = sigma_decay_ratio
-            print("The threshold ratio will decay "
-                  "to {} * (current ratio)".format(threshold_ratio_decay_ratio) +
+            print("The sigma will decay "
+                  "to {} * (current ratio)".format(sigma_decay_ratio) +
                   "after each application of the shrink wrap algorithm. To stop this decaying,"
                   "please set threshold_ratio_decay_ratio=1. when calling this funciton. ")
 
@@ -734,7 +742,7 @@ class BaseAlterProj:
               "default methods with default parameters.")
 
         # Step 3: Set the initial diffraction and initial density values
-        self.set_zeroth_iteration_value(fill_detector_gap=True, phase="Random")
+        self.set_zeroth_iteration_value(fill_detector_gap=False, phase="Random")
 
         # Step 4: Initialize the holder variables.
         self.update_input_dict()
@@ -743,7 +751,7 @@ class BaseAlterProj:
     def set_zeroth_iteration_value(self, fill_detector_gap=False, phase="Random"):
 
         # Step 1: Get the phase
-        if phase in ('Random', 'Zero', 'Minimal'):
+        if phase in ('Random', 'Zero', 'Minimal', 'Support'):
             if phase == "Random":
 
                 # Create a central symmetric phase array
@@ -756,6 +764,11 @@ class BaseAlterProj:
 
             elif phase == "Zero":
                 phase_array = np.ones_like(self.magnitude)
+            elif phase == "Support":
+                print("Using the support as the initial guess of the density.")
+                phase_array = np.zeros_like(self.support, dtype=np.float64)
+                phase_array[self.support] = 1.
+
             else:
                 raise Exception("Sorry, the minimal phase initialization method is not "
                                 "implemented yet")
@@ -772,7 +785,12 @@ class BaseAlterProj:
 
         # Step 3: Get all the values
         self.diffraction = np.multiply(phase_array, magnitude_tmp)
-        self.density = np.fft.ifftn(self.diffraction).real
+
+        if phase in ('Random', 'Zero', 'Minimal'):
+            self.density = np.fft.ifftn(self.diffraction).real
+
+        else:
+            self.density = np.copy(phase_array)
 
     ###################################
     # Parameter & consistency check

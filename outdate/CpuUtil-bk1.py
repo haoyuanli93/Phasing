@@ -67,7 +67,7 @@ def iterative_projection_normal(data_dict, holder_dict, a, b, c, d, e, f):
 
     ndens_t = holder_dict['new density tmp']
 
-    # ndiff_m = holder_dict['new diffraction magnitude']
+    ndiff_m = holder_dict['new diffraction magnitude']
     ndiff_c = holder_dict['diffraction with magnitude constrain']
     phase = holder_dict['phase holder']
 
@@ -75,16 +75,24 @@ def iterative_projection_normal(data_dict, holder_dict, a, b, c, d, e, f):
     ndiff_c[:] = np.fft.fftn(density)
 
     # Step 2: Apply magnitude constrain to the diffraction
+    # np.absolute(ndiff_c[mag_m], out=ndiff_m[mag_m].real)
+    # print(np.sum(np.abs(ndens_t)))
+
+    # np.divide(ndiff_c[mag_m], ndiff_m[mag_m], out=phase[mag_m], where=ndiff_m[mag_m] > 0)
+    # np.divide(ndiff_c[mag_m], ndiff_m[mag_m], out=phase[mag_m])
+
+    # np.multiply(mag[mag_m], phase[mag_m], out=ndiff_c[mag_m])
+
     phase[:] = util.get_phase(ndiff_c)
-    ndiff_c[mag_m] = np.multiply(mag[mag_m], phase[mag_m])
 
     # Step 3: Get the updated density
-    ndens_t[:] = np.fft.ifftn(ndiff_c).real[:]
+    ndens_t[:] = np.fft.ifftn(ndiff_c).real
 
     # Step 4: Apply real space constrain
     # Get the positions where to modify
     support_m[:] = support[:]
 
+    # np.add(e * ndens_t[support], f * density[support], out=support_t[support])
     support_t[support] = e * ndens_t[support] + f * density[support]
     np.greater(support_t[support], 0, out=support_m[support])
 
@@ -92,8 +100,12 @@ def iterative_projection_normal(data_dict, holder_dict, a, b, c, d, e, f):
     np.logical_not(support_m, out=support_mn)
 
     # Apply the real space update rule
+    # np.add(c * ndens_t[support_mn], d * density[support_mn], out=density[support_mn])
+    # np.add(a * ndens_t[support_m], b * density[support_m], out=density[support_m])
     density[support_mn] = c * ndens_t[support_mn] + d * density[support_mn]
     density[support_m] = a * ndens_t[support_m] + b * density[support_m]
+
+    # print(np.sum(np.abs(density - data_dict['density'])))
 
 
 def error_reduction(data_dict, holder_dict):

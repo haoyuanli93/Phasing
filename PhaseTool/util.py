@@ -10,6 +10,8 @@ from numba import float64, int64, void
     
 """
 
+epsilon = np.finfo(np.float64).eps
+
 
 def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, convex_hull=False):
     """
@@ -64,6 +66,19 @@ def abs2(x):
     """
 
     return x.real ** 2 + x.imag ** 2
+
+
+@numba.vectorize([numba.complex64(numba.complex64), numba.complex128(numba.complex128)])
+def get_phase(x):
+    """
+    Calculate the norm of the vector
+    :param x:
+    :return:
+    """
+    value = np.abs(x)
+    if value >= epsilon:
+        return x / value
+    return x
 
 
 def get_radial_info(pattern, pattern_mask, origin, bin_num=300):
@@ -166,7 +181,7 @@ def get_support_from_autocorrelation(magnitude, magnitude_mask, origin,
         data_tmp = magnitude
 
     # Step 2. Get the correlation
-    autocorrelation = np.fft.ifftn(np.square(data_tmp)).real
+    autocorrelation = np.abs(np.fft.ifftn(np.square(data_tmp)))
 
     if gaussian_filter:
         ndimage.gaussian_filter(input=autocorrelation,
@@ -283,7 +298,7 @@ def create_disk(space, center, radius, radius_square):
     :return:
     """
     for l in range(- radius, radius):
-        for m in range( - radius, radius):
+        for m in range(- radius, radius):
             if l * l + m * m <= radius_square:
                 space[l + center[0], m + center[1]] += 1.
 
@@ -312,10 +327,10 @@ def get_smooth_sample(space_length=128, support_length=48, obj_num=50):
     space = np.zeros((space_length, space_length), dtype=np.float64)
 
     for l in range(obj_num):
-        space = create_disk(space=space,
-                            center=center_list[l],
-                            radius=radius_list[l],
-                            radius_square=radius_square[l])
+        create_disk(space=space,
+                    center=center_list[l],
+                    radius=radius_list[l],
+                    radius_square=radius_square[l])
 
     ndimage.gaussian_filter(input=space, sigma=2, output=space)
     return space
