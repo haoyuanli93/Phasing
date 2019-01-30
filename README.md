@@ -66,10 +66,22 @@ little bit too tricky at present.
 
 ### What's the working flow with this package
 
+#### Simple initialization
+
 1. Create a AlterProj object. This object is the interface for all the later on calculation.
 2. Initialize the object with the magnitude and the mask for the magnitude. Notice that the 
 magnitude should have been shifted with numpy.fft.ifftshift
-3. 
+3. Set the behavior of the object to be the default behavior
+4. Execute the algorithm
+
+#### Complex initialization
+
+1. Create a AlterProj object. This object is the interface for all the later on calculation.
+2. Initialize the object with the magnitude and the mask for the magnitude. Notice that the 
+magnitude should have been shifted with numpy.fft.ifftshift
+3. Initialize the support with whatever you think is proper.
+3. Initialize the algorithm 
+4. Set the behavior of the shrink-wrap algorithm.
 
 
 
