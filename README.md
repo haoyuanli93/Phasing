@@ -38,14 +38,13 @@ This repo depends on the following packages:
     3.cudatoolkit
     4.pyculib
     5.scipy
+    6. scikit-image
  
 To run the examples, one needs additionally the following
 packages:
 
     1. matplotlib
-    2. scikit-image
-    3. jupyter notebook
-    
+    2. jupyter notebook
     
 ## Detailed Record
 Honestly, I have not idea how to name this section. There is quite a lot I would like to 
