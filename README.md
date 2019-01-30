@@ -1,46 +1,36 @@
 # Phasing
-This package is an implementation of the HIO algorithm and the 
-shrinkwrap function described in the papaer
 
-S. Marchesini, H. He, H. N. Chapman, S. P. Hau-Riege, 
-A. Noy, M. R. Howells, U. Weierstall, and J. C. H. Spence
-Phys. Rev. B 68, 140101(R) – Published 28 October 2003
+This package aims to give users a good control of the process when they want to 
+retrieve the phase of diffraction patterns with various alternating projection 
+algorithms.
 
-Originally the code is borrowed from the repo:
+At present, this algorithm support the following algorithms
 
-https://github.com/cwg45/Image-Reconstruction
+- Error Reduction (ER)
+- Hybrid Input-Output [(HIO)](https://www.osapublishing.org/ol/abstract.cfm?uri=ol-3-1-27)
+- Hybrid Projection Reflection [(HPR)](https://www.ncbi.nlm.nih.gov/pubmed/12801170)
+- Relaxed Averaged Alternating Reflections [(RAAR)](https://iopscience.iop.org/article/10.1088/0266-5611/21/1/004)
+- Relaxed Averaged Alternating Reflections with Generalized Interior Feedback [(GIF-RAAR)](https://www.ncbi.nlm.nih.gov/pubmed/23187243) 
+- [Shrink-Wrap](https://link.aps.org/doi/10.1103/PhysRevB.68.140101) 
 
-The algorithm implemented in that repo is from the following 
-paper. 
+#### Reference 
+In the previous section, links are connected to papers for the corresponding algorithm. However, 
+I have not been able to produce a complete references because I am not familiar with markdown. 
+I'll come back and add a complete reference in about 2 months (i.e. 2019.3).
 
-J. R. Fienup, "Phase retrieval algorithms: a
- comparison," Appl. Opt. 21, 2758-2769 (1982)
+This package grew from the following repo: [https://github.com/cwg45/Image-Reconstruction](https://github.com/cwg45/Image-Reconstruction)
+It only implements the HIO algorithm. I begin this project when I was playing with the script in 
+this repo. 
 
-Now I have completely rewritten the code. Therefore no part
-of this repo should come from the above repo. However, 
-I am not sure if there are still
-some remnant codes are from that repo. Therefore I'll still 
-keep the link here for record. I'll fix it as soon as possible 
-if anyone claim the copyright of any part of this repo.
+I think I have completely rewritten the code, especially in this second version. However, 
+I am not sure if there are still some remnant codes coming from that repo. Therefore I'll still 
+keep the link here for record. 
 
-## Introduction
-This repo is an implementation of the HIO algorithm 
-with the shrinkwrap function.  
- 
-I'd like to have a package working with gpu and is 
-convenient to use inside the jupyter notebook. So,
-I build this repo. I have finished the first 
-stage. i.e. It can do HIO with shrinkwrap on both cpu and gpu
-now. However, it's not published to pip yet. Therefore, 
-if one would like to use this repo, one has to clone this 
-repo and add the path as I have done in the examples in the 
-'notebooks' folder.
+## Project Goal
+This project aims to provide convenient commandline toolkit for scientists to solve phase 
+retrieval problems with alternating projection algorithms such as ER, HIO, HPR, RAAR and GIF-RAAR.
 
-So much intro for now. I'll temporarily move to the other 
-projects now. Hopefully, I'll come back to this soon and 
-finish the next step. 
-
-## Dependence
+## Package Dependence
 This repo depends on the following packages:
 
     1.numpy
@@ -56,3 +46,30 @@ packages:
     2. scikit-image
     3. jupyter notebook
     
+    
+## Detailed Record
+Honestly, I have not idea how to name this section. There is quite a lot I would like to 
+elaborate here.
+
+### What has been done
+First, the user can use CPU for simulation with the available algorithms now. However, there are 
+still a lot to be done.
+
+### What to be done
+- Add MPI support. Therefore, later, the user can run different retrieval in parallel.
+- Add GPU support. Therefore, if the user needs to analysis a large object, then the GPU can 
+speed up the calculation a lot. 
+- However, I have no plan for multiple GPU reconstruction in parallel. Because it's just a 
+little bit too tricky at present.
+- Add metrics to measure the convergence progress and the convergence property.
+- Add some simple function such at the shifting to the center to make the package easier to use.
+
+### What's the working flow with this package
+
+1. Create a AlterProj object. This object is the interface for all the later on calculation.
+2. Initialize the object with the magnitude and the mask for the magnitude. Notice that the 
+magnitude should have been shifted with numpy.fft.ifftshift
+3. 
+
+
+
