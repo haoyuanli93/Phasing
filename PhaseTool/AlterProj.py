@@ -490,8 +490,7 @@ class BaseAlterProj:
                             "self.set_algorithm.")
 
     def execute_algorithm(self, algorithm=None, beta=None, iter_num=None, beta_decay=False,
-                          beta_decay_rate=7, initial_density=None, shrink_wrap_on=None,
-                          test=False):
+                          beta_decay_rate=7, initial_density=None, shrink_wrap_on=None):
         """
 
         :param algorithm:
@@ -501,7 +500,6 @@ class BaseAlterProj:
         :param beta_decay_rate:
         :param initial_density:
         :param shrink_wrap_on:
-        :param test: Enable some test features
 
         :return:
         """

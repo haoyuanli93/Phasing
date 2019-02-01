@@ -53,8 +53,48 @@ def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, con
     return support
 
 
-def check_algorithm_configuritions():
-    pass
+def get_autocorrelation(image):
+    """
+    Get the autocorrelation of the image
+    :param image:
+    :return:
+    """
+    return np.fft.ifftshift(np.abs(np.fft.ifftn(image)))
+
+
+def shift_to_center(array):
+    """
+    Shift the image so that the center of mass of this image is the same as the geometric center
+    of the image.
+
+    :param array:
+    :return: The shifted array
+    """
+    # Get array information
+    shape = array.shape
+    dim = len(shape)
+    center = np.array([x / 2.0 for x in shape])
+
+    # Get the position of the center of mass
+    center_mass = ndimage.center_of_mass(array)
+
+    # Shift the pattern
+    shifted_array = ndimage.shift(array,
+                                  shift=[center[l] - center_mass[l] for l in range(dim)])
+
+    return shifted_array
+
+
+def resolve_trivial_ambiguity(array, reference_array):
+    """
+    Usually, the user would have to do multiple recovers to finally determine the phase.
+    However, for different reconstructions from the same magnitude, there could be some
+    trivial ambiguity. This functions aims to resolve this problem.
+
+    :param array:
+    :param reference_array:
+    :return:
+    """
 
 
 @numba.vectorize([numba.float32(numba.complex64), numba.float64(numba.complex128)])
@@ -245,7 +285,7 @@ def fill_detector_gap(magnitude, magnitude_mask, origin, gaussian_filter=True,
     return magnitude_filled
 
 
-def approximate_magnitude_projection(dens, mag, epsilon):
+def approximate_magnitude_projection(dens, mag, eps):
     """
        This is a new operator to replace the original magnitude operator. According to professor
     Luke in the paper
@@ -263,7 +303,7 @@ def approximate_magnitude_projection(dens, mag, epsilon):
                 original one. Because the original array have edges if one simply assign zeros to
                 the missing data, one might consider to assign values from the estimation to reduce
                 the artifical edges.
-    :param epsilon: A epsilon value used to calculate the true epsilon value. The detail should be
+    :param eps: A epsilon value used to calculate the true epsilon value. The detail should be
                     find from the article.
     :return:
     """
@@ -274,7 +314,7 @@ def approximate_magnitude_projection(dens, mag, epsilon):
     holder_2 = abs2(holder_1)
 
     # Calculate the true epsilon that should be used in the calculation
-    teps = (epsilon * np.max(holder_2)) ** 2
+    teps = (eps * np.max(holder_2)) ** 2
 
     # Calculatet the output without truely return any array
     holder_3 = np.divide(np.multiply(holder_2 - np.multiply(mag, np.sqrt(holder_2 + teps)),
