@@ -32,6 +32,7 @@ class AlterProjChain:
             self.detector_mask = detector_mask
 
         # Important output
+        self.alter_proj_obj = None  # The reference to find the AlterProj object
         self.support = None
         self.support_history = []
         self.density_history = []
@@ -86,9 +87,18 @@ class AlterProjChain:
     def set_algorithm_sequence(self):
         pass
 
+    def show_algorithm_sequence(self):
+        pass
+
     def use_default_algorithm_sequence(self, idx):
         pass
 
+
+###############################################################################################
+#
+#   Below are some default chain parameters
+#
+###############################################################################################
 
 """
 This chain assumes that there is not detector gap. Therefore, the auto-correlation is a good start 
@@ -100,60 +110,108 @@ default_alter_proj_chain_1 = [
     # 1st Dict: It initializes the object, gets support, set shrink warp, do some calculation.
     ###############################################################################################
     {
-
-        # Set the algorithm properties
+        # Group 1: Set the algorithm properties
         'AlgName': 'RAAR',  # Algorithm name
         'IterNum': 1200,  # Iternation number
         'InitBeta': 0.87,  # The initial beta value
-        'BetaDecay': False,  # Whether the beta value will decay after several iterations
-        'BetaDecayRate': None,
-        # Since BetaDecay is disabled, there is not need for this value.
-        # Usually, this value is set to 30.
+        'BetaDecay': True,  # Whether the beta value will decay after several iterations
+        'BetaDecayRate': 20,  # How the beta value decays
 
-        # Set the initial support properties
+        # Group 2: Set the initial support properties
         'InitSupport Type': 'Auto-correlation',  # Initial support type
+        # The following entry is for Type 'Assigned'. Because one derive the initial support
+        # from auto-correlation, this is not used in this step in this chain.
         'InitSupport': None,
-        # Because one derive the initial support
-        # from auto-correlation, this is not used
+        'InitSupport Threshold': 0.04,  # The threshold to get the support
+        'InitSupport Gaussian Filter': True,  # Whether to use Gaussian filter to get the support
+        'InitSupport Gaussian sigma': 1.0,
+        # Whether to fill the detector gaps when calculating the auto-correlation
+        'InitSupport Fill Detector Gaps': True,
 
-        # Set the shrink-wrap properties
-        'ShrinkWrap Flag': False  # Whether to use ShrinkWrap algorithm to update the support
+        # Group 3: Set the initial density properties
+        'InitDensity Type': "Support",  # Derive the density from the support.
+        'InitDensity Phase': "Random",
+
+        # Group 4: Set the shrink-wrap properties
+        'ShrinkWrap Flag': False,  # Whether to use ShrinkWrap algorithm to update the support
+        'ShrinkWrap Threshold Ratio': 0.04,  # This is the default value. Not using this entry.
+        'ShrinkWrap Sigma': 10.,  # Default value
+        'ShrinkWrap Decay Rate': 50,  # Default Value
+        'ShrinkWrap Threshold Decay Ratio': 1.0,  # Default value.
+        'ShrinkWrap Sigma Decay Ratio': 0.99,  # Default value.for
+        'ShrinkWrap Filling Holes': True,
+        'ShrinkWrap ConvexHull': False,
     },
-    {},
-    {}]
 
-"""
-# Step 1: Create a object
-alter_proj = PhaseTool.AlterProj.BaseAlterProj()
+    ###############################################################################################
+    # 2nd Dict: Copy the previous reconstruction object. Notice that I am writing it in a simpler
+    # way since I do not change much parameters. However, you can just specify all the parameters
+    # just like the first dictionary.
+    ###############################################################################################
+    {
+        # Group 1: Set the algorithm properties
+        """
+        Since I do not want to change any parameters about the algorithm itself, 
+        I do not need to specify them again. If one wants to change any parameters here, one can
+        copy the corresponding entries from the previous dictionary and make the corresponding 
+        modifications. 
+        """
 
-# Step 2: Initialize the object with the data
-alter_proj.initialize_easy(magnitude=np.fft.ifftshift(magnitude),
-                           magnitude_mask=np.ones_like(magnitude, dtype=np.bool),
-                           full_initialization=False)
-# Step 3: Set initial guess
-alter_proj.set_support(support=alter_proj.derive_support_from_autocorrelation(threshold=0.04,
-                                                                              gaussian_filter=True,
-                                                                              sigma=1.0,
-                                                                              fill_detector_gap=False,
-                                                                              bin_num=300))
+        # Group 2: Set the initial support properties
+        'InitSupport Type': 'Assigned',  # Initial support type
+        # The following entry is for Type 'Assigned'.
+        'InitSupport': 'Current Support',
+        # This means does not change anything since this second object is a deepcopy of the
+        # previous object
 
-alter_proj.set_zeroth_iteration_value(fill_detector_gap=False, phase="Random")
+        # Group 3: Set the initial density properties
+        'InitDensity Type': "Assigned",  # Use the result from previous object
 
-alter_proj.update_input_dict()
+        # Group 4: Set the shrink-wrap properties
+        'ShrinkWrap Flag': False,  # Whether to use ShrinkWrap algorithm to update the support
+        'ShrinkWrap Threshold Ratio': 0.04,  # This is the default value. Not using this entry.
+        'ShrinkWrap Sigma': 10.,  # Default value
+        'ShrinkWrap Decay Rate': 50,  # Default Value
+        'ShrinkWrap Threshold Decay Ratio': 1.0,  # Default value.
+        'ShrinkWrap Sigma Decay Ratio': 0.99,  # Default value.for
+        'ShrinkWrap Filling Holes': True,
+        'ShrinkWrap ConvexHull': False,
+    },
 
-alter_proj.shrink_warp_properties(on=False,
-                                  threshold_ratio=0.04,
-                                  sigma=10.,
-                                  decay_rate=50,
-                                  threshold_ratio_decay_ratio=1.0,
-                                  sigma_decay_ratio=0.99,
-                                  filling_holes=False,
-                                  convex_hull=False)
+    ###############################################################################################
+    # 3rd Dict: It initializes the object, gets support, set shrink warp, do some calculation.
+    ###############################################################################################
+    {
+        # Group 1: Set the algorithm properties
+        'AlgName': 'RAAR',  # Algorithm name
+        'IterNum': 1200,  # Iternation number
+        'InitBeta': 0.87,  # The initial beta value
+        'BetaDecay': True,  # Whether the beta value will decay after several iterations
+        'BetaDecayRate': 20,  # How the beta value decays
 
-alter_proj.set_beta_and_iter_num(beta=0.75,
-                                 iter_num=1200,
-                                 decay=True,
-                                 decay_rate=20)
+        # Group 2: Set the initial support properties
+        'InitSupport Type': 'Auto-correlation',  # Initial support type
+        # The following entry is for Type 'Assigned'. Because one derive the initial support
+        # from auto-correlation, this is not used in this step in this chain.
+        'InitSupport': None,
+        'InitSupport Threshold': 0.04,  # The threshold to get the support
+        'InitSupport Gaussian Filter': True,  # Whether to use Gaussian filter to get the support
+        'InitSupport Gaussian sigma': 1.0,
+        # Whether to fill the detector gaps when calculating the auto-correlation
+        'InitSupport Fill Detector Gaps': True,
 
-alter_proj.set_algorithm(alg_name="RAAR")
-"""
+        # Group 3: Set the initial density properties
+        'InitDensity Type': "Support",  # Derive the density from the support.
+        'InitDensity Phase': "Random",
+
+        # Group 4: Set the shrink-wrap properties
+        'ShrinkWrap Flag': False,  # Whether to use ShrinkWrap algorithm to update the support
+        'ShrinkWrap Threshold Ratio': 0.04,  # This is the default value. Not using this entry.
+        'ShrinkWrap Sigma': 10.,  # Default value
+        'ShrinkWrap Decay Rate': 50,  # Default Value
+        'ShrinkWrap Threshold Decay Ratio': 1.0,  # Default value.
+        'ShrinkWrap Sigma Decay Ratio': 0.99,  # Default value.for
+        'ShrinkWrap Filling Holes': True,
+        'ShrinkWrap ConvexHull': False,
+    }
+]
