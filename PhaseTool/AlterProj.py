@@ -15,18 +15,15 @@ methods for the users to use.
 """
 
 
-class BaseAlterProj:
-    def __init__(self, device='cpu'):
+class CpuAlterProj:
+    def __init__(self):
         """
         One can use this method to initialize a CDI object and can create a newer one
         with information from this object.
-
-        :param device: Another object of this kind.
         """
 
         # Meta parameters
         size = 64
-        self.device = device
         # History recorder
         self.history = []
 
@@ -953,23 +950,6 @@ class BaseAlterProj:
     ###################################
     # Algorithm
     ###################################
+    # TODO: Let the user to totally customize the algorithm
     def totally_customize_algorithm(self):
         pass
-
-    def get_device(self):
-        """
-
-        :return:
-        """
-        return self.device
-
-    def set_device(self, device):
-        """
-
-        :param device:
-        :return:
-        """
-        if device in ('cpu', 'gpu'):
-            self.device = device
-        else:
-            raise Exception("The device can only be 'cpu' or 'gpu'.")
