@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import ndimage
+from scipy import stats
 from skimage import morphology
 import numba
 from numba import float64, int64, void
@@ -91,10 +92,62 @@ def resolve_trivial_ambiguity(array, reference_array):
     However, for different reconstructions from the same magnitude, there could be some
     trivial ambiguity. This functions aims to resolve this problem.
 
+    The way to resolve this ambiguity is to compare with a reference array.
+
+    The detail should be obvious if you read the source code.
+
     :param array:
     :param reference_array:
-    :return:
+    :return: The transformed array.
     """
+
+    ################################################################################################
+    # Step 1, Shift the reference array to the center
+    ################################################################################################
+    # Shifted reference array
+    sr_array = shift_to_center(reference_array)
+
+    ################################################################################################
+    # Step 2, Calculate the correlation between the flipped and shifted array with the sr_array
+    ################################################################################################
+
+    # Get the dimension number
+    dim = len(array.shape)
+
+    # Generate a list of all possible flips
+    tmp_list = np.meshgrid(*(np.array([0, 1], dtype=np.int64),) * dim)
+    flip_list = np.transpose(np.stack((x.flatten() for x in tmp_list)))
+    flip_num = np.power(2, dim)
+
+    # Loop through all the possible flips
+    correlation = np.zeros(flip_num, dtype=np.float64)  # Holder for correlation value
+    for l in range(flip_num):
+
+        flip_array = np.copy(array)  # Holder for the flipped array
+        # Calculated the flipped array
+        for m in range(dim):
+            if flip_list[l, m] == 1:
+                flip_array = np.flip(flip_array, axis=m)
+
+        # Calculate the shifted array
+        shifted_array = shift_to_center(flip_array)
+
+        # Calculate the correlation between the reference and the shifted array
+        correlation[l] = stats.pearsonr(shifted_array, sr_array)[0]
+
+    # Find the array with the largest correlation
+    idx = np.argmax(correlation)
+    cor_val = correlation[idx]
+
+    # Constructed the selected array
+    flip_array = np.copy(array)
+    for m in range(dim):
+        if flip_list[idx, m] == 1:
+            flip_array = np.flip(flip_array, axis=m)
+
+    shifted_array = shift_to_center(flip_array)
+
+    return shifted_array, sr_array, cor_val
 
 
 @numba.vectorize([numba.float32(numba.complex64), numba.float64(numba.complex128)])
@@ -119,6 +172,32 @@ def get_phase(x):
     if value >= epsilon:
         return x / value
     return x
+
+
+def get_beam_stop_mask(space_shape, space_center, radius):
+    """
+    Get a boolean mask about the beam stop.
+
+    :param space_shape: The shape of the space
+    :param space_center: The center of the space
+    :param radius: The radius of the beam stop
+    :return:
+    """
+
+    dim = len(space_shape)
+
+    # Calculate the distance
+    distance = sum(np.meshgrid(*[np.square(np.arange(space_shape[x])
+                                           - int(space_center[x])) for x in range(dim)]))
+    np.sqrt(distance, out=distance)
+
+    # Holder for the mask
+    mask = np.ones(space_shape, dtype=np.bool)
+    mask[distance <= radius] = False
+
+    mask_not = np.logical_not(mask)
+
+    return mask, mask_not
 
 
 def get_radial_info(pattern, pattern_mask, origin, bin_num=300):
@@ -343,34 +422,217 @@ def create_disk(space, center, radius, radius_square):
                 space[l + center[0], m + center[1]] += 1.
 
 
-def get_smooth_sample(space_length=128, support_length=48, obj_num=50):
+@numba.jit(void(float64[:, :, :], int64[:], int64, int64), nopython=True, parallel=True)
+def create_sphere(space, center, radius, radius_square):
+    """
+    This function create a disk.
+
+    :param space:
+    :param center:
+    :param radius:
+    :param radius_square:
+    :return:
+    """
+    for l in range(- radius, radius):
+        for m in range(- radius, radius):
+            for n in range(-radius, radius):
+                if l * l + m * m <= radius_square:
+                    space[l + center[0], m + center[1], n + center[2]] += 1.
+
+
+def get_smooth_sample(dim=2, space_length=128, support_length=48,
+                      obj_num=50, rlim_low=1,
+                      rlim_high=6):
     """
     This function returns a smooth sample for test.
+
+    :param dim: The dimension of the sample space
     :param space_length:
     :param support_length:
     :param obj_num:
+    :param rlim_low: This function generates spheres or disks as examples. rlim_low represent the
+                    lowest radius value for the random sphere radius.
+    :param rlim_high: The hightest radius value.
     :return:
     """
+
     # Step 1: Get the center of the space and change the format.
     obj_num = int(obj_num)
-    center = (int(space_length / 2.), int(space_length / 2.0))
+    center = (int(space_length / 2.),) * dim
 
     # Step 2: Generate 50 random center position and 50 random length
     center_list = np.random.randint(low=center[0] - int(support_length / 2.0),
                                     high=center[0] + int(support_length / 2.0),
-                                    size=(obj_num, 2),
+                                    size=(obj_num, dim),
                                     dtype=np.int64)
-    radius_list = np.random.randint(low=1, high=5, size=obj_num)
+    radius_list = np.random.randint(low=rlim_low, high=rlim_high, size=obj_num)
     radius_square = np.square(radius_list)
 
     # Step 3: Use the create_disk function to create these objects in the space
-    space = np.zeros((space_length, space_length), dtype=np.float64)
+    space = np.zeros((space_length,) * dim, dtype=np.float64)
 
-    for l in range(obj_num):
-        create_disk(space=space,
-                    center=center_list[l],
-                    radius=radius_list[l],
-                    radius_square=radius_square[l])
+    if dim == 2:
+        for l in range(obj_num):
+            create_disk(space=space,
+                        center=center_list[l],
+                        radius=radius_list[l],
+                        radius_square=radius_square[l])
+    elif dim == 3:
+        for l in range(obj_num):
+            create_sphere(space=space,
+                          center=center_list[l],
+                          radius=radius_list[l],
+                          radius_square=radius_square[l])
+
+    else:
+        raise Exception("At present, this function can only handle 2 and 3 d case. "
+                        "Therefore, the argument dim has to be 2 or 3.")
 
     ndimage.gaussian_filter(input=space, sigma=2, output=space)
+
     return space
+
+
+class SmoothSample:
+    def __init__(self, dim=2, space_length=128, support_length=48, total_density=1e4,
+                 beam_stop=2, shot_noise=True, gaussian=True,
+                 gaussian_mean=0, gaussian_sigma=1,
+                 obj_num=50, rlim_low=1, rlim_high=6):
+        """
+        This generate a smooth sample and generate the corresponding diffraction information
+
+        :param dim:
+        :param total_density: The summation of the density. This controls the diffraction
+                                strength.
+        :param space_length: The length of the sample
+        :param support_length: The region in which the centers of the objects are in
+        :param beam_stop: The size of the beam stop
+        :param shot_noise: Whether to apply the po
+        :param gaussian:
+        :param gaussian_mean:
+        :param gaussian_sigma:
+        :param obj_num: Number of disks or spheres in the sample
+        :param rlim_low: This function generates spheres or disks as examples.
+                    rlim_low represent the lowest radius value for the random sphere radius.
+        :param rlim_high: The hightest radius value.
+        """
+
+        self.dim = dim
+        self.center = np.array((space_length / 2.0,) * dim, dtype=np.float64)
+        self.beam_stop = 0
+
+        # The sample
+        self.density = get_smooth_sample(dim=dim,
+                                         space_length=space_length,
+                                         support_length=support_length,
+                                         obj_num=obj_num,
+                                         rlim_high=rlim_high,
+                                         rlim_low=rlim_low)
+
+        # Normalize the sample
+        tmp = np.sum(self.density, dtype=np.float64)
+        tmp = float(total_density / tmp)
+        self.density *= tmp
+
+        # Things that can not be measured
+        self.diffraction = np.fft.fftshift(np.fft.fftn(self.density))
+        self.complex_phase = get_phase(self.diffraction)
+
+        # Things that can be measured
+        self.intensity = abs2(self.diffraction)
+        self.magnitude = np.sqrt(self.intensity)
+
+        # Things that can be derived
+        self.autocorrelation = get_autocorrelation(self.intensity)
+
+        # Consider various detector effect
+        # 1. Beam stop
+        self.detector_mask = np.ones_like(self.density)
+        self.detector_mask_not = np.logical_not(self.detector_mask)
+
+        self.det_intensity = np.copy(self.intensity)
+        self.det_intensity[self.detector_mask_not] = 0.
+
+        self.det_magnitude = np.sqrt(self.det_intensity)
+        self.det_autocorrelation = get_autocorrelation(self.det_intensity)
+
+        # 2. Detector Noise
+        self.shot_noise_noise_flag = False
+        self.gaussian_noise_flag = False
+        self.gaussian_mean = 0
+        self.gaussian_sigma = 1
+
+        self.det_noisy_intensity = np.copy(self.intensity)
+        self.det_noisy_intensity[self.detector_mask_not] = 0.
+
+        self.det_noisy_magnitude = np.sqrt(self.det_intensity)
+        self.det_noisy_autocorrelation = get_autocorrelation(self.det_intensity)
+
+        # Apply the detector effects
+        self._set_and_add_detector_effect(beam_stop=beam_stop,
+                                          shot_noise=shot_noise,
+                                          gaussian=gaussian,
+                                          gaussian_mean=gaussian_mean,
+                                          gaussian_sigma=gaussian_sigma)
+
+    def estimate_support(self, threshold):
+        """
+
+        :param threshold:
+        :return:  support[self.density >= threshold] = true
+        """
+        support = np.zeros_like(self.density, dtype=np.bool)
+        support[self.density >= threshold] = True
+
+        return support
+
+    def _set_and_add_detector_effect(self, beam_stop,
+                                     shot_noise=False,
+                                     gaussian=False,
+                                     gaussian_mean=0,
+                                     gaussian_sigma=1):
+        """
+        Add detector noise.
+        
+        :param beam_stop:
+        :param shot_noise: 
+        :param gaussian: 
+        :param gaussian_mean: 
+        :param gaussian_sigma: 
+        :return: 
+        """
+        self.beam_stop = beam_stop
+
+        # Step 1: Create the mask
+        (self.detector_mask,
+         self.detector_mask_not) = get_beam_stop_mask(space_shape=self.density.shape,
+                                                      space_center=self.center,
+                                                      radius=self.beam_stop)
+        # Step 2: Apply this mask
+        self.det_intensity = np.copy(self.intensity)
+        self.det_intensity[self.detector_mask_not] = 0.
+
+        self.det_magnitude = np.sqrt(self.det_intensity)
+        self.det_autocorrelation = get_autocorrelation(self.det_intensity)
+
+        # Step 3: Add noise
+        self.shot_noise_noise_flag = shot_noise
+        self.gaussian_noise_flag = gaussian
+        self.gaussian_sigma = gaussian_sigma
+        self.gaussian_mean = gaussian_mean
+
+        self.det_noisy_intensity = np.copy(self.det_intensity)
+        if self.shot_noise_noise_flag:
+            self.det_noisy_intensity = np.random.poisson(self.det_noisy_intensity)
+        if self.gaussian_noise_flag:
+            self.det_noisy_intensity += np.random.normal(self.gaussian_mean,
+                                                         self.gaussian_sigma,
+                                                         size=self.density.shape)
+
+        # Fix negative values and values outside the beam stop mask
+        self.det_noisy_intensity[self.det_noisy_intensity <= 0] = 0
+        self.det_noisy_intensity[self.detector_mask_not] = 0
+
+        # Calculate the magnitude and the
+        self.det_noisy_magnitude = np.sqrt(self.det_noisy_intensity)
+        self.det_noisy_autocorrelation = get_autocorrelation(self.det_noisy_intensity)
