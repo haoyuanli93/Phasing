@@ -206,8 +206,8 @@ class CpuAlterProj:
                                     the calculation parameters, the initialization condition
         :return:
         """
-        self.magnitude = magnitude
-        self.magnitude_mask = magnitude_mask
+        self.magnitude = np.fft.fftshift(magnitude)
+        self.magnitude_mask = np.fft.fftshift(magnitude_mask)
 
         # Execute later-on initialization
         if full_initialization:
@@ -215,8 +215,8 @@ class CpuAlterProj:
         else:
             self._init_from_initez()
 
-    def derive_support_from_autocorrelation(self, threshold=0.04, gaussian_filter=True,
-                                            sigma=1.0, fill_detector_gap=False, bin_num=300):
+    def get_auto_support(self, threshold=0.04, gaussian_filter=True,
+                         sigma=1.0, fill_detector_gap=False, bin_num=300):
         """
         Generate a support from the autocorrelation function calculated from the support info.
 
@@ -732,22 +732,22 @@ class CpuAlterProj:
         self._init_from_initez()
 
         # Step 2: Initialize the support
-        self.derive_support_from_autocorrelation()
+        self.get_auto_support()
         print("Initialize the support array with the auto-correlation array using "
               "default methods with default parameters.")
 
         # Step 3: Set the initial diffraction and initial density values
-        self.set_zeroth_iteration_value(fill_detector_gap=False, phase="Random")
+        self.derive_initial_density(fill_detector_gap=False, method="Random")
 
         # Step 4: Initialize the holder variables.
         self.update_input_dict()
         self.update_holder_dict()
 
-    def set_zeroth_iteration_value(self, fill_detector_gap=False, phase="Random"):
+    def derive_initial_density(self, fill_detector_gap=False, method="Random"):
 
         # Step 1: Get the phase
-        if phase in ('Random', 'Zero', 'Minimal', 'Support'):
-            if phase == "Random":
+        if method in ('Random', 'Zero', 'Minimal', 'Support'):
+            if method == "Random":
 
                 # Create a central symmetric phase array
                 tmp1 = np.random.rand(*self.magnitude.shape)
@@ -757,9 +757,9 @@ class CpuAlterProj:
 
                 phase_array = np.exp(1j * np.pi * (tmp1 - tmp2))
 
-            elif phase == "Zero":
+            elif method == "Zero":
                 phase_array = np.ones_like(self.magnitude)
-            elif phase == "Support":
+            elif method == "Support":
                 print("Using the support as the initial guess of the density.")
                 phase_array = np.zeros_like(self.support, dtype=np.float64)
                 phase_array[self.support] = 1.
@@ -781,7 +781,7 @@ class CpuAlterProj:
         # Step 3: Get all the values
         self.diffraction = np.multiply(phase_array, magnitude_tmp)
 
-        if phase in ('Random', 'Zero', 'Minimal'):
+        if method in ('Random', 'Zero', 'Minimal'):
             self.density = np.fft.ifftn(self.diffraction).real
 
         else:
