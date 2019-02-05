@@ -58,7 +58,6 @@ still a lot to be done.
 - Fix the default behavior of the CpuAlterProj object. I think there is some problem with the 
 initialization when one changed the algorithm and some other parameters
 - Add a comprehensive test.
-- Add MPI support. Therefore, later, the user can run different retrieval in parallel.
 - Write a demo
 - Furnish the doc
 
