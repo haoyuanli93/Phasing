@@ -420,7 +420,6 @@ class CpuAlterProj:
 
         if alg_name in self.available_algorithms:
             self.algorithm = alg_name
-            self.update_holder_dict()
 
             # Initialize the parameter dictionary
             if self.algorithm == 'HIO':
@@ -728,6 +727,7 @@ class CpuAlterProj:
         :return:
         """
 
+        # TODO: This default behavior should be modified
         # Step 1: Finish the most elementary initialization
         self._init_from_initez()
 

@@ -65,6 +65,10 @@ class AlterProjChain:
         :return: 
         """
 
+        # TODO: Distinguish different device configurations
+        if device:
+            pass
+
         # Step 1: Create the object
         self.alter_proj_obj = CpuAlterProj()
 
@@ -113,7 +117,8 @@ class AlterProjChain:
             raise Exception("Sorry, at this time, the logic of this program is not very "
                             "complete, please set the entry 'InitSupport Type' to "
                             "'Auto-correlation' if you want to derive the support from the "
-                            "auto-correlation or 'Assigned' if you just does not want to . ")
+                            "auto-correlation or 'Assigned' if you want to use existing value "
+                            "or assign a new value. ")
 
         # Step 4: Set the initial density value
         # Case 1: The user want to derive the density
@@ -124,8 +129,67 @@ class AlterProjChain:
 
         # Case 2: The user want to assign the initial density value
         elif alg_info['InitDensity Type'] == 'Assigned':
-            pass
 
+            # If use the previous result, does not change anything
+            if alg_info['InitDensity'] == 'Current Density':
+                pass
+
+            # Use a specified numpy array compatible with the intensity array
+            elif type(alg_info['InitDensity']).__name__ == 'ndarray':
+
+                # Check type and shape before assigning the value.
+
+                if alg_info['InitDensity'].shape == self.intensity.shape:
+                    self.alter_proj_obj.set_initial_density(density=alg_info['InitDensity'])
+                else:
+                    raise Exception("The shape of the assigned initial density has to be the same "
+                                    "as that of the intensity array.")
+
+            else:  # Deal with unexpected values
+                raise Exception("Sorry, at this time, the logic of this program is not very "
+                                "complete, please set the entry 'InitDensity' to "
+                                "'Current Density' use the existing density or a compatible "
+                                "numpy array since they are the only supported options. ")
+
+        else:  # Deal with unexpected values
+            raise Exception("Sorry, at this time, the logic of this program is not very "
+                            "complete, please set the entry 'InitDensity Type' to "
+                            "'Auto' if you want to derive the density "
+                            "auto-correlation or 'Assigned' if you want to use exising value "
+                            "or assign a new value. ")
+
+        # Step 5: Specify the ShrinkWrap parameters
+        if alg_info['ShrinkWrap Flag']:
+            self.alter_proj_obj.shrink_warp_properties(
+                on=alg_info['ShrinkWrap Flag'],
+                threshold_ratio=alg_info['ShrinkWrap Threshold Ratio'],
+                sigma=alg_info['ShrinkWrap Sigma'],
+                decay_rate=alg_info['ShrinkWrap Decay Rate'],
+                threshold_ratio_decay_ratio=alg_info['ShrinkWrap Threshold Decay Ratio'],
+                sigma_decay_ratio=alg_info['ShrinkWrap Sigma Decay Ratio'],
+                filling_holes=alg_info['ShrinkWrap Filling Holes'],
+                convex_hull=alg_info['ShrinkWrap ConvexHull'])
+
+        else:
+            # Turn off the shrink wrap process
+            self.alter_proj_obj.shrink_warp_properties(on=False)
+
+        # Step 6: Set the Alternating Projection Algorithm parameters.
+        if 'AlgName' in alg_info:
+            self.alter_proj_obj.set_algorithm(alg_name=alg_info['AlgName'])
+
+            if alg_info['AlgName'] == 'ER':
+                self.alter_proj_obj.set_beta_and_iter_num(iter_num=alg_info['IterNum'])
+
+            else:
+                self.alter_proj_obj.set_beta_and_iter_num(beta=alg_info['InitBeta'],
+                                                          iter_num=alg_info['IterNum'],
+                                                          decay=alg_info['BetaDecay'],
+                                                          decay_rate=alg_info['BetaDecayRate'])
+
+        # Step 7: Update the input dict and the holder dict
+        self.alter_proj_obj.update_input_dict()
+        self.alter_proj_obj.update_holder_dict()
 
     def _modify_algorithm_object(self, algorithm_info):
         """
@@ -133,6 +197,8 @@ class AlterProjChain:
         :param algorithm_info: 
         :return: 
         """
+        # Step 1: Check if one needs to update the alternating projection method
+        pass
 
     def execute_algorithm_sequence(self):
 
@@ -148,14 +214,34 @@ class AlterProjChain:
             else:
                 pass
 
-    def set_algorithm_sequence(self):
-        pass
+    def set_algorithm_sequence(self, alg_sequence):
+        """
+        Use customized algorithm sequence.
+
+        :param alg_sequence:
+        :return:
+        """
+        if type(alg_sequence).__name__ == 'list':
+            self.algorithm_sequence = alg_sequence
+        else:
+            raise Exception("The alg_sequence has to be a list, even if you only use only one "
+                            "algorithm and has specified only one dictionary.")
 
     def show_algorithm_sequence(self):
         pass
 
     def use_default_algorithm_sequence(self, idx):
-        pass
+        """
+        Switch between different algorithm chains
+
+        :param idx:
+        :return:
+        """
+        if idx == 1:
+            self.algorithm_sequence = default_alter_proj_chain_1
+        else:
+            raise Exception("Sorry, at present, idx has to be 1 since I have only prepared "
+                            "1 default chain.")
 
 
 ###############################################################################################
