@@ -55,13 +55,19 @@ First, the user can use CPU for simulation with the available algorithms now. Ho
 still a lot to be done.
 
 ### What to be done
+- Fix the default behavior of the CpuAlterProj object. I think there is some problem with the 
+initialization when one changed the algorithm and some other parameters
+- Add a comprehensive test.
 - Add MPI support. Therefore, later, the user can run different retrieval in parallel.
+- Write a demo
+- Furnish the doc
+
+### What can be done for the next developer if there is any
 - Add GPU support. Therefore, if the user needs to analysis a large object, then the GPU can 
 speed up the calculation a lot. 
 - However, I have no plan for multiple GPU reconstruction in parallel. Because it's just a 
 little bit too tricky at present.
 - Add metrics to measure the convergence progress and the convergence property.
-- Add some simple function such at the shifting to the center to make the package easier to use.
 
 ### What's the working flow with this package
 
