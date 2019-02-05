@@ -70,8 +70,6 @@ class CpuAlterProj:
         self.shrink_wrap_hist = {'threshold rate history': [],
                                  'sigma history': []}
 
-        self.shrink_wrap_keep_history = False
-
         ########################
         # Alternating Projection parameters
         ########################
@@ -674,7 +672,7 @@ class CpuAlterProj:
 
     def shrink_warp_properties(self, on=False, threshold_ratio=0.04, sigma=5.0, decay_rate=30,
                                threshold_ratio_decay_ratio=1.0, sigma_decay_ratio=0.95,
-                               filling_holes=True, convex_hull=False, keep_history=True):
+                               filling_holes=True, convex_hull=False):
         """
         This is just a temporary implementation of the shrink warp tuning function.
         There are actually, quite a lot of parameters to tune and that has to be consistent with 
@@ -690,8 +688,7 @@ class CpuAlterProj:
         :param sigma_decay_ratio: 
         :param filling_holes:
         :param convex_hull:
-        :param keep_history:
-        :return: 
+        :return:
         """
         self.shrink_wrap_on = on
         if on:
@@ -755,17 +752,14 @@ class CpuAlterProj:
                 print("When update the support, use the standard result of the shrink wrap "
                       "algorithm as the new support.")
 
-        self.shrink_wrap_keep_history = keep_history
-
-    def update_shrink_wrap_properties(self, keep_history=False):
+    def update_shrink_wrap_properties(self):
         """
         Update some properties and keep track of the history.
 
         :return:
         """
-        if keep_history:
-            self.shrink_wrap_hist['threshold rate history'].append(self.shrink_wrap_threshold_retio)
-            self.shrink_wrap_hist['sigma history'].append(self.shrink_wrap_sigma)
+        self.shrink_wrap_hist['threshold rate history'].append(self.shrink_wrap_threshold_retio)
+        self.shrink_wrap_hist['sigma history'].append(self.shrink_wrap_sigma)
 
         self.shrink_wrap_sigma *= self.shrink_wrap_sigma_decay_ratio
         self.shrink_wrap_threshold_retio *= self.shrink_wrap_threshold_decay_ratio
