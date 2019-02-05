@@ -80,14 +80,12 @@ class AlterProjChain:
         # Step 3: Get the support
         if alg_info['InitSupport Type'] == 'Auto-correlation':
             # Derive the support from the auto-correlation
-            tmp_support = self.alter_proj_obj.get_auto_support(
+            _ = self.alter_proj_obj.use_auto_support(
                 threshold=alg_info['InitSupport Threshold'],
                 gaussian_filter=alg_info['InitSupport Gaussian Filter'],
                 sigma=alg_info['InitSupport Gaussian sigma'],
                 fill_detector_gap=alg_info['InitSupport Fill Detector Gaps'],
                 bin_num=alg_info['InitSupport Bin Num'])
-
-            self.alter_proj_obj.set_support(support=tmp_support)
 
         # Deal with the case where the user want to use their own support
         elif alg_info['InitSupport Type'] == 'Assigned':
@@ -179,7 +177,8 @@ class AlterProjChain:
             self.alter_proj_obj.set_algorithm(alg_name=alg_info['AlgName'])
 
             if alg_info['AlgName'] == 'ER':
-                self.alter_proj_obj.set_beta_and_iter_num(iter_num=alg_info['IterNum'])
+                self.alter_proj_obj.set_beta_and_iter_num(beta=None,
+                                                          iter_num=alg_info['IterNum'])
 
             else:
                 self.alter_proj_obj.set_beta_and_iter_num(beta=alg_info['InitBeta'],
@@ -201,14 +200,12 @@ class AlterProjChain:
         # Step 1: Modify the support
         if alg_info['InitSupport Type'] == 'Auto-correlation':
             # Derive the support from the auto-correlation
-            tmp_support = self.alter_proj_obj.get_auto_support(
+            _ = self.alter_proj_obj.use_auto_support(
                 threshold=alg_info['InitSupport Threshold'],
                 gaussian_filter=alg_info['InitSupport Gaussian Filter'],
                 sigma=alg_info['InitSupport Gaussian sigma'],
                 fill_detector_gap=alg_info['InitSupport Fill Detector Gaps'],
                 bin_num=alg_info['InitSupport Bin Num'])
-
-            self.alter_proj_obj.set_support(support=tmp_support)
 
         # Deal with the case where the user want to use their own support
         elif alg_info['InitSupport Type'] == 'Assigned':

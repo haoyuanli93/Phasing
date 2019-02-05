@@ -54,27 +54,27 @@ class CpuAlterProj:
         # Shrink Wrap Parameters
         ########################
         self.shrink_wrap_on = False
-        self.support_fill_holes = False
-        self.support_convex_hull = False
+        self.shrink_wrap_fill_holes = False
+        self.shrink_wrap_convex_hull = False
         self.shrink_wrap_counter = 0
 
-        self.shrink_wrap_rate = 50  # The number of iterations before the shrink wrap occurs.
-        self.shrink_wrap_sigma = 0.  # The sigma in the gaussian filter in the process.
+        self.shrink_wrap_rate = 30  # The number of iterations before the shrink wrap occurs.
+        self.shrink_wrap_sigma = 5.  # The sigma in the gaussian filter in the process.
 
         # The ratio the sigma decays after each application
-        self.shrink_wrap_sigma_decay_ratio = 0.9
+        self.shrink_wrap_sigma_decay_ratio = 0.95
 
         self.shrink_wrap_threshold_retio = 0.04
-        self.shrink_wrap_threshold_decay_ratio = 0.9
+        self.shrink_wrap_threshold_decay_ratio = 1.0
 
         self.shrink_wrap_hist = {'threshold rate history': [],
                                  'sigma history': []}
 
+        self.shrink_wrap_keep_history = False
+
         ########################
         # Alternating Projection parameters
         ########################
-        # Calculation counter
-        self.iter_counter = 0
 
         self.available_algorithms = ['ER', 'HIO', 'HPR', 'RAAR', 'GIF-RAAR']
         self.algorithm = "RAAR"
@@ -103,8 +103,10 @@ class CpuAlterProj:
                            "par_f": 0.,
                            "epsilon": 1e-15}
 
-        self.iter_num = 200
-        self.beta = 0.87 * np.ones(self.iter_num, dtype=np.float64)
+        self.iter_num = 1200
+        self.beta = 0.75 * np.ones(self.iter_num, dtype=np.float64)
+        self.beta_decay = True
+        self.beta_decay_rate = 20
 
         ########################
         # Dictionaries
@@ -215,8 +217,77 @@ class CpuAlterProj:
         else:
             self._init_from_initez()
 
-    def get_auto_support(self, threshold=0.04, gaussian_filter=True,
-                         sigma=1.0, fill_detector_gap=False, bin_num=300):
+    def _init_from_initez(self):
+        """
+        This is an internal method used to initialize some more properties when the user has used
+        the  method minimal_data_initialize(magnitude, magnitude_mask).
+
+        This method only initializes some not very important variables. The user has to initialize
+        the calculation parameters, the initial values and the other stuff.
+        :return:
+        """
+
+        self.data_dict["magnitude array"] = self.magnitude
+        self.data_dict["magnitude mask"] = self.magnitude_mask
+        self.holder_dict["magnitude mask not"] = np.logical_not(self.magnitude_mask)
+
+        # Abstract info
+        self.data_shape = copy.deepcopy(self.magnitude.shape)
+        self.dim = len(self.magnitude.shape)
+
+        # Set and check the origin of the origin of the data
+        self.set_and_check_detector_origin()
+
+    def _full_init_from_initez(self):
+        """
+        This is an internal method used to initialize some more properties when the user has
+        used the method minimal_data_initialize(magnitude, magnitude_mask).
+
+        In short, this function initialize all
+
+        :return:
+        """
+
+        # TODO: This default behavior should be modified
+        # Step 1: Finish the most elementary initialization
+        self._init_from_initez()
+
+        # Step 2: Initialize the support
+        self.use_auto_support()
+        print("Initialize the support array with the auto-correlation array using "
+              "default methods with default parameters.")
+
+        # Step 3: Set the initial diffraction and initial density values
+        self.derive_initial_density(fill_detector_gap=True, method="Random")
+
+        # Step 4: Set the Shrink Wrap Properties
+        self.shrink_warp_properties(
+            on=self.shrink_wrap_on,
+            threshold_ratio=self.shrink_wrap_threshold_retio,
+            sigma=self.shrink_wrap_sigma,
+            decay_rate=self.shrink_wrap_rate,
+            threshold_ratio_decay_ratio=self.shrink_wrap_threshold_decay_ratio,
+            sigma_decay_ratio=self.shrink_wrap_sigma_decay_ratio,
+            filling_holes=self.shrink_wrap_fill_holes,
+            convex_hull=self.shrink_wrap_convex_hull)
+
+        # Step 5: Set beta and iteration number
+        self.set_beta_and_iter_num(
+            beta=self.beta,
+            iter_num=self.iter_num,
+            decay=self.beta_decay,
+            decay_rate=self.beta_decay_rate)
+
+        # Step 6: Set the Algorithm
+        self.set_algorithm(alg_name=self.algorithm)
+
+        # Step 4: Initialize the holder variables.
+        print("Update the input and holder dictionaries")
+        self.update_input_dict()
+        self.update_holder_dict()
+
+    def use_auto_support(self, threshold=0.04, gaussian_filter=True,
+                         sigma=1.0, fill_detector_gap=True, bin_num=300):
         """
         Generate a support from the autocorrelation function calculated from the support info.
 
@@ -280,47 +351,7 @@ class CpuAlterProj:
         self.data_dict["density"] = self.density
         print("The initial density is updated.")
 
-    def update_holder_dict(self):
-        """
-        Create variables with proper data shape.
-        :return:
-        """
-        # Create different variables
-        self.holder_dict = {"magnitude mask not": np.logical_not(self.magnitude_mask),
-                            "support not": np.logical_not(self.support),
-
-                            "diffraction": self.diffraction,
-                            "new diffraction magnitude": np.zeros(self.data_shape,
-                                                                  dtype=np.complex128),
-                            "phase holder": np.zeros(self.data_shape, dtype=np.complex128),
-                            "diffraction with magnitude constrain": np.zeros(self.data_shape,
-                                                                             dtype=np.complex128),
-
-                            "new density tmp": np.zeros(self.data_shape, dtype=np.float64),
-
-                            "modified support": np.zeros(self.data_shape, dtype=np.bool),
-                            "modified support not": np.zeros(self.data_shape, dtype=np.bool),
-                            "support holder temporary": np.zeros(self.data_shape, dtype=np.float64),
-
-                            "tmp holder 2": np.zeros(self.data_shape, dtype=np.complex128),
-                            "tmp holder 3": np.zeros(self.data_shape, dtype=np.float64),
-                            "tmp holder 4": np.zeros(self.data_shape, dtype=np.complex128)
-                            }
-
-    def update_input_dict(self):
-        """
-        Create variables with proper values and data shaps.
-        :return:
-        """
-        self.data_dict = {"magnitude array": self.magnitude,
-                          "magnitude mask": self.magnitude_mask,
-                          "support": self.support,
-                          "density": self.density}
-
-    ################################################################################################
-    # Algorithm manipulation and execution
-    ################################################################################################
-    def set_beta_and_iter_num(self, beta=0.75, iter_num=200, decay=False, decay_rate=7):
+    def set_beta_and_iter_num(self, iter_num, beta=None, decay=False, decay_rate=20):
         """
         This function set the beta for the algorithm. In this algorithm, for simplicity, the
         iteration number has to be the same as the number of betas.
@@ -360,7 +391,9 @@ class CpuAlterProj:
             print("Therefore, the 'decay' and 'iter_num' arguments are ignored.")
             print("The iteration number is set to be the length of the beta array which "
                   "currently is {}".format(beta.shape[0]))
-        else:
+
+        # Step 2: Check if beta is a scalar.
+        elif isinstance(beta, (int, float, complex)):
 
             """
             Case 2: The user only gives a constant number for beta
@@ -387,6 +420,50 @@ class CpuAlterProj:
                 self.iter_num = iter_num
                 print("The user uses a constant value for the beta argument. The argument "
                       "decay is set to False. The iteration number is {}".format(iter_num))
+
+        # Step 3: Beta is not specified.
+        else:
+
+            print("Since the argument beta is not specified, the arguments decay and decay_rate "
+                  "are ignored.")
+
+            if self.beta:
+
+                # If the existing beta is a scalar, then create a new list of beta with this value
+                #
+                if isinstance(self.beta, (int, float, complex)):
+                    self.beta = self.beta * np.ones(iter_num, dtype=np.float64)
+
+                # If the existing beta is a list, then take sublist or extend it to the current
+                # iteration number
+                elif isinstance(self.beta, (list, tuple, np.ndarray)):
+                    self.beta = np.array(self.beta)
+                    if self.beta.shape[0] >= iter_num:
+                        self.beta = self.beta[:iter_num]
+                        self.iter_num = iter_num
+
+                    else:
+                        tmp = np.copy(self.beta)
+                        tmp_2 = tmp.shape[0]
+
+                        # Update the two properties
+                        self.beta = np.zeros(iter_num, dtype=np.float64)
+                        self.iter_num = iter_num
+
+                        # Initialize the new beta array
+                        self.beta[:tmp_2] = tmp[:]
+                        self.beta[tmp_2:] = tmp[-1]
+
+            else:
+                """
+                In this case, the user has set none value to the self.beta property for whatever 
+                reason. And in the same time, the user does not provide a new valid beta value 
+                In this case, whether it's using ER or any other algorithm, just set beta to be 
+                ones. 
+                """
+                # Due to some unexpected reason,
+                self.beta = np.ones(iter_num, dtype=np.float64)
+                self.iter_num = iter_num
 
     def _use_decaying_beta(self, initial_beta=0.75, decay_rate=7, iter_num=200):
         """
@@ -516,18 +593,25 @@ class CpuAlterProj:
 
         # Set the shrink wrap behavior
         if type(shrink_wrap_on) is bool:
+            self.shrink_wrap_on = shrink_wrap_on
             if shrink_wrap_on:
-                self.shrink_warp_properties(on=True, filling_holes=True)
-            else:
-                self.shrink_wrap_on = False
+                print("Enable shrink wrap function.")
 
-        # One should initialize the iteration number since the beta value is tricky to tune.
-        self.iter_counter = 0
-        print("The self.iter_counter is set to 0.")
+        # Prepare for the calculation
+        if not (self.algorithm in self.available_algorithms):
 
-        # Begin Calculation
-        if self.algorithm in self.available_algorithms:
+            # If the algorithm is not available, give an error.
+            raise Exception("There is something wrong with the self.algorithm property." +
+                            "At present, the only available algorithms are " +
+                            "{}".format(self.available_algorithms))
+
+        # If the algorithm is available, check self-consistency and do the calculation
+        else:
             print("Using algorithm {}".format(self.algorithm))
+
+            # Update the input dict and the holder dict
+            self.update_input_dict()
+            self.update_holder_dict()
 
             # Check self consistency
             self.check_consistency_short()
@@ -544,26 +628,20 @@ class CpuAlterProj:
 
                     # Step 2: Check if one should apply the shrink wrap
                     if self.shrink_wrap_on:
-                        if np.mod(self.iter_counter, self.shrink_wrap_rate) == 0:
+                        if np.mod(idx, self.shrink_wrap_rate) == 0:
                             tmp = util.shrink_wrap(
                                 density=self.data_dict["density"],
                                 sigma=self.shrink_wrap_sigma,
                                 threshold_ratio=self.shrink_wrap_threshold_retio,
-                                filling_holds=self.support_fill_holes,
-                                convex_hull=self.support_convex_hull)
+                                filling_holds=self.shrink_wrap_fill_holes,
+                                convex_hull=self.shrink_wrap_convex_hull)
 
                             self.set_support(support=tmp)
                             self.update_shrink_wrap_properties()
 
-                    # Step 3:increase the counter
-                    self.iter_counter += 1
-
             else:
 
                 for idx in range(self.iter_num):
-
-                    if np.mod(idx, 100) == 0:
-                        print("iteration number: {}".format(idx))
 
                     # Step 1: Execute the alternating projections
                     CpuUtil.iterative_projection_normal(data_dict=self.data_dict,
@@ -576,32 +654,27 @@ class CpuAlterProj:
                                                         f=self.param_dict["par_f"])
 
                     # Step 3: Update the beta parameter
-                    self.update_param_dict_with_beta(beta=self.beta[self.iter_counter])
+                    self.update_param_dict_with_beta(beta=self.beta[idx])
 
                     # Step 4: Check if one should apply the shrink wrap
                     if self.shrink_wrap_on:
-                        if np.mod(self.iter_counter, self.shrink_wrap_rate) == 0:
+                        if np.mod(idx, self.shrink_wrap_rate) == 0:
+                            print("This is iteration No.{}".format(idx))
+                            print("Update the support with shrink wrap.")
+
                             tmp = util.shrink_wrap(
                                 density=self.data_dict["density"],
                                 sigma=self.shrink_wrap_sigma,
                                 threshold_ratio=self.shrink_wrap_threshold_retio,
-                                filling_holds=self.support_fill_holes,
-                                convex_hull=self.support_convex_hull)
+                                filling_holds=self.shrink_wrap_fill_holes,
+                                convex_hull=self.shrink_wrap_convex_hull)
 
                             self.set_support(support=tmp)
+                            self.update_shrink_wrap_properties()
 
-                    # Step 3:increase the counter
-                    self.iter_counter += 1
-
-        # If the algorithm is not available, give an error.
-        else:
-            raise Exception("There is something wrong with the self.algorithm property." +
-                            "At present, the only available algorithms are " +
-                            "{}".format(self.available_algorithms))
-
-    def shrink_warp_properties(self, on=False, threshold_ratio=None, sigma=None, decay_rate=None,
-                               threshold_ratio_decay_ratio=0.9, sigma_decay_ratio=0.9,
-                               filling_holes=None, convex_hull=None):
+    def shrink_warp_properties(self, on=False, threshold_ratio=0.04, sigma=5.0, decay_rate=30,
+                               threshold_ratio_decay_ratio=1.0, sigma_decay_ratio=0.95,
+                               filling_holes=True, convex_hull=False, keep_history=True):
         """
         This is just a temporary implementation of the shrink warp tuning function.
         There are actually, quite a lot of parameters to tune and that has to be consistent with 
@@ -617,15 +690,15 @@ class CpuAlterProj:
         :param sigma_decay_ratio: 
         :param filling_holes:
         :param convex_hull:
+        :param keep_history:
         :return: 
         """
+        self.shrink_wrap_on = on
         if on:
-            self.shrink_wrap_on = on
             print("Enable shrink wrap functions.")
         else:
-            self.shrink_wrap_on = on
-            threshold_ratio_decay_ratio = 1.0
-            sigma_decay_ratio = 1.0
+            print("Disable shrink wrap functions.")
+            return
 
         if threshold_ratio:
             self.shrink_wrap_threshold_retio = threshold_ratio
@@ -663,33 +736,36 @@ class CpuAlterProj:
 
         if type(filling_holes) == bool:
             if filling_holes:
-                self.support_fill_holes = True
+                self.shrink_wrap_fill_holes = True
                 print("As per request, when update the support, fill holes in the support "
                       "derived from standard shrink wrap algorithm.")
             else:
-                self.support_fill_holes = False
+                self.shrink_wrap_fill_holes = False
 
         if type(convex_hull) == bool:
             if convex_hull:
-                self.support_convex_hull = True
+                self.shrink_wrap_convex_hull = True
                 print("As per request, when update the support, use the convex hull of the result "
                       "of the standard shrink wrap algorithm as the suuport.")
             else:
-                self.support_convex_hull = False
+                self.shrink_wrap_convex_hull = False
 
         if type(filling_holes) == bool and type(convex_hull) == bool:
             if (not filling_holes) and (not convex_hull):
                 print("When update the support, use the standard result of the shrink wrap "
                       "algorithm as the new support.")
 
-    def update_shrink_wrap_properties(self):
+        self.shrink_wrap_keep_history = keep_history
+
+    def update_shrink_wrap_properties(self, keep_history=False):
         """
         Update some properties and keep track of the history.
 
         :return:
         """
-        self.shrink_wrap_hist['threshold rate history'].append(self.shrink_wrap_threshold_retio)
-        self.shrink_wrap_hist['sigma history'].append(self.shrink_wrap_sigma)
+        if keep_history:
+            self.shrink_wrap_hist['threshold rate history'].append(self.shrink_wrap_threshold_retio)
+            self.shrink_wrap_hist['sigma history'].append(self.shrink_wrap_sigma)
 
         self.shrink_wrap_sigma *= self.shrink_wrap_sigma_decay_ratio
         self.shrink_wrap_threshold_retio *= self.shrink_wrap_threshold_decay_ratio
@@ -702,54 +778,8 @@ class CpuAlterProj:
     ###################################
     # Initialization details
     ###################################
-    def _init_from_initez(self):
-        """
-        This is an internal method used to initialize some more properties when the user has used
-        the  method minimal_data_initialize(magnitude, magnitude_mask).
 
-        This method only initializes some not very important variables. The user has to initialize
-        the calculation parameters, the initial values and the other stuff.
-        :return:
-        """
-
-        self.data_dict["magnitude array"] = self.magnitude
-        self.data_dict["magnitude mask"] = self.magnitude_mask
-        self.holder_dict["magnitude mask not"] = np.logical_not(self.magnitude_mask)
-
-        # Abstract info
-        self.data_shape = copy.deepcopy(self.magnitude.shape)
-        self.dim = len(self.magnitude.shape)
-
-        # Set and check the origin of the origin of the data
-        self.set_and_check_detector_origin()
-
-    def _full_init_from_initez(self):
-        """
-        This is an internal method used to initialize some more properties when the user has
-        used the method minimal_data_initialize(magnitude, magnitude_mask).
-
-        In short, this function initialize all
-
-        :return:
-        """
-
-        # TODO: This default behavior should be modified
-        # Step 1: Finish the most elementary initialization
-        self._init_from_initez()
-
-        # Step 2: Initialize the support
-        self.get_auto_support()
-        print("Initialize the support array with the auto-correlation array using "
-              "default methods with default parameters.")
-
-        # Step 3: Set the initial diffraction and initial density values
-        self.derive_initial_density(fill_detector_gap=False, method="Random")
-
-        # Step 4: Initialize the holder variables.
-        self.update_input_dict()
-        self.update_holder_dict()
-
-    def derive_initial_density(self, fill_detector_gap=False, method="Random"):
+    def derive_initial_density(self, fill_detector_gap=True, method="Random"):
 
         # Step 1: Get the phase
         if method in ('Random', 'Zero', 'Minimal', 'Support'):
@@ -959,3 +989,40 @@ class CpuAlterProj:
     # TODO: Let the user to totally customize the algorithm
     def totally_customize_algorithm(self):
         pass
+
+    def update_holder_dict(self):
+        """
+        Create variables with proper data shape.
+        :return:
+        """
+        # Create different variables
+        self.holder_dict = {"magnitude mask not": np.logical_not(self.magnitude_mask),
+                            "support not": np.logical_not(self.support),
+
+                            "diffraction": self.diffraction,
+                            "new diffraction magnitude": np.zeros(self.data_shape,
+                                                                  dtype=np.complex128),
+                            "phase holder": np.zeros(self.data_shape, dtype=np.complex128),
+                            "diffraction with magnitude constrain": np.zeros(self.data_shape,
+                                                                             dtype=np.complex128),
+
+                            "new density tmp": np.zeros(self.data_shape, dtype=np.float64),
+
+                            "modified support": np.zeros(self.data_shape, dtype=np.bool),
+                            "modified support not": np.zeros(self.data_shape, dtype=np.bool),
+                            "support holder temporary": np.zeros(self.data_shape, dtype=np.float64),
+
+                            "tmp holder 2": np.zeros(self.data_shape, dtype=np.complex128),
+                            "tmp holder 3": np.zeros(self.data_shape, dtype=np.float64),
+                            "tmp holder 4": np.zeros(self.data_shape, dtype=np.complex128)
+                            }
+
+    def update_input_dict(self):
+        """
+        Create variables with proper values and data shaps.
+        :return:
+        """
+        self.data_dict = {"magnitude array": self.magnitude,
+                          "magnitude mask": self.magnitude_mask,
+                          "support": self.support,
+                          "density": self.density}
