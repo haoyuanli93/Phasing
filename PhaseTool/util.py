@@ -41,14 +41,11 @@ def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, con
 
     # Check if additional conditions are available.
     if filling_holds:
-        print("As per request, fill holes in the support. The convex_hull argument is ignored.")
         ndimage.binary_fill_holes(input=support_tmp, output=support)
 
     elif convex_hull:
-        print("As per request, use the convex hull of standard shrink-wrap result as the support.")
         support = morphology.convex_hull_image(support_tmp)
     else:
-        print("Using the result of the standard shrink-wrap as the new support array.")
         support = np.copy(support_tmp)
 
     return support

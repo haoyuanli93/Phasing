@@ -485,8 +485,8 @@ class CpuAlterProj:
                             "{} with function".format(self.available_algorithms) +
                             "self.set_algorithm.")
 
-    def execute_algorithm(self, algorithm=None, beta=None, iter_num=None, beta_decay=False,
-                          beta_decay_rate=7, initial_density=None, shrink_wrap_on=None):
+    def execute_algorithm(self, algorithm=None, beta=None, iter_num=None, beta_decay=None,
+                          beta_decay_rate=None, initial_density=None, shrink_wrap_on=None):
         """
 
         :param algorithm:
@@ -664,17 +664,23 @@ class CpuAlterProj:
         if type(filling_holes) == bool:
             if filling_holes:
                 self.support_fill_holes = True
-                print("Filling holes in the support derived from standard shrink wrap algorithm.")
+                print("As per request, when update the support, fill holes in the support "
+                      "derived from standard shrink wrap algorithm.")
             else:
                 self.support_fill_holes = False
 
         if type(convex_hull) == bool:
             if convex_hull:
                 self.support_convex_hull = True
-                print("Use the convex hull of the result of the standard shrink wrap algorithm "
-                      "as the suuport.")
+                print("As per request, when update the support, use the convex hull of the result "
+                      "of the standard shrink wrap algorithm as the suuport.")
             else:
                 self.support_convex_hull = False
+
+        if type(filling_holes) == bool and type(convex_hull) == bool:
+            if (not filling_holes) and (not convex_hull):
+                print("When update the support, use the standard result of the shrink wrap "
+                      "algorithm as the new support.")
 
     def update_shrink_wrap_properties(self):
         """

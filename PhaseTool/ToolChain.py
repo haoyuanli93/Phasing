@@ -191,28 +191,160 @@ class AlterProjChain:
         self.alter_proj_obj.update_input_dict()
         self.alter_proj_obj.update_holder_dict()
 
-    def _modify_algorithm_object(self, algorithm_info):
+    def _modify_algorithm_object(self, alg_info):
         """
         After the first stage, one will copy from the existing 
-        :param algorithm_info: 
+        :param alg_info:
         :return: 
         """
-        # Step 1: Check if one needs to update the alternating projection method
-        pass
+
+        # Step 1: Modify the support
+        if alg_info['InitSupport Type'] == 'Auto-correlation':
+            # Derive the support from the auto-correlation
+            tmp_support = self.alter_proj_obj.get_auto_support(
+                threshold=alg_info['InitSupport Threshold'],
+                gaussian_filter=alg_info['InitSupport Gaussian Filter'],
+                sigma=alg_info['InitSupport Gaussian sigma'],
+                fill_detector_gap=alg_info['InitSupport Fill Detector Gaps'],
+                bin_num=alg_info['InitSupport Bin Num'])
+
+            self.alter_proj_obj.set_support(support=tmp_support)
+
+        # Deal with the case where the user want to use their own support
+        elif alg_info['InitSupport Type'] == 'Assigned':
+
+            # Use previous support, just do not change anything
+            if alg_info['InitSupport'] == 'Current Support':
+                # This means does not change anything
+                pass
+
+            # Use a specified numpy array compatible with the intensity array
+            elif type(alg_info['InitSupport']).__name__ == 'ndarray':
+
+                # Check type and shape before assigning the value.
+                if alg_info['InitSupport'].shape == self.intensity.shape:
+                    self.alter_proj_obj.set_support(support=alg_info['InitSupport'])
+                else:
+                    raise Exception("The shape of the assigned initial support has to be the same "
+                                    "as that of the intensity array.")
+
+            else:  # Deal with unexpected values
+                raise Exception("Sorry, at this time, the logic of this program is not very "
+                                "complete, please set the entry 'InitSupport' to "
+                                "'Current Support' use the existing support or a compatible "
+                                "numpy array since they are the only supported options. ")
+
+        else:  # Deal with unexpected values
+            raise Exception("Sorry, at this time, the logic of this program is not very "
+                            "complete, please set the entry 'InitSupport Type' to "
+                            "'Auto-correlation' if you want to derive the support from the "
+                            "auto-correlation or 'Assigned' if you want to use existing value "
+                            "or assign a new value. ")
+
+        # Step 2: Set the initial density value
+        # Case 1: The user want to derive the density
+        if alg_info['InitDensity Type'] == 'Derived':
+            self.alter_proj_obj.derive_initial_density(
+                fill_detector_gap=alg_info['InitDensity Fill Detector Gaps'],
+                method=alg_info['InitDensity Deriving Method'])
+
+        # Case 2: The user want to assign the initial density value
+        elif alg_info['InitDensity Type'] == 'Assigned':
+
+            # If use the previous result, does not change anything
+            if alg_info['InitDensity'] == 'Current Density':
+                pass
+
+            # Use a specified numpy array compatible with the intensity array
+            elif type(alg_info['InitDensity']).__name__ == 'ndarray':
+
+                # Check type and shape before assigning the value.
+
+                if alg_info['InitDensity'].shape == self.intensity.shape:
+                    self.alter_proj_obj.set_initial_density(density=alg_info['InitDensity'])
+                else:
+                    raise Exception("The shape of the assigned initial density has to be the same "
+                                    "as that of the intensity array.")
+
+            else:  # Deal with unexpected values
+                raise Exception("Sorry, at this time, the logic of this program is not very "
+                                "complete, please set the entry 'InitDensity' to "
+                                "'Current Density' use the existing density or a compatible "
+                                "numpy array since they are the only supported options. ")
+
+        else:  # Deal with unexpected values
+            raise Exception("Sorry, at this time, the logic of this program is not very "
+                            "complete, please set the entry 'InitDensity Type' to "
+                            "'Auto' if you want to derive the density "
+                            "auto-correlation or 'Assigned' if you want to use exising value "
+                            "or assign a new value. ")
+
+        # Step 5: Specify the ShrinkWrap parameters
+        if alg_info['ShrinkWrap Flag']:
+            self.alter_proj_obj.shrink_warp_properties(
+                on=alg_info['ShrinkWrap Flag'],
+                threshold_ratio=alg_info['ShrinkWrap Threshold Ratio'],
+                sigma=alg_info['ShrinkWrap Sigma'],
+                decay_rate=alg_info['ShrinkWrap Decay Rate'],
+                threshold_ratio_decay_ratio=alg_info['ShrinkWrap Threshold Decay Ratio'],
+                sigma_decay_ratio=alg_info['ShrinkWrap Sigma Decay Ratio'],
+                filling_holes=alg_info['ShrinkWrap Filling Holes'],
+                convex_hull=alg_info['ShrinkWrap ConvexHull'])
+
+        else:
+            # Turn off the shrink wrap process
+            self.alter_proj_obj.shrink_warp_properties(on=False)
+
+        # Step 6: Set the Alternating Projection Algorithm parameters.
+        if 'AlgName' in alg_info:
+            self.alter_proj_obj.set_algorithm(alg_name=alg_info['AlgName'])
+
+            if alg_info['AlgName'] == 'ER':
+                self.alter_proj_obj.set_beta_and_iter_num(iter_num=alg_info['IterNum'])
+
+            else:
+                self.alter_proj_obj.set_beta_and_iter_num(beta=alg_info['InitBeta'],
+                                                          iter_num=alg_info['IterNum'],
+                                                          decay=alg_info['BetaDecay'],
+                                                          decay_rate=alg_info['BetaDecayRate'])
+
+        # Step 7: Update the input dict and the holder dict
+        self.alter_proj_obj.update_input_dict()
+        self.alter_proj_obj.update_holder_dict()
 
     def execute_algorithm_sequence(self):
+        """
+        Execute the algorithm sequence.
+
+        :return: None
+        """
 
         # Counter for algorithm dictionaries
         for ctr in range(len(self.algorithm_sequence)):
-            if ctr == 0:
-                alter_proj = self._create_algorithm_object(self.algorithm_sequence[ctr])
 
-                # TODO Finish the calculation
-                pass
+            print("Begin the No.{} algorithm in this sequence.".format(ctr))
+
+            if ctr == 0:
+
+                # During the first iteration, create the project
+                self._create_algorithm_object(self.algorithm_sequence[ctr])
+
+                # Execute the algorithm
+                self.alter_proj_obj.execute_algorithm()
+
                 if self.keep_full_history:
-                    self.alter_proj_obj_history.append(alter_proj)
+                    self.alter_proj_obj_history.append(copy.deepcopy(self.alter_proj_obj))
             else:
-                pass
+                # During the first iteration, create the project
+                self._modify_algorithm_object(self.algorithm_sequence[ctr])
+
+                # Execute the algorithm
+                self.alter_proj_obj.execute_algorithm()
+
+                if self.keep_full_history:
+                    self.alter_proj_obj_history.append(copy.deepcopy(self.alter_proj_obj))
+
+        print("Finished all the steps in the calculation.")
 
     def set_algorithm_sequence(self, alg_sequence):
         """
@@ -227,8 +359,59 @@ class AlterProjChain:
             raise Exception("The alg_sequence has to be a list, even if you only use only one "
                             "algorithm and has specified only one dictionary.")
 
-    def show_algorithm_sequence(self):
-        pass
+    def show_introduction_and_algorithm_sequence(self, show_detail=False):
+        """
+        This function shows the calculation sequence in a understandable way.
+
+        :return:
+        """
+
+        # Step 0: Give a fixed introduction
+        print("----------------------------Part 0: Introduction-----------------------------------")
+        print("When doing phase retrieval, it seems a little bit difficult to do it with a single "
+              "algorithm. Therefore I created this AlterProjChain object to organize a sequence of "
+              "different projection methods. Therefore, this object is not fundamental. You can "
+              "definitely combine CpuAlterProj objects to finished whatever you can do with this "
+              "object and more.")
+        print("")
+        print("In this object, the calculation sequence is controlled with a list called "
+              "algorithm_sequence. Each element in this list is a dictionary. Each dictionary "
+              "contains complete information for one group of alternating projection algorithm.")
+        print("")
+
+        # Step 1: Show briefly summarize the this calculation sequence.
+        print("----------------------------Part 1: Current Sequence Summary-----------------------")
+
+        alg_num = len(self.algorithm_sequence)
+        # Deal with the case when the user has not initialized this sequence.
+        if alg_num == 0:
+            print("There is no algorithm in the algorithm sequence. It seems that you have not "
+                  "initialized this algorithm sequence. Please initialize the sequence with "
+                  "function set_algorithm_sequence or use_default_algorithm_sequence.")
+
+        else:
+            print("At present there are totally {} elements in the algorithm sequence.".format(
+                alg_num))
+            print("They are respectively:")
+            for l in range(alg_num):
+                print("For algorithm No.{}".format(l))
+
+                alg_info = self.algorithm_sequence[l]
+                print("Algorithm Name:{}".format(alg_info['AlgName']))
+                print("Use Decaying Beta:{}".format(alg_info['BetaDecay']))
+                print("Iteration Number:{}".format(alg_info['IterNum']))
+                print("Use Shrink Wrap:{}".format(alg_info['ShrinkWrap Flag']))
+
+        # Step 2: Check if one needs to show the details
+        if show_detail:
+            print("----------------------------Part 2: "
+                  "Detail---------------------------------------")
+            print("Since you would like to see the detail of the sequence, the elements in the "
+                  "algorithm sequence is printed in sequence. The detailed explanation of each "
+                  "entry of the dictionary can be found on the github and in the source code.")
+            for l in range(alg_num):
+                print("For algorithm No.{}".format(l))
+                print(self.algorithm_sequence[l])
 
     def use_default_algorithm_sequence(self, idx):
         """
