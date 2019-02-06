@@ -184,8 +184,8 @@ def get_beam_stop_mask(space_shape, space_center, radius):
     dim = len(space_shape)
 
     # Calculate the distance
-    distance = sum(np.meshgrid(*[np.square(np.arange(space_shape[x])
-                                           - int(space_center[x])) for x in range(dim)]))
+    distance = sum(np.meshgrid(*[np.square(np.arange(space_shape[x], dtype=np.float64)
+                                           - float(space_center[x])) for x in range(dim)]))
     np.sqrt(distance, out=distance)
 
     # Holder for the mask
@@ -621,6 +621,8 @@ class SmoothSample:
         self.det_noisy_intensity = np.copy(self.det_intensity)
         if self.shot_noise_noise_flag:
             self.det_noisy_intensity = np.random.poisson(self.det_noisy_intensity)
+            self.det_noisy_intensity = self.det_noisy_intensity.astype(np.float64)
+
         if self.gaussian_noise_flag:
             self.det_noisy_intensity += np.random.normal(self.gaussian_mean,
                                                          self.gaussian_sigma,

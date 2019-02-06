@@ -425,7 +425,7 @@ class CpuAlterProj:
             print("Since the argument beta is not specified, the arguments decay and decay_rate "
                   "are ignored.")
 
-            if self.beta:
+            if not (self.beta is None):
 
                 # If the existing beta is a scalar, then create a new list of beta with this value
                 #

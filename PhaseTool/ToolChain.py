@@ -27,10 +27,10 @@ class AlterProjChain:
         self.intensity = None
         self.detector_mask = None
 
-        if intensity:
+        if not (intensity is None):
             self.intensity = intensity
 
-        if detector_mask:
+        if not (detector_mask is None):
             self.detector_mask = detector_mask
 
         # Important output
@@ -73,12 +73,16 @@ class AlterProjChain:
         self.alter_proj_obj = CpuAlterProj()
 
         # Step 2: Initialize the object
-        self.alter_proj_obj.initialize_easy(magnitude=np.sqrt(self.intensity),
-                                            magnitude_mask=self.detector_mask,
+        self.alter_proj_obj.initialize_easy(magnitude=np.fft.fftshift(np.sqrt(self.intensity)),
+                                            magnitude_mask=np.fft.fftshift(self.detector_mask),
                                             full_initialization=False)
 
         # Step 3: Get the support
         if alg_info['InitSupport Type'] == 'Auto-correlation':
+
+            # Test
+            print("Initialize with auto-correlation information.")
+
             # Derive the support from the auto-correlation
             _ = self.alter_proj_obj.use_auto_support(
                 threshold=alg_info['InitSupport Threshold'],
@@ -316,9 +320,17 @@ class AlterProjChain:
         :return: None
         """
 
+        print("")
+        print("***********************************************************************************")
+        print("******************     Start The Calculation      *********************************")
+        print("***********************************************************************************")
+        print("")
+
         # Counter for algorithm dictionaries
         for ctr in range(len(self.algorithm_sequence)):
 
+            print("")
+            print("***------------------------------------------------------------------------***")
             print("Begin the No.{} algorithm in this sequence.".format(ctr))
 
             if ctr == 0:
@@ -340,6 +352,9 @@ class AlterProjChain:
 
                 if self.keep_full_history:
                     self.alter_proj_obj_history.append(copy.deepcopy(self.alter_proj_obj))
+
+            print("***------------------------------------------------------------------------***")
+            print("")
 
         print("Finished all the steps in the calculation.")
 
@@ -391,13 +406,15 @@ class AlterProjChain:
                 alg_num))
             print("They are respectively:")
             for l in range(alg_num):
+
+                print("")
                 print("For algorithm No.{}".format(l))
 
                 alg_info = self.algorithm_sequence[l]
                 print("Algorithm Name:{}".format(alg_info['AlgName']))
-                print("Use Decaying Beta:{}".format(alg_info['BetaDecay']))
                 print("Iteration Number:{}".format(alg_info['IterNum']))
                 print("Use Shrink Wrap:{}".format(alg_info['ShrinkWrap Flag']))
+                print("")
 
         # Step 2: Check if one needs to show the details
         if show_detail:
@@ -409,6 +426,10 @@ class AlterProjChain:
             for l in range(alg_num):
                 print("For algorithm No.{}".format(l))
                 print(self.algorithm_sequence[l])
+
+        print("----------------------------End of the introduction--------------------------------")
+        print('')
+        print('')
 
     def use_default_algorithm_sequence(self, idx):
         """
@@ -456,7 +477,7 @@ default_alter_proj_chain_1 = [
         'InitSupport Gaussian Filter': True,  # Whether to use Gaussian filter to get the support
         'InitSupport Gaussian sigma': 1.0,
         # Whether to fill the detector gaps when calculating the auto-correlation
-        'InitSupport Fill Detector Gaps': True,
+        'InitSupport Fill Detector Gaps': False,
         'InitSupport Bin Num': 300,  # How many bins to use to fill the gaps
 
         # Group 3: Set the initial density properties
@@ -485,9 +506,9 @@ default_alter_proj_chain_1 = [
         # Group 1: Set the algorithm properties
         'AlgName': 'RAAR',  # Algorithm name
         'IterNum': 1200,  # Iternation number
-        'InitBeta': 0.93,  # The initial beta value
+        'InitBeta': 0.87,  # The initial beta value
         'BetaDecay': True,  # Whether the beta value will decay after several iterations
-        'BetaDecayRate': 35,  # How the beta value decays
+        'BetaDecayRate': 20,  # How the beta value decays
 
         # Group 2: Set the initial support properties
         'InitSupport Type': 'Assigned',  # Initial support type
@@ -525,19 +546,14 @@ default_alter_proj_chain_1 = [
         # Because it is the Error Reduction, one does not need the other parameters.
 
         # Group 2: Set the initial support properties
-        'InitSupport Type': 'Auto-correlation',  # Initial support type
+        'InitSupport Type': 'Assigned',  # Initial support type
         # The following entry is for Type 'Assigned'. Because one derive the initial support
         # from auto-correlation, this is not used in this step in this chain.
-        'InitSupport': None,
-        'InitSupport Threshold': 0.04,  # The threshold to get the support
-        'InitSupport Gaussian Filter': True,  # Whether to use Gaussian filter to get the support
-        'InitSupport Gaussian sigma': 1.0,
-        # Whether to fill the detector gaps when calculating the auto-correlation
-        'InitSupport Fill Detector Gaps': True,
+        'InitSupport': 'Current Support',
 
         # Group 3: Set the initial density properties
-        'InitDensity Type': "Support",  # Derive the density from the support.
-        'InitDensity Phase': "Random",
+        'InitDensity Type': "Assigned",  # Derive the density from the support.
+        'InitDensity': 'Current Density',
 
         # Group 4: Set the shrink-wrap properties
         'ShrinkWrap Flag': False,  # Whether to use ShrinkWrap algorithm to update the support
