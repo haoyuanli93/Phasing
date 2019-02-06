@@ -88,8 +88,7 @@ class AlterProjChain:
                 threshold=alg_info['InitSupport Threshold'],
                 gaussian_filter=alg_info['InitSupport Gaussian Filter'],
                 sigma=alg_info['InitSupport Gaussian sigma'],
-                fill_detector_gap=alg_info['InitSupport Fill Detector Gaps'],
-                bin_num=alg_info['InitSupport Bin Num'])
+                fill_detector_gap=alg_info['InitSupport Fill Detector Gaps'])
 
         # Deal with the case where the user want to use their own support
         elif alg_info['InitSupport Type'] == 'Assigned':
@@ -444,6 +443,9 @@ class AlterProjChain:
             raise Exception("Sorry, at present, idx has to be 1 since I have only prepared "
                             "1 default chain.")
 
+    def get_default_algorithm_sequence(self, idx):
+        pass
+
 
 ###############################################################################################
 #
@@ -478,7 +480,6 @@ default_alter_proj_chain_1 = [
         'InitSupport Gaussian sigma': 1.0,
         # Whether to fill the detector gaps when calculating the auto-correlation
         'InitSupport Fill Detector Gaps': False,
-        'InitSupport Bin Num': 300,  # How many bins to use to fill the gaps
 
         # Group 3: Set the initial density properties
         'InitDensity Type': "Derived",  # Derive the density from the support.

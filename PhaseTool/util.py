@@ -266,34 +266,28 @@ def get_category_map(value_pattern, bin_num):
     return category_map, ends
 
 
-def get_support_from_autocorrelation(magnitude, magnitude_mask, origin,
+def get_support_from_autocorrelation(magnitude, magnitude_mask,
                                      threshold=0.04,
                                      gaussian_filter=True,
                                      gaussian_sigma=1.,
-                                     flag_fill_detector_gap=False,
-                                     bin_num=300):
+                                     flag_fill_detector_gap=False):
     """
 
     :param magnitude:
     :param magnitude_mask:
-    :param origin:
     :param threshold:
     :param gaussian_filter:
     :param gaussian_sigma:
     :param flag_fill_detector_gap:
-    :param bin_num:
     :return:
     """
 
     # Step 1. Check if I need to fix those gaps.
     if flag_fill_detector_gap:
+
         # Create a variable to handle both case at the same time
         data_tmp = fill_detector_gap(magnitude=magnitude,
-                                     magnitude_mask=magnitude_mask,
-                                     origin=origin,
-                                     gaussian_filter=gaussian_filter,
-                                     gaussian_sigma=gaussian_sigma,
-                                     bin_num=bin_num)
+                                     magnitude_mask=magnitude_mask)
     else:
         data_tmp = magnitude
 
@@ -330,19 +324,37 @@ def fill_detector_gap(magnitude, magnitude_mask):
     :return:
     """
 
-    # Get pixel number
-    pixel_num = np.prod(magnitude.shape)
+    # Step 1: Check if there is any gap:
+    if np.all(magnitude_mask):
 
-    # Create coordinate mesh grid
-    coordiantes = np.meshgrid(*(np.arange(x, dtype=np.int64) for x in magnitude.shape))
+        print("There is no gap on the detector. Use the original magnitude.")
+        return magnitude
 
-    # Turn them into 1D array
-    coordiantes = [np.reshape(x, pixel_num) for x in coordiantes]
+    else:
+        # Step 2: Begin the interpolation
+        # Create coordinate mesh grid
+        coordiantes = np.meshgrid(*(np.arange(x, dtype=np.int64) for x in magnitude.shape))
 
-    # 
+        # Apply the masks to extract the valid points
+        valid_points = [x[magnitude_mask] for x in coordiantes]
+        valid_values = magnitude[magnitude_mask]
 
-    # Step 1: Create an interpolation object
-    my_interpolating_function = RegularGridInterpolator(coordiantes, data)
+        # Apply the masks to find out where to interpolate
+        mask_not = np.logical_not(magnitude_mask)
+        unknown_points_list = [x[mask_not] for x in coordiantes]
+        unknown_points = np.transpose(np.stack(unknown_points_list))
+
+        # Create an interpolation object
+        my_interpolating_function = RegularGridInterpolator(valid_points, valid_values)
+
+        # Carry out the interpolation
+        interpolate_value = my_interpolating_function(unknown_points)
+
+        # Fill pixels inside the gaps with the interpolated values
+        mag_copy = np.copy(magnitude)
+        mag_copy[unknown_points_list] = interpolate_value
+
+        return mag_copy
 
 
 def approximate_magnitude_projection(dens, mag, eps):

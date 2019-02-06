@@ -285,7 +285,7 @@ class CpuAlterProj:
         self.update_holder_dict()
 
     def use_auto_support(self, threshold=0.04, gaussian_filter=True,
-                         sigma=1.0, fill_detector_gap=True, bin_num=300):
+                         sigma=1.0, fill_detector_gap=True):
         """
         Generate a support from the autocorrelation function calculated from the support info.
 
@@ -303,21 +303,16 @@ class CpuAlterProj:
                                 auto correlation. By default, one should use this filter.
         :param sigma: The sigma value used in the Gaussian filter.
         :param fill_detector_gap: Whether to fill those gaps in the detector.
-        :param bin_num: This is the bin number used to get radial information. This only has effect
-                        when the fill_detector_gap is set to be True. The detail should be obvious
-                        from the code.
         :return:
         """
 
         self.support = util.get_support_from_autocorrelation(
             magnitude=self.magnitude,
             magnitude_mask=self.magnitude_mask,
-            origin=self.center_in_pixel,
             threshold=threshold,
             gaussian_filter=gaussian_filter,
             gaussian_sigma=sigma,
             flag_fill_detector_gap=fill_detector_gap,
-            bin_num=bin_num
         )
 
         # Update the input dictionary
@@ -802,9 +797,7 @@ class CpuAlterProj:
 
         # Step 2: Fix the detector gaps
         if fill_detector_gap:
-            magnitude_tmp = self.fill_detector_gaps(gaussian_filter=True,
-                                                    gaussian_sigma=1.0,
-                                                    bin_num=300)
+            magnitude_tmp = self.fill_detector_gaps()
         else:
             magnitude_tmp = self.magnitude
 
@@ -954,22 +947,14 @@ class CpuAlterProj:
     ###################################
     # Momentum space
     ###################################
-    def fill_detector_gaps(self, gaussian_filter=True, gaussian_sigma=1., bin_num=300):
+    def fill_detector_gaps(self):
         """
-        Return the magnitude pattern where all the gap pixels are filled with the average value
-        of that radial region. A gaussion filter is optional.
+        Return the magnitude pattern where all the gap pixels are filled with interpolation values.
 
-        :param gaussian_filter:
-        :param gaussian_sigma:
-        :param bin_num:
         :return:
         """
         return util.fill_detector_gap(magnitude=self.magnitude,
-                                      magnitude_mask=self.magnitude_mask,
-                                      origin=self.center_in_pixel,
-                                      gaussian_filter=gaussian_filter,
-                                      gaussian_sigma=gaussian_sigma,
-                                      bin_num=bin_num)
+                                      magnitude_mask=self.magnitude_mask)
 
     def set_magnitude(self, magnitude):
         self.magnitude = magnitude
