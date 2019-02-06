@@ -4,6 +4,7 @@ from scipy import stats
 from skimage import morphology
 import numba
 from numba import float64, int64, void
+from scipy.interpolate import RegularGridInterpolator
 
 """
     Some functions are shared by both cpu and gpu algorithms,
@@ -113,7 +114,7 @@ def resolve_trivial_ambiguity(array, reference_array):
 
     # Generate a list of all possible flips
     tmp_list = np.meshgrid(*(np.array([0, 1], dtype=np.int64),) * dim)
-    flip_list = np.transpose(np.stack((x.flatten() for x in tmp_list)))
+    flip_list = np.transpose(np.stack((np.reshape(x, np.power(2, dim)) for x in tmp_list)))
     flip_num = np.power(2, dim)
 
     # Loop through all the possible flips
@@ -318,47 +319,30 @@ def get_support_from_autocorrelation(magnitude, magnitude_mask, origin,
     return support_holder
 
 
-def fill_detector_gap(magnitude, magnitude_mask, origin, gaussian_filter=True,
-                      gaussian_sigma=1., bin_num=300):
+def fill_detector_gap(magnitude, magnitude_mask):
     """
-    Fill the gaps in the detector will the corresponding average value for that radial region.
+    Previously, I think radial value is a good choice to fill the gaps. Now, I do not think so.
+    I will simply use "from scipy.interpolate import RegularGridInterpolator" to handle this.
+    It is basically, a N-d linear interpolation.
 
     :param magnitude:
     :param magnitude_mask:
-    :param origin:
-    :param gaussian_filter:
-    :param gaussian_sigma:
-    :param bin_num:
     :return:
     """
 
-    # Get the radial info
-    (catmap,
-     mean_holder,
-     ends,
-     distance) = get_radial_info(pattern=magnitude,
-                                 pattern_mask=magnitude_mask,
-                                 origin=origin,
-                                 bin_num=bin_num)
+    # Get pixel number
+    pixel_num = np.prod(magnitude.shape)
 
-    # Fill the gaps
-    magnitude_filled = np.zeros_like(magnitude)
+    # Create coordinate mesh grid
+    coordiantes = np.meshgrid(*(np.arange(x, dtype=np.int64) for x in magnitude.shape))
 
-    # Create a tmp mask for convenience
-    mask_tmp = np.zeros_like(magnitude, dtype=np.bool)
-    magmask_tmp = np.logical_not(magnitude_mask)
+    # Turn them into 1D array
+    coordiantes = [np.reshape(x, pixel_num) for x in coordiantes]
 
-    for l in range(bin_num):
-        mask_tmp[:] = False
-        mask_tmp[(catmap == bin_num) & magmask_tmp] = True
+    # 
 
-        magnitude_filled[mask_tmp] = mean_holder[l]
-
-    if gaussian_filter:
-        magnitude_filled = ndimage.gaussian_filter(input=magnitude_filled,
-                                                   sigma=gaussian_sigma)
-
-    return magnitude_filled
+    # Step 1: Create an interpolation object
+    my_interpolating_function = RegularGridInterpolator(coordiantes, data)
 
 
 def approximate_magnitude_projection(dens, mag, eps):

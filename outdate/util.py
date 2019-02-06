@@ -62,3 +62,49 @@ def get_gaussian_filter(extend, sigma, dimension):
     np.exp(holder, out=holder)
 
     return holder
+
+
+def fill_detector_gap(magnitude, magnitude_mask, origin, gaussian_filter=True,
+                      gaussian_sigma=1., bin_num=300):
+    """
+    Fill the gaps in the detector will the corresponding average value for that radial region.
+
+    :param magnitude:
+    :param magnitude_mask:
+    :param origin:
+    :param gaussian_filter:
+    :param gaussian_sigma:
+    :param bin_num:
+    :return:
+    """
+
+    # Get the radial info
+    (catmap,
+     mean_holder,
+     ends,
+     distance) = get_radial_info(pattern=magnitude,
+                                 pattern_mask=magnitude_mask,
+                                 origin=origin,
+                                 bin_num=bin_num)
+
+    # Fill the gaps
+    magnitude_filled = np.zeros_like(magnitude)
+
+    # Create a tmp mask for convenience
+    mask_tmp = np.zeros_like(magnitude, dtype=np.bool)
+    magmask_tmp = np.logical_not(magnitude_mask)
+
+    for l in range(bin_num):
+        mask_tmp[:] = False
+        mask_tmp[(catmap == bin_num) & magmask_tmp] = True
+
+        magnitude_filled[mask_tmp] = mean_holder[l]
+
+    if gaussian_filter:
+        magnitude_filled = ndimage.gaussian_filter(input=magnitude_filled,
+                                                   sigma=gaussian_sigma)
+
+    return magnitude_filled
+
+
+l
