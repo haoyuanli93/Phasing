@@ -28,7 +28,7 @@ I think I have completely rewritten the code, especially in this second version.
 I am not sure if there are still some remnant codes coming from that repo. Therefore I'll still 
 keep the link here for record. 
 
-## [Developer] Project Structure
+# [Developer] Project Structure
 
 This package is divided in to three layers. 
 
@@ -44,10 +44,51 @@ ToolChain.py is of an even higher level. However, it is not a superclass of obje
 
 Basically, it has a property called the algorithm_sequence which is a list containing several dictionaries. Each dictionary can be used to initialize an AlterPorj object. The user can use a pre-designed algorithm-sequence to process the image. The user may also modify existing sequences and fine tune the behavior. 
 
-Before I create this object, I thought it would be useful. However, not so much anymore, because I just find it a little bit clumsy. 
+Before I create this object, I thought it would be useful. However, not so much anymore, because I just find it a little bit clumsy. However, this does mean it is totally useless. In the future, if one would like to tune the default algorithm sequences carefully and find several very robust solutions to several general and common siturations, this object can still be useful.
+
+# Example and working flow
+This section explains how this package works. What's the suggested solution in several common situations.
+
+Examples to these situations are stored in jupyer notebook files in the *Example* folder. 
+
+There are several things to notice. 
+
+1. Usually, one needs to do multiple reconstructions and compare all the reconstructed densities with correlatoins and selected the best one. This is best done with MPI. However, I did not implement that. Instead, one has to write such a script oneself. 
+2. Theoretically, the difference between 2D and 3D is mainly about the speed. However, in reality, the different is huge. 2D patterns are mainly photon counts which suffer from serious Poisson noise while 3D patterns are mainly reconstructed smooth patterns. No Poisson noise, but there are some other more subtle noise.
+3. The detector gaps and beam stops could have significant influences on the initial support which in turn can greatly influence the reconstructed image.
+4. I have not implemented any metrics to measure the convergence.
+5. There are some useful functions to shift the image to the center and search all possible flips to resolve the trivial ambiguity.
+
+## Example 1: No noise, no gaps, support from auto-correlation
+This 
+
+## Example 2: Noisy, no gaps, support from auto-correlatoin
+
+## Example 3: Noisy, with beam stop, support from auto-correlation
+
+## Example 4: Noisy, with beam stop, square support
 
 
-## Package Dependence
+# Tune the behavior
+
+## Simple initialization
+
+1. Create a AlterProj object. This object is the interface for all the later on calculation.
+2. Initialize the object with the magnitude and the mask for the magnitude. Notice that the 
+magnitude should have been shifted with numpy.fft.ifftshift
+3. Set the behavior of the object to be the default behavior
+4. Execute the algorithm
+
+## Complex initialization
+
+1. Create a AlterProj object. This object is the interface for all the later on calculation.
+2. Initialize the object with the magnitude and the mask for the magnitude. Notice that the 
+magnitude should have been shifted with numpy.fft.ifftshift
+3. Initialize the support with whatever you think is proper.
+3. Initialize the algorithm 
+4. Set the behavior of the shrink-wrap algorithm.
+
+# Package Dependence
 This repo depends on the following packages:
 
     1.numpy
@@ -62,47 +103,23 @@ packages:
 
     1. matplotlib
     2. jupyter notebook
-    
-## Detailed Record
-Honestly, I have not idea how to name this section. There is quite a lot I would like to 
-elaborate here.
 
-### What has been done
-First, the user can use CPU for simulation with the available algorithms now. However, there are 
-still a lot to be done.
+# Important API
+A complete documentation of the APIs is beyond my capibility. Please check the source code. At present, I only maintain important APIs here and make sure the documentation of the source code is good.
 
-### What to be done
+# Detailed Record
+This section contains some important record for later development.
+
+## What to be done
 - Fix the default behavior of the CpuAlterProj object. I think there is some problem with the 
 initialization when one changed the algorithm and some other parameters
 - Add a comprehensive test.
 - Write a demo
 - Furnish the doc
 
-### What can be done for the next developer if there is any
+## What can be done for the next developer 
 - Add GPU support. Therefore, if the user needs to analysis a large object, then the GPU can 
 speed up the calculation a lot. 
 - However, I have no plan for multiple GPU reconstruction in parallel. Because it's just a 
 little bit too tricky at present.
 - Add metrics to measure the convergence progress and the convergence property.
-
-### What's the working flow with this package
-
-#### Simple initialization
-
-1. Create a AlterProj object. This object is the interface for all the later on calculation.
-2. Initialize the object with the magnitude and the mask for the magnitude. Notice that the 
-magnitude should have been shifted with numpy.fft.ifftshift
-3. Set the behavior of the object to be the default behavior
-4. Execute the algorithm
-
-#### Complex initialization
-
-1. Create a AlterProj object. This object is the interface for all the later on calculation.
-2. Initialize the object with the magnitude and the mask for the magnitude. Notice that the 
-magnitude should have been shifted with numpy.fft.ifftshift
-3. Initialize the support with whatever you think is proper.
-3. Initialize the algorithm 
-4. Set the behavior of the shrink-wrap algorithm.
-
-
-
