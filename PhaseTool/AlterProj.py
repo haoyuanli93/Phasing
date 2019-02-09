@@ -1,7 +1,9 @@
 import numpy as np
 import copy
+from skimage import morphology
 from PhaseTool import util
 from PhaseTool import CpuUtil
+
 
 """
 This is the main interface to the applications.
@@ -285,7 +287,7 @@ class CpuAlterProj:
         self.update_holder_dict()
 
     def use_auto_support(self, threshold=0.04, gaussian_filter=True,
-                         sigma=1.0, fill_detector_gap=True):
+                         sigma=1.0, fill_detector_gap=True, convex_hull=False):
         """
         Generate a support from the autocorrelation function calculated from the support info.
 
@@ -303,6 +305,7 @@ class CpuAlterProj:
                                 auto correlation. By default, one should use this filter.
         :param sigma: The sigma value used in the Gaussian filter.
         :param fill_detector_gap: Whether to fill those gaps in the detector.
+        :param convex_hull: Use the convex hull as the support.
         :return:
         """
 
@@ -314,6 +317,11 @@ class CpuAlterProj:
             gaussian_sigma=sigma,
             flag_fill_detector_gap=fill_detector_gap,
         )
+
+        support_tmp = np.fft.ifftshift(support_tmp)
+        if convex_hull is True:
+            support_tmp = morphology.convex_hull_image(support_tmp)
+        support_tmp = np.fft.fftshift(support_tmp)
 
         self.support = support_tmp
         # Update the input dictionary
@@ -802,11 +810,12 @@ class CpuAlterProj:
         else:
             magnitude_tmp = self.magnitude
 
+        magnitude_tmp = magnitude_tmp.astype(np.complex128)
         # Step 3: Get all the values
         self.diffraction = np.multiply(phase_array, magnitude_tmp)
 
         if method in ('Random', 'Zero', 'Minimal'):
-            self.density = np.fft.ifftn(self.diffraction).real
+            self.density = np.abs(np.fft.ifftn(self.diffraction))
 
         else:
             self.density = np.copy(phase_array)
@@ -954,8 +963,8 @@ class CpuAlterProj:
 
         :return:
         """
-        return util.fill_detector_gap(magnitude=self.magnitude,
-                                      magnitude_mask=self.magnitude_mask)
+        return util.fill_detector_gap(magnitude=np.fft.fftshift(self.magnitude),
+                                      magnitude_mask=np.fft.fftshift(self.magnitude_mask))
 
     def set_magnitude(self, magnitude):
         self.magnitude = magnitude

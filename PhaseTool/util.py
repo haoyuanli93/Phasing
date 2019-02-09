@@ -328,6 +328,10 @@ def fill_detector_gap(magnitude, magnitude_mask):
     :return:
     """
 
+    # check for nan
+    if np.isnan(np.sum(magnitude)):
+        raise Exception("There are some nan values in the magnitude array.")
+
     # Step 1: Check if there is any gap:
     if np.all(magnitude_mask):
 
@@ -359,10 +363,6 @@ def fill_detector_gap(magnitude, magnitude_mask):
         # Fill pixels inside the gaps with the interpolated values
         mag_copy = np.copy(magnitude)
         mag_copy[unknown_points_list] = interpolate_value
-
-        # check for nan
-        if np.isnan(np.sum(mag_copy)):
-            raise Exception("There are some nan values in the new array.")
 
         return mag_copy
 
