@@ -58,6 +58,7 @@ There are several things to notice.
 3. The detector gaps and beam stops could have significant influences on the initial support which in turn can greatly influence the reconstructed image.
 4. I have not implemented any metrics to measure the convergence.
 5. There are some useful functions to shift the image to the center and search all possible flips to resolve the trivial ambiguity.
+6. I find the shrink-wrap function not stable. I have no idea why this is the case. I can not find a 
 
 ## Example 1: No noise, no gaps, support from auto-correlation
 This 

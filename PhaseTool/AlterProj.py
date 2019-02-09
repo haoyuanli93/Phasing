@@ -306,15 +306,16 @@ class CpuAlterProj:
         :return:
         """
 
-        self.support = util.get_support_from_autocorrelation(
-            magnitude=self.magnitude,
-            magnitude_mask=self.magnitude_mask,
+        support_tmp = util.get_support_from_autocorrelation(
+            magnitude=np.fft.ifftshift(self.magnitude),
+            magnitude_mask=np.fft.ifftshift(self.magnitude_mask),
             threshold=threshold,
             gaussian_filter=gaussian_filter,
             gaussian_sigma=sigma,
             flag_fill_detector_gap=fill_detector_gap,
         )
 
+        self.support = support_tmp
         # Update the input dictionary
         self.data_dict["support"] = self.support
         self.holder_dict["support not"] = np.logical_not(self.support)
@@ -543,7 +544,7 @@ class CpuAlterProj:
         elif self.algorithm == "RAAR":
             self.param_dict["par_c"] = 1 - 2 * beta
             self.param_dict["par_d"] = beta
-        elif self.algorithm == "GIF-HPR":
+        elif self.algorithm == "GIF-RAAR":
             self.param_dict["par_a"] = 1 + beta
             self.param_dict["par_b"] = - beta
             self.param_dict["par_c"] = 1 - 2 * beta

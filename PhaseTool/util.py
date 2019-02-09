@@ -1,10 +1,9 @@
 import numpy as np
 from scipy import ndimage
-from scipy import stats
 from skimage import morphology
 import numba
 from numba import float64, int64, void
-from scipy.interpolate import RegularGridInterpolator
+from scipy.interpolate import LinearNDInterpolator
 
 """
     Some functions are shared by both cpu and gpu algorithms,
@@ -15,7 +14,8 @@ from scipy.interpolate import RegularGridInterpolator
 epsilon = np.finfo(np.float64).eps
 
 
-def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, convex_hull=False):
+def shrink_wrap(density, sigma=1., threshold_ratio=0.04,
+                filling_holds=False, convex_hull=False):
     """
     This function derive
 
@@ -24,9 +24,11 @@ def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, con
     :param sigma:
     :param threshold_ratio:
     :param filling_holds:
+=
     :return:
     """
-    density_smooth = ndimage.gaussian_filter(input=density, sigma=sigma)
+
+    density_smooth = ndimage.gaussian_filter(input=np.fft.ifftshift(density), sigma=sigma)
     den_min = np.min(density_smooth)
     den_span = np.max(density_smooth) - den_min
 
@@ -36,6 +38,7 @@ def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, con
 
     # Take a threshold
     threshold = threshold_ratio * den_span + den_min
+    # threshold = threshold_ratio * den_span
 
     # Apply the threshold
     support_tmp[density_smooth >= threshold] = True
@@ -49,7 +52,7 @@ def shrink_wrap(density, sigma=1, threshold_ratio=0.04, filling_holds=False, con
     else:
         support = np.copy(support_tmp)
 
-    return support
+    return np.fft.fftshift(support)
 
 
 def get_autocorrelation(image):
@@ -118,12 +121,13 @@ def resolve_trivial_ambiguity(array, reference_array):
     flip_num = np.power(2, dim)
 
     # Loop through all the possible flips
-    correlation = np.zeros(flip_num, dtype=np.float64)  # Holder for correlation value
+    similarity_score = np.zeros(flip_num, dtype=np.float64)  # Holder for similarity score
     for l in range(flip_num):
 
         flip_array = np.copy(array)  # Holder for the flipped array
         # Calculated the flipped array
         for m in range(dim):
+
             if flip_list[l, m] == 1:
                 flip_array = np.flip(flip_array, axis=m)
 
@@ -131,11 +135,11 @@ def resolve_trivial_ambiguity(array, reference_array):
         shifted_array = shift_to_center(flip_array)
 
         # Calculate the correlation between the reference and the shifted array
-        correlation[l] = stats.pearsonr(shifted_array, sr_array)[0]
+        similarity_score[l] = np.sqrt(np.sum(np.square(shifted_array - sr_array)))
 
     # Find the array with the largest correlation
-    idx = np.argmax(correlation)
-    cor_val = correlation[idx]
+    idx = np.argmin(similarity_score)
+    cor_val = similarity_score[idx]
 
     # Constructed the selected array
     flip_array = np.copy(array)
@@ -272,7 +276,6 @@ def get_support_from_autocorrelation(magnitude, magnitude_mask,
                                      gaussian_sigma=1.,
                                      flag_fill_detector_gap=False):
     """
-
     :param magnitude:
     :param magnitude_mask:
     :param threshold:
@@ -283,8 +286,7 @@ def get_support_from_autocorrelation(magnitude, magnitude_mask,
     """
 
     # Step 1. Check if I need to fix those gaps.
-    if flag_fill_detector_gap:
-
+    if flag_fill_detector_gap is True:
         # Create a variable to handle both case at the same time
         data_tmp = fill_detector_gap(magnitude=magnitude,
                                      magnitude_mask=magnitude_mask)
@@ -302,11 +304,13 @@ def get_support_from_autocorrelation(magnitude, magnitude_mask,
     # Step 3. Get the threshold and get the support.
 
     # Set all the pixels with values lower than the threshold to be zero.
-    # Notice that here, the ture threshold (threshold_t) is low + threshold * span
+    # Notice that here, the true threshold (threshold_t) is low + threshold * span
     low = np.min(autocorrelation)
     span = np.max(autocorrelation) - low
-
     threshold_t = low + threshold * span
+
+    print("The true threshold is {}".format(threshold_t))
+
     support_holder = np.ones_like(magnitude_mask, dtype=np.bool)
     support_holder[autocorrelation <= threshold_t] = False
 
@@ -336,7 +340,9 @@ def fill_detector_gap(magnitude, magnitude_mask):
         coordiantes = np.meshgrid(*(np.arange(x, dtype=np.int64) for x in magnitude.shape))
 
         # Apply the masks to extract the valid points
-        valid_points = [x[magnitude_mask] for x in coordiantes]
+        valid_points = (x[magnitude_mask] for x in coordiantes)
+        valid_points = np.transpose(np.stack(valid_points))
+
         valid_values = magnitude[magnitude_mask]
 
         # Apply the masks to find out where to interpolate
@@ -345,7 +351,7 @@ def fill_detector_gap(magnitude, magnitude_mask):
         unknown_points = np.transpose(np.stack(unknown_points_list))
 
         # Create an interpolation object
-        my_interpolating_function = RegularGridInterpolator(valid_points, valid_values)
+        my_interpolating_function = LinearNDInterpolator(valid_points, valid_values)
 
         # Carry out the interpolation
         interpolate_value = my_interpolating_function(unknown_points)
@@ -353,6 +359,10 @@ def fill_detector_gap(magnitude, magnitude_mask):
         # Fill pixels inside the gaps with the interpolated values
         mag_copy = np.copy(magnitude)
         mag_copy[unknown_points_list] = interpolate_value
+
+        # check for nan
+        if np.isnan(np.sum(mag_copy)):
+            raise Exception("There are some nan values in the new array.")
 
         return mag_copy
 
@@ -487,16 +497,14 @@ def get_smooth_sample(dim=2, space_length=128, support_length=48,
 
 
 class SmoothSample:
-    def __init__(self, dim=2, space_length=128, support_length=48, total_density=1e4,
+    def __init__(self, dim=2, space_length=128, support_length=32,
                  beam_stop=2, shot_noise=True, gaussian=True,
                  gaussian_mean=0, gaussian_sigma=1,
-                 obj_num=50, rlim_low=1, rlim_high=6):
+                 obj_num=34, rlim_low=1, rlim_high=6):
         """
         This generate a smooth sample and generate the corresponding diffraction information
 
         :param dim:
-        :param total_density: The summation of the density. This controls the diffraction
-                                strength.
         :param space_length: The length of the sample
         :param support_length: The region in which the centers of the objects are in
         :param beam_stop: The size of the beam stop
@@ -521,11 +529,6 @@ class SmoothSample:
                                          obj_num=obj_num,
                                          rlim_high=rlim_high,
                                          rlim_low=rlim_low)
-
-        # Normalize the sample
-        tmp = np.sum(self.density, dtype=np.float64)
-        tmp = float(total_density / tmp)
-        self.density *= tmp
 
         # Things that can not be measured
         self.diffraction = np.fft.fftshift(np.fft.fftn(self.density))
