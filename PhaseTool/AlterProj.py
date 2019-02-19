@@ -4,7 +4,6 @@ from skimage import morphology
 from PhaseTool import util
 from PhaseTool import CpuUtil
 
-
 """
 This is the main interface to the applications.
 
@@ -18,10 +17,13 @@ methods for the users to use.
 
 
 class CpuAlterProj:
-    def __init__(self):
+    def __init__(self, prtf_flag=True):
         """
         One can use this method to initialize a CDI object and can create a newer one
         with information from this object.
+
+        :param prtf_flag: Where to calculate the phase retrieval transfer function during the
+                          calculation
         """
 
         # Meta parameters
@@ -107,6 +109,13 @@ class CpuAlterProj:
         self.beta = 0.75 * np.ones(self.iter_num, dtype=np.float64)
         self.beta_decay = True
         self.beta_decay_rate = 20
+
+        ########################
+        # Phase retrieval transfer function
+        ########################
+        self.prtf_flag = prtf_flag
+        self.prtf_num = 1.
+        self.prtf_array = np.zeros_like(self.diffraction, dtype=np.complex128)
 
         ########################
         # Dictionaries
@@ -351,6 +360,13 @@ class CpuAlterProj:
         """
         self.density = density
         self.data_dict["density"] = self.density
+
+        # Update the value of the diffraction
+        tmp = np.fft.fftn(self.density)
+        phase = util.get_phase(tmp)
+        self.diffraction = np.multiply(self.magnitude, phase)
+
+        self.holder_dict["diffraction"] = self.diffraction
         print("The initial density is updated.")
 
     def set_beta_and_iter_num(self, iter_num, beta=None, decay=False, decay_rate=20):
@@ -565,7 +581,8 @@ class CpuAlterProj:
                             "self.set_algorithm.")
 
     def execute_algorithm(self, algorithm=None, beta=None, iter_num=None, beta_decay=None,
-                          beta_decay_rate=None, initial_density=None, shrink_wrap_on=None):
+                          beta_decay_rate=None, initial_density=None, shrink_wrap_on=None,
+                          prtf_flag=None):
         """
 
         :param algorithm:
@@ -575,7 +592,7 @@ class CpuAlterProj:
         :param beta_decay_rate:
         :param initial_density:
         :param shrink_wrap_on:
-
+        :param prtf_flag: Where to calculate the prtf array during the calculation
         :return:
         """
 
@@ -598,6 +615,17 @@ class CpuAlterProj:
             self.shrink_wrap_on = shrink_wrap_on
             if shrink_wrap_on:
                 print("Enable shrink wrap function.")
+
+        # Tune the prtf behavior
+        if prtf_flag in (True, False):
+            self.prtf_flag = prtf_flag
+
+        # If utilize teh prtf function then update the
+        if self.prtf_flag:
+            # Check if this is the first time to calculate the prtf function
+            # since if this is the first time, then one would need to initialize the function
+            if (self.prtf_num > 0.5) and (self.prtf_num < 1.5):
+                self.prtf_array = util.get_phase(self.diffraction)
 
         # Prepare for the calculation
         if not (self.algorithm in self.available_algorithms):
@@ -641,6 +669,13 @@ class CpuAlterProj:
                             self.set_support(support=tmp)
                             self.update_shrink_wrap_properties()
 
+                    # Step 3: Check if one needs to calculate the prtf function
+                    if self.prtf_flag:
+                        self.prtf_num += 1.
+                        # Update the prtf array
+                        self.prtf_array[:] *= (self.prtf_num - 1)/self.prtf_num
+                        self.prtf_array[:] += self.holder_dict["phase holder"]/self.prtf_num
+
             else:
 
                 for idx in range(self.iter_num):
@@ -673,6 +708,14 @@ class CpuAlterProj:
 
                             self.set_support(support=tmp)
                             self.update_shrink_wrap_properties()
+
+                    # Step 5: Check if one needs to calculate the prtf function
+                    if self.prtf_flag:
+                        self.prtf_num += 1.
+                        # Update the prtf array
+                        self.prtf_array[:] *= (self.prtf_num - 1) / self.prtf_num
+                        self.prtf_array[:] += self.holder_dict[
+                                                  "phase holder"] / self.prtf_num
 
     def shrink_warp_properties(self, on=False, threshold_ratio=0.04, sigma=5.0, decay_rate=30,
                                threshold_ratio_decay_ratio=1.0, sigma_decay_ratio=0.95,
