@@ -94,8 +94,6 @@ This repo depends on the following packages:
 
     1.numpy
     2.numba
-    3.cudatoolkit
-    4.pyculib
     5.scipy
     6.scikit-image
  

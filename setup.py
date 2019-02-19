@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name='PhaseTool',
-    version='dev',
+    version='cpu',
     description=(
         'This package contains different PhaseTool retrieval algorithms. '),
     long_description=("In this package, I try to implement all PhaseTool "
@@ -17,8 +17,6 @@ setup(
                       'matplotlib',
                       'h5py',
                       'numba',
-                      'cudatoolkit',
-                      'pyculib',
                       'scipy',
                       'scikit-image'],
     platforms=["Linux"],
