@@ -236,7 +236,7 @@ def get_radial_info(pattern, pattern_mask, origin, bin_num=300):
     cat_stop = np.max(catmap_masked)
 
     # Get the mean value
-    mean_holder = np.zeros(bin_num, dtype=np.float64)
+    mean_holder = np.zeros(bin_num, dtype=pattern.dtype)
     for l in range(cat_start, cat_stop):
         mean_holder[l] = np.mean(pattern[catmap == l])
 

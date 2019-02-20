@@ -624,8 +624,15 @@ class CpuAlterProj:
         if self.prtf_flag:
             # Check if this is the first time to calculate the prtf function
             # since if this is the first time, then one would need to initialize the function
+
+            # This variable is used to obtain the 0 frequence mode
+            # The phase of this mode is normalized to zero.
+            center_pixel_position = (0,) * self.center_in_pixel.shape[0]
+
             if (self.prtf_num > 0.5) and (self.prtf_num < 1.5):
                 self.prtf_array = util.get_phase(self.diffraction)
+                # Normalize the center pixel's phase
+                self.prtf_array /= self.prtf_array[center_pixel_position]
 
         # Prepare for the calculation
         if not (self.algorithm in self.available_algorithms):
@@ -673,8 +680,11 @@ class CpuAlterProj:
                     if self.prtf_flag:
                         self.prtf_num += 1.
                         # Update the prtf array
-                        self.prtf_array[:] *= (self.prtf_num - 1)/self.prtf_num
-                        self.prtf_array[:] += self.holder_dict["phase holder"]/self.prtf_num
+                        self.prtf_array[:] *= (self.prtf_num - 1) / self.prtf_num
+                        phase = self.holder_dict["phase holder"]
+                        phase /= phase[center_pixel_position]
+
+                        self.prtf_array[:] += phase / self.prtf_num
 
             else:
 
@@ -714,8 +724,10 @@ class CpuAlterProj:
                         self.prtf_num += 1.
                         # Update the prtf array
                         self.prtf_array[:] *= (self.prtf_num - 1) / self.prtf_num
-                        self.prtf_array[:] += self.holder_dict[
-                                                  "phase holder"] / self.prtf_num
+                        phase = self.holder_dict["phase holder"]
+                        phase /= phase[center_pixel_position]
+
+                        self.prtf_array[:] += phase / self.prtf_num
 
     def shrink_warp_properties(self, on=False, threshold_ratio=0.04, sigma=5.0, decay_rate=30,
                                threshold_ratio_decay_ratio=1.0, sigma_decay_ratio=0.95,

@@ -144,7 +144,7 @@ def error_reduction(data_dict, holder_dict):
     # Get holder variables
     support_n = holder_dict['support not']
 
-    ndiff_m = holder_dict['new diffraction magnitude']
+    # ndiff_m = holder_dict['new diffraction magnitude']
     ndiff_c = holder_dict['diffraction with magnitude constrain']
 
     phase = holder_dict['phase holder']
@@ -153,11 +153,16 @@ def error_reduction(data_dict, holder_dict):
     ndiff_c[:] = np.fft.fftn(density)
 
     # Step 2: Apply magnitude constrain to the diffraction
-    np.absolute(np.absolute(ndiff_c[mag_m]), out=ndiff_m[mag_m])
-    np.divide(ndiff_c[mag_m], ndiff_m[mag_m],
-              out=phase[mag_m], where=ndiff_m[mag_m] > 0)
+    phase[:] = util.get_phase(ndiff_c)
+    ndiff_c[mag_m] = np.multiply(mag[mag_m], phase[mag_m])
 
-    np.multiply(mag[mag_m], phase[mag_m], out=ndiff_c[mag_m])
+    # This is the previous implementation. Somehow, it's hard to extract the
+    # PRTF information from this method.
+    #
+    # np.absolute(np.absolute(ndiff_c[mag_m]), out=ndiff_m[mag_m])
+    # np.divide(ndiff_c[mag_m], ndiff_m[mag_m],
+    #          out=phase[mag_m], where=ndiff_m[mag_m] > 0)
+    # np.multiply(mag[mag_m], phase[mag_m], out=ndiff_c[mag_m])
 
     # Step 3: Get the updated density
     density[:] = np.fft.ifftn(ndiff_c).real
